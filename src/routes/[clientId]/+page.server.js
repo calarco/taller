@@ -1,0 +1,30 @@
+import { switchThemeAction } from '$lib/server/controllers/User.controller.js';
+import { createCarMakeAction } from '$lib/server/controllers/CarMake.controller.js'
+import { createCarModelAction } from '$lib/server/controllers/CarModel.controller.js';
+import { upsertClientAction, deleteClientAction } from '$lib/server/controllers/Client.controller.js';
+import { upsertVehicleAction } from '$lib/server/controllers/Vehicle.controller.js';
+
+export const actions = {
+	switchTheme: async (event) => {
+		return await switchThemeAction(event);
+	},
+	logout: async (event) => {
+		event.cookies.delete('auth-token', { path: '/' });
+		event.cookies.delete('userId', { path: '/' });
+	},
+	createCarMake: async (event) => {
+		return await createCarMakeAction(event)
+	},
+	createCarModel: async (event) => {
+		return await createCarModelAction(event)
+	},
+	upsertClient: async (event) => {
+		return await upsertClientAction(event);
+	},
+	deleteClient: async (event) => {
+		return await deleteClientAction(event);
+	},
+	upsertVehicle: async (event) => {
+		return await upsertVehicleAction(event);
+	}
+};
