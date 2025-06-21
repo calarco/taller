@@ -475,6 +475,7 @@ textarea {
 	max-height: 12.5rem;
 }
 
+input[name="clientName"],
 select {
 	display: block;
 	appearance: none;
@@ -602,8 +603,7 @@ input[type='date']:disabled,
 input[type='time']:disabled,
 input[type='password']:disabled,
 textarea:disabled,
-input[name='fabricante']:disabled,
-input[name='modelo']:disabled,
+input[name="clientName"]:disabled,
 select:disabled {
 	pointer-events: none;
 	outline: 1px solid rgba(0, 0, 0, 0);

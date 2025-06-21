@@ -62,14 +62,14 @@
 				<span class="icon edit"></span>
 			</button>
 		</div>
+		{#if windowState.activeCard === 'repair' && windowState.id === repair.repairId}
+			<RepairForm {repair} />
+		{/if}
+		<Dialog bind:dialog title="¿Borrar reparacion?" action="?/deleteRepair">
+			<input type="hidden" name="repairId" value={repair?.repairId} />
+			{@render repairContent()}
+		</Dialog>
 	{/if}
-	{#if windowState.activeCard === 'repair' && windowState.id === repair.repairId}
-		<RepairForm {repair} />
-	{/if}
-	<Dialog bind:dialog title="¿Borrar reparacion?" action="?/deleteRepair">
-		<input type="hidden" name="repairId" value={repair?.repairId} />
-		{@render repairContent()}
-	</Dialog>
 </Card>
 
 <style>

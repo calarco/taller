@@ -26,7 +26,7 @@
 		{/if}
 		<div class="dialogButtons">
 			<button type="button" onclick={() => dialog.close()}>Cancelar</button>
-			<button type="submit" onclick={() => dialog.close()}>{actionText || 'Borrar'}</button>
+			<button type="submit" onclick={() => dialog.close()} class={[{ save: actionText === 'Guardar' }]}>{actionText || 'Borrar'}</button>
 		</div>
 	</form>
 </dialog>
@@ -55,6 +55,10 @@
 			text-align: center;
 			padding: 0.75rem 1rem;
 			border-bottom: var(--border-variant);
+		}
+
+		.dialogButtons > .save {
+			color: var(--secondary);
 		}
 	}
 

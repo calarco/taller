@@ -2,7 +2,7 @@ import { error, fail, redirect, isRedirect } from '@sveltejs/kit';
 import { getModel } from '$lib/server/db';
 import { createCarModel } from '$lib/server/controllers/CarModel.controller.js';
 import { upsertClient } from '$lib/server/controllers/Client.controller';
-import { deleteRepairs } from '$lib/server/controllers/Repair.controller';
+import { deleteRepairs, moveRepairs } from '$lib/server/controllers/Repair.controller';
 
 export function findVehicle(userId, filters) {
 	const Vehicle = getModel(userId, 'Vehicle');
@@ -21,7 +21,10 @@ export function deleteByVehicleId(userId, vehicleId) {
 
 export async function upsertVehicle(userId, vehicle) {
 	const Vehicle = getModel(userId, 'Vehicle');
-	const data = await Vehicle.findOneAndUpdate({ vehicleId: vehicle.vehicleId }, vehicle, { new: true, upsert: true });
+	const data = await Vehicle.findOneAndUpdate({ vehicleId: vehicle.oldVehicleId || vehicle.vehicleId }, vehicle, { new: true, upsert: true });
+	if (vehicle.oldVehicleId && vehicle.oldVehicleId !== vehicle.vehicleId) {
+		await moveRepairs(userId, vehicle.oldVehicleId, vehicle.vehicleId);
+	}
 	await upsertClient(userId, { clientId: data.clientId, updatedAt: true });
 	return data;
 }
@@ -36,7 +39,8 @@ export async function upsertVehicleAction(event) {
 		const form = await event.request.formData();
 		const vehicle = {
 			vehicleId: (form.get('vehicleId') || '').replace(/\s+/g, '').toUpperCase(),
-			clientId: event.params.clientId,
+			oldVehicleId: form.get('oldVehicleId'),
+			clientId: form.get('clientId') || event.params.clientId,
 			carMakeId: form.get('carMakeId'),
 			carModelId: form.get('carModelId'),
 			carModelName: form.get('carModelName'),
@@ -48,6 +52,9 @@ export async function upsertVehicleAction(event) {
 
 		if (!vehicle.vehicleId) {
 			return fail(400, { vehicleIdError: 'Ingrese la patente' });
+		}
+		if (!vehicle.clientId) {
+			return fail(400, { clientIdError: 'Ingrese el cliente' });
 		}
 		if (event.params.vehicleId !== vehicle.vehicleId) {
 			const existing = await findVehicle(userId, { vehicleId: vehicle.vehicleId });

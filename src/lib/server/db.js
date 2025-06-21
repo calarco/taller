@@ -50,7 +50,7 @@ export async function initDatabase() {
 export function getModel(userId, model) {
 	let name = 'taller';
 	if (model !== 'User') {
-		if (userId === 'test2') {
+		if (userId === 'montiel') {
 			name = 'montiel';
 		}
 	}

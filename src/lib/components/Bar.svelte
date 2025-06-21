@@ -59,20 +59,13 @@
 			position: relative;
 			width: 100%;
 			max-width: 91rem;
+			border-radius: 4px;
+			overflow: hidden;
 			background: var(--surface);
 			box-shadow: var(--shadow);
 			display: grid;
 			grid-template-columns: 1fr auto auto;
 			gap: 1px;
-
-			&::after {
-				content: '';
-				position: absolute;
-				top: 0;
-				bottom: 0;
-				left: -1px;
-				border-left: var(--border-variant);
-			}
 
 			p {
 				position: relative;
@@ -100,7 +93,7 @@
 				font: 500 0.75rem/1.25rem var(--font-family);
 				color: var(--primary);
 
-				&::after {
+				&:first-child:after {
 					content: '';
 					position: absolute;
 					top: 0;

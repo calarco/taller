@@ -24,6 +24,11 @@ export async function upsertRepair(userId, repair) {
 	return data;
 }
 
+export function moveRepairs(userId, oldId, newId) {
+	const Repair = getModel(userId, 'Repair');
+	return Repair.updateMany({ vehicleId: oldId }, { vehicleId: newId });
+}
+
 async function getNewId(userId) {
 	let max = 1;
 	const repair = await findRepair(userId, {}, { repairId: 1 }).sort({ repairId: -1 }).collation({ locale: 'en_US', numericOrdering: true });
