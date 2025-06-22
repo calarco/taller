@@ -349,7 +349,7 @@
 			height: 100%;
 			position: relative;
 			padding: 0 1rem;
-			min-width: 4.25rem;
+			width: 6rem;
 			text-align: right;
 			text-transform: uppercase;
 			font-family: var(--font-family-alt);

@@ -37,7 +37,7 @@ export async function getSearch(userId, value) {
 				carModelId: x.vehicles?.carModelId,
 				repairId: x.vehicles?.repairs?.repairId,
 				description: x.vehicles?.repairs?.description,
-				updatedAt: new Date(Math.max(x.vehicles?.repairs?.updatedAt, x.vehicles?.updatedAt, x.updatedAt)),
+				updatedAt: new Date(Math.max(x.vehicles?.repairs?.updatedAt || 0, x.vehicles?.updatedAt || 0, x.updatedAt)),
 			})),
 		];
 
