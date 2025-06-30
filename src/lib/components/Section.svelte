@@ -8,7 +8,9 @@
 
 <section class={[{ notOverlay: !overlay, cards }]}>
 	{@render children()}
-	<div class="padding"></div>
+	{#if cards}
+		<div class="padding"></div>
+	{/if}
 	{#if overlay}
 		<div class="overlay" role="button" tabindex="0" aria-pressed="false" onkeyup={() => {}} onkeydown={() => {}} onclick={() => {
 			windowState.activeCard = '';
@@ -33,6 +35,8 @@
 		overflow-y: hidden;
 
 		&.cards {
+			background: var(--surface);
+			box-shadow: var(--shadow);
 			padding: 1.5rem;
 			padding-left: calc(1.5rem + 8px);
 			gap: 1.5rem;

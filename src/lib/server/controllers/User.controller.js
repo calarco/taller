@@ -1,7 +1,7 @@
 import { error, fail } from '@sveltejs/kit';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { SECRET_JWT_KEY } from '$env/static/private';
+import { JWT_KEY } from '$env/static/private';
 import { getModel } from '$lib/server/db';
 
 export function findUser(userId, filters) {
@@ -15,7 +15,7 @@ export function authenticate(cookies) {
 		if (!token) {
 			return;
 		}
-		const auth = jwt.verify(token, SECRET_JWT_KEY);
+		const auth = jwt.verify(token, JWT_KEY);
 		return auth;
 	} catch (err) {
 		throw error(500, err.body || err.toString());
@@ -43,7 +43,7 @@ export async function loginUserAction(event) {
 			return fail(400, { passwordError: 'Contraseña incorrecta' });
 		}
 
-		const token = jwt.sign({ id: user._id.toString() }, SECRET_JWT_KEY);
+		const token = jwt.sign({ id: user._id.toString() }, JWT_KEY, { expiresIn: '5040h' });
 		const options = {
 			httpOnly: true,
 			secure: true,
@@ -89,7 +89,7 @@ export async function createUserAction(event) {
 
 export async function switchThemeAction(event) {
 	try {
-		const userId = event.cookies.get('userId')
+		const userId = event.cookies.get('userId');
 		if (!userId) {
 			return;
 		}

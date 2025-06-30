@@ -4,7 +4,7 @@
 	import Form from '$lib/components/Form.svelte';
 	import Label from '$lib/components/Label.svelte';
 
-	let client = windowState.id !== '' ? page.data.client : {};
+	let client = $derived(windowState.id ? page.data.client : {});
 </script>
 
 <Form action="?/upsertClient" --grid-columns="1fr 1fr [end]">

@@ -13,4 +13,11 @@ CarModelSchema.index({ carModelId: 1 });
 CarModelSchema.set('toObject', { virtuals: true });
 CarModelSchema.set('toJSON', { virtuals: true });
 
+CarModelSchema.virtual('carMake', {
+	ref: 'CarMake',
+	localField: 'carMakeId',
+	foreignField: 'carMakeId',
+	justOne: true
+});
+
 export default CarModelSchema;

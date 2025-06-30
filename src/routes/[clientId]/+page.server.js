@@ -1,8 +1,9 @@
 import { switchThemeAction } from '$lib/server/controllers/User.controller.js';
-import { createCarMakeAction } from '$lib/server/controllers/CarMake.controller.js'
+import { createCarMakeAction } from '$lib/server/controllers/CarMake.controller.js';
 import { createCarModelAction } from '$lib/server/controllers/CarModel.controller.js';
 import { upsertClientAction, deleteClientAction } from '$lib/server/controllers/Client.controller.js';
 import { upsertVehicleAction } from '$lib/server/controllers/Vehicle.controller.js';
+import { upsertEstimateAction } from '$lib/server/controllers/Estimate.controller.js';
 
 export const actions = {
 	switchTheme: async (event) => {
@@ -13,10 +14,10 @@ export const actions = {
 		event.cookies.delete('userId', { path: '/' });
 	},
 	createCarMake: async (event) => {
-		return await createCarMakeAction(event)
+		return await createCarMakeAction(event);
 	},
 	createCarModel: async (event) => {
-		return await createCarModelAction(event)
+		return await createCarModelAction(event);
 	},
 	upsertClient: async (event) => {
 		return await upsertClientAction(event);
@@ -26,5 +27,8 @@ export const actions = {
 	},
 	upsertVehicle: async (event) => {
 		return await upsertVehicleAction(event);
-	}
+	},
+	upsertEstimate: async (event) => {
+		return await upsertEstimateAction(event);
+	},
 };

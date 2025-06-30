@@ -27,8 +27,7 @@ VehicleSchema.virtual('client', {
 VehicleSchema.virtual('repairs', {
 	ref: 'Repair',
 	localField: 'vehicleId',
-	foreignField: 'vehicleId',
-	justOne: true
+	foreignField: 'vehicleId'
 });
 
 export default VehicleSchema;

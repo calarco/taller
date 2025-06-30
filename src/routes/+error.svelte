@@ -2,12 +2,21 @@
 	import { fade, fly, blur } from 'svelte/transition';
 	import { sineIn, sineOut } from 'svelte/easing';
 	import { page } from '$app/state';
+	import { windowState } from '$lib/shared.svelte.js';
 </script>
 
 <div class="container" in:fade={{ duration: 300, easing: sineOut }} out:fade={{ duration: 250, easing: sineIn }}>
 	<div in:fly={{ y: '-1rem', duration: 200, easing: sineOut }} out:blur={{ amount: 32, duration: 150, easing: sineIn }}>
 		<div>
-			<a class="button" href="/" aria-label="cerrar">
+			<a
+				class="button"
+				href="/"
+				aria-label="cerrar"
+				onclick={() => {
+					windowState.activeCard = '';
+					windowState.id = '';
+				}}
+			>
 				<span class="icon close"></span>
 			</a>
 			<h4>ERROR</h4>
@@ -67,6 +76,7 @@
 				padding: 0.5rem 1rem;
 				color: var(--on-foreground);
 				text-align: center;
+				user-select: text;
 			}
 		}
 	}

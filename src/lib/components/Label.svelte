@@ -30,7 +30,7 @@
 				</button>
 			</div>
 		{/if}
-		{#if onCreate && showCreate}
+		{#if showCreate}
 			<div class="create" in:fade={{ duration: 200 }} out:fade={{ duration: 150 }}>
 				<button type="button" onmousedown={onCreate} aria-label="crear">
 					<span class={['icon', 'create', { isCreate }]}></span>
@@ -46,6 +46,8 @@
 <style>
 	label {
 		grid-column-end: var(--column-end, span 1);
+		flex-grow: 1;
+		width: 100%;
 		min-height: 5rem;
 		padding: 0.5rem 1rem 0.75rem 1rem;
 		background: var(--surface);
@@ -79,8 +81,8 @@
 			position: absolute;
 			z-index: 2000;
 			top: 0;
+			bottom: 0;
 			left: -1px;
-			height: 1.75rem;
 			border-radius: 4px;
 			background: var(--error);
 			display: grid;

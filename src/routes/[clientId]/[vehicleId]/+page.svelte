@@ -11,23 +11,28 @@
 	let isCreate = $derived(windowState.activeCard === 'repair' && windowState.id === '');
 </script>
 
-<div class="panel" in:fly={{ y: '-1rem', duration: 300, easing: sineOut }} out:blur={{ amount: 32, duration: 250, easing: sineIn }}>
+<div class="panel" in:fly={{ x: '-1rem', duration: 300, easing: sineOut }} out:blur={{ amount: 32, duration: 250, easing: sineIn }}>
 	{#key data.vehicle.vehicleId}
-		<div class="container" in:fly={{ y: '-1rem', duration: 300, easing: sineOut }} out:blur={{ amount: 32, duration: 900, easing: sineIn }}>
-			<Section overlay={windowState.activeCard === 'repair'} cards>
-				<div class={["createButton", { isCreate }]}>
+		<div class="container" in:fly={{ x: '-1rem', duration: 300, easing: sineOut }} out:blur={{ amount: 32, duration: 900, easing: sineIn }}>
+			<Section overlay={windowState.activeCard === 'repair' || windowState.activeCard === 'estimate'} cards>
+				<div class={['createCont', { isCreate }]}>
 					{#if isCreate}
-						<RepairForm/>
+						<RepairForm />
 					{/if}
-					<button type="button" onclick={() => {
-						windowState.activeCard = 'repair';
-						windowState.id = '';
-					}}>
-						<span class="icon create">reparacion</span>
+					<button
+						type="button"
+						class="createButton"
+						onclick={() => {
+							windowState.activeCard = 'repair';
+							windowState.id = '';
+						}}
+						aria-label="crear"
+					>
+						<span class="icon repair"></span>
 					</button>
 				</div>
 				{#each data.repairs as repair (repair.repairId)}
-					<RepairCard {repair} /> 
+					<RepairCard {repair} />
 				{/each}
 				{#if !data.repairs?.length}
 					<h5 class="empty">Sin reparaciones</h5>
@@ -52,23 +57,14 @@
 		right: 0;
 		bottom: 0;
 		left: 0;
-		overflow: hidden;
-		border-radius: 4px;
-		background: var(--surface);
-		box-shadow: var(--shadow);
 	}
 
-	.createButton {
+	.createCont {
 		position: sticky;
+		z-index: 100;
 		top: 0;
 		height: 3rem;
 		padding: 0 0 3rem 0;
-		border-radius: 4px;
-		border: 1px solid var(--secondary-variant);
-		background: var(--secondary-variant);
-		backdrop-filter: var(--backdrop-filter);
-		color: var(--secondary);
-		z-index: 100;
 		transition: z-index 0.35s step-end;
 
 		&.isCreate {
@@ -76,24 +72,8 @@
 			transition: z-index 0s;
 		}
 
-		&:hover {
-			cursor: pointer;
-		}
-
 		> button {
-			position: relative;
 			width: 100%;
-			height: 3rem;
-			overflow: hidden;
-			color: inherit;
-
-			.icon.create {
-				padding-right: 0.5rem;
-
-				&::before {
-					background: var(--secondary);
-				}
-			}
 		}
 	}
 </style>

@@ -1,15 +1,19 @@
 import { error } from '@sveltejs/kit';
 import { findClients } from '$lib/server/controllers/Client.controller';
 import { findVehicles } from '$lib/server/controllers/Vehicle.controller';
+import { findEstimates } from '$lib/server/controllers/Estimate.controller';
 
 export async function getSearch(userId, value) {
 	try {
-		let [clients, vehicles] = [];
+		let [clients, vehicles, estimates] = [];
 		if (!value) {
-			clients = await findClients(userId)
-				.sort({ updatedAt: -1 })
-				.populate({ path: 'vehicles', perDocumentLimit: 1, options: { sort: { updatedAt: -1 } }, populate: { path: 'repairs', perDocumentLimit: 1, options: { sort: { updatedAt: -1 } } } })
-				.limit(50);
+			[clients, estimates] = await Promise.all([
+				findClients(userId)
+					.sort({ updatedAt: -1 })
+					.populate({ path: 'vehicles', perDocumentLimit: 1, options: { sort: { updatedAt: -1 } }, populate: { path: 'repairs', perDocumentLimit: 1, options: { sort: { updatedAt: -1 } } } })
+					.limit(50),
+				findEstimates(userId).sort({ updatedAt: -1 }).limit(50),
+			]);
 		} else {
 			const filter = { $regex: value, $options: 'i' };
 			[clients, vehicles] = await Promise.all([
@@ -21,6 +25,15 @@ export async function getSearch(userId, value) {
 		}
 
 		const search = [
+			...(estimates || []).map((x) => ({
+				id: x.estimateId,
+				estimateId: x.estimateId,
+				vehicleId: x.vehicleId,
+				carModelId: x.carModelId,
+				description: x.description,
+				email: x.email,
+				updatedAt: x.updatedAt,
+			})),
 			...(vehicles || []).map((x) => ({
 				id: x.vehicleId,
 				vehicleId: x.vehicleId,
@@ -35,9 +48,9 @@ export async function getSearch(userId, value) {
 				clientName: x.name + ' ' + x.lastName,
 				vehicleId: x.vehicles?.vehicleId,
 				carModelId: x.vehicles?.carModelId,
-				repairId: x.vehicles?.repairs?.repairId,
-				description: x.vehicles?.repairs?.description,
-				updatedAt: new Date(Math.max(x.vehicles?.repairs?.updatedAt || 0, x.vehicles?.updatedAt || 0, x.updatedAt)),
+				repairId: x.vehicles?.repairs?.length ? x.vehicles.repairs[0].repairId : '',
+				description: x.vehicles?.repairs?.length ? x.vehicles.repairs[0].description : '',
+				updatedAt: new Date(Math.max(x.vehicles?.repairs?.length ? x.vehicles.repairs[0].updatedAt : 0, x.vehicles?.updatedAt || 0, x.updatedAt)),
 			})),
 		];
 

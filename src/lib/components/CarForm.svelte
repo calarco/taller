@@ -8,8 +8,8 @@
 
 	let { carModelProp } = $props();
 
-	let carModelId = $state(carModelProp || '');
-	let carMakeId = $state(page.data.carModels?.find((x) => x.carModelId === carModelId)?.carMakeId || '');
+	let carModelId = $derived(carModelProp || '');
+	let carMakeId = $derived(page.data.carModels?.find((x) => x.carModelId === carModelId)?.carMakeId || '');
 
 	let carMakes = $derived(page.data.carMakes || []);
 	let carModels = $derived(page.data.carModels?.filter((x) => x.carMakeId === carMakeId) || []);
@@ -149,12 +149,11 @@
 <style>
 	fieldset {
 		grid-column-end: var(--column-end, span 1);
-		grid-row-end: span 2;
+		grid-row-end: var(--row-end, span 2);
 		height: 100%;
 		background: var(--surface);
-		display: grid;
-		grid-auto-flow: row;
-		align-items: center;
+		display: flex;
+		flex-direction: var(--flow, column);
 	}
 
 	.container {
@@ -169,13 +168,12 @@
 			right: 0;
 			display: grid;
 			grid-auto-flow: column;
-			align-items: center;
+			gap: 0.5rem;
 			grid-template-columns: 1fr auto;
 
 			> button {
 				padding: 0.25rem 0.5rem;
 				border: none;
-				margin-left: 0.25rem;
 
 				&:disabled {
 					opacity: 0.5;

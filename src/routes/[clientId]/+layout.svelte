@@ -16,18 +16,20 @@
 		<div in:fly={{ y: '-1rem', duration: 300, easing: sineOut }} out:blur={{ amount: 32, duration: 900, easing: sineIn }}>
 			<div class="vehiculos">
 				<Section overlay={windowState.activeCard === 'vehicle' || windowState.activeCard === 'client'} cards>
-					<div class={['createButton', { isCreate }]}>
+					<div class={['createCont', { isCreate }]}>
 						{#if isCreate}
 							<VehicleForm />
 						{/if}
 						<button
 							type="button"
+							class="createButton"
 							onclick={() => {
 								windowState.activeCard = 'vehicle';
 								windowState.id = '';
 							}}
+							aria-label="crear"
 						>
-							<span class="icon create">vehiculo</span>
+							<span class="icon vehicle"></span>
 						</button>
 					</div>
 					{#if !data.vehicles?.length}
@@ -64,23 +66,15 @@
 	}
 
 	.vehiculos {
-		overflow: hidden;
 		border-radius: 4px;
-		background: var(--surface);
 		border-top: var(--border-variant);
-		box-shadow: var(--shadow);
 	}
 
-	.createButton {
+	.createCont {
 		position: sticky;
 		top: 0;
 		height: 3rem;
 		padding: 0 0 3rem 0;
-		border-radius: 4px;
-		border: 1px solid var(--secondary-variant);
-		background: var(--secondary-variant);
-		backdrop-filter: var(--backdrop-filter);
-		color: var(--secondary);
 		z-index: 100;
 		transition: z-index 0.35s step-end;
 
@@ -94,19 +88,7 @@
 		}
 
 		> button {
-			position: relative;
 			width: 100%;
-			height: 3rem;
-			overflow: hidden;
-			color: inherit;
-
-			.icon.create {
-				padding-right: 0.5rem;
-
-				&::before {
-					background: var(--secondary);
-				}
-			}
 		}
 	}
 </style>

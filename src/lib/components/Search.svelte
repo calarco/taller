@@ -2,7 +2,7 @@
 	import { slide, blur } from 'svelte/transition';
 	import { sineIn, sineOut } from 'svelte/easing';
 	import { page } from '$app/state';
-	import { getCarName } from '$lib/shared.svelte';
+	import { getCarName, windowState } from '$lib/shared.svelte';
 	import Section from '$lib/components/Section.svelte';
 
 	let value = $state('');
@@ -28,7 +28,7 @@
 </script>
 
 <div class="panel">
-	<Section>
+	<Section overlay={windowState.activeCard === 'estimate'}>
 		<label class="buscador">
 			<div>
 				{#if !value}
@@ -54,55 +54,102 @@
 			<input id="searchInput" type="search" name="search" placeholder="Buscar" autocomplete="off" bind:value />
 		</label>
 		{#if !search?.length}
-			<h5 class="empty" in:slide={{ axis: 'y', duration: 200, easing: sineOut }} out:slide={{ axis: 'y', duration: 150, easing: sineIn }}>No se encontraron resultados</h5>
+			<h5 class="empty" in:slide={{ axis: 'y', duration: 150, easing: sineIn }} out:slide={{ axis: 'y', duration: 150, easing: sineOut }}>No se encontraron resultados</h5>
 		{/if}
 		{#each search as resultado (resultado.id)}
-			<div class="result" in:slide={{ axis: 'y', duration: 200, easing: sineOut }} out:slide={{ axis: 'y', duration: 150, easing: sineIn }}>
-				<div class="cliente">
-					<a href={`/${resultado.clientId}`} class={['clienteCont', { isActive: resultado.clientId === page.url.pathname.split('/')[1] }, { isVehicle: resultado.vehicleId }]}>
+			<div class="result" in:slide={{ axis: 'y', duration: 150, easing: sineOut }} out:slide={{ axis: 'y', duration: 150, easing: sineIn }}>
+				{#if resultado.clientId}
+					<div class="cliente">
+						<a href={`/${resultado.clientId}`} class={['clienteCont', { isActive: resultado.clientId === page.url.pathname.split('/')[1] }, { isVehicle: resultado.vehicleId }]}>
+							<div class="cont">
+								<span class="icon client"></span>
+								<h5>{resultado.clientName}</h5>
+							</div>
+						</a>
+						{#if resultado.vehicleId}
+							<a href={`/${resultado.clientId}/${resultado.vehicleId || ''}${resultado.repairId ? '#' + resultado.repairId : ''}`} class="vehiculo">
+								<div class="vehiculoCont cont">
+									<span class="icon vehicle"></span>
+									<div>
+										{#if resultado.vehicleId.length === 6}
+											<h4 class="vehicleId">{resultado.vehicleId?.slice(0, 3)}<span>{resultado.vehicleId?.slice(-3)}</span></h4>
+										{:else if resultado.vehicleId.length === 7}
+											<h4 class="vehicleId">{resultado.vehicleId?.slice(0, 2)}<span>{resultado.vehicleId?.slice(2, 5)}</span><span>{resultado.vehicleId?.slice(-2)}</span></h4>
+										{:else}
+											<h4 class="vehicleId">{resultado.vehicleId}</h4>
+										{/if}
+										<small>{getCarName(resultado.carModelId)}</small>
+									</div>
+								</div>
+								{#if resultado.repairId}
+									<div class="reparacionCont cont">
+										<span class="icon repair"></span>
+										<p>{resultado.description}</p>
+									</div>
+								{/if}
+							</a>
+						{/if}
+					</div>
+					<a href={`/${resultado.clientId}/${resultado.vehicleId || ''}${resultado.repairId ? '#' + resultado.repairId : ''}`} class="updatedAt">
 						<div>
-							<span class="icon client"></span>
-							<h5>{resultado.clientName}</h5>
+							{resultado.updatedAt.getDate()}/{resultado.updatedAt.toLocaleDateString('default', { month: 'short' }).substring(0, 3)}/{resultado.updatedAt
+								.toLocaleDateString('default', { year: 'numeric' })
+								.substring(2, 4)}
+						</div>
+						<div>
+							{resultado.updatedAt.toLocaleTimeString([], {
+								hour: '2-digit',
+								minute: '2-digit',
+								hour12: false,
+							})}
 						</div>
 					</a>
-					{#if resultado.vehicleId}
-						<a href={`/${resultado.clientId}/${resultado.vehicleId || ''}${resultado.repairId ? '#' + resultado.repairId : ''}`} class="vehiculo">
-							<div class="vehiculoCont">
-								<span class="icon vehicle"></span>
-								<div>
-									{#if resultado.vehicleId.length === 6}
-										<h4 class="vehicleId">{resultado.vehicleId?.slice(0, 3)}<span>{resultado.vehicleId?.slice(-3)}</span></h4>
-									{:else if resultado.vehicleId.length === 7}
-										<h4 class="vehicleId">{resultado.vehicleId?.slice(0, 2)}<span>{resultado.vehicleId?.slice(2, 5)}</span><span>{resultado.vehicleId?.slice(-2)}</span></h4>
-									{:else}
-										<h4 class="vehicleId">{resultado.vehicleId}</h4>
-									{/if}
-									<small>{getCarName(resultado.carModelId)}</small>
+				{/if}
+				{#if resultado.estimateId}
+					<a class="estimate" href={`estimate/${resultado.estimateId}`}>
+						<div class="estimateCont cont">
+							<span class="icon estimate"></span>
+							<p>{resultado.description}</p>
+						</div>
+						{#if resultado.vehicleId}
+							<div class="vehiculo">
+								<div class="vehiculoCont cont">
+									<span class="icon vehicle"></span>
+									<div>
+										{#if resultado.vehicleId.length === 6}
+											<h4 class="vehicleId">{resultado.vehicleId?.slice(0, 3)}<span>{resultado.vehicleId?.slice(-3)}</span></h4>
+										{:else if resultado.vehicleId.length === 7}
+											<h4 class="vehicleId">{resultado.vehicleId?.slice(0, 2)}<span>{resultado.vehicleId?.slice(2, 5)}</span><span>{resultado.vehicleId?.slice(-2)}</span></h4>
+										{:else}
+											<h4 class="vehicleId">{resultado.vehicleId}</h4>
+										{/if}
+										<small>{getCarName(resultado.carModelId)}</small>
+									</div>
 								</div>
+								{#if resultado.email}
+									<div class="reparacionCont cont">
+										<span class="icon mail"></span>
+										<p>{resultado.email}</p>
+									</div>
+								{/if}
 							</div>
-							{#if resultado.repairId}
-								<div class="reparacionCont">
-									<span class="icon repair"></span>
-									<p>{resultado.description}</p>
-								</div>
-							{/if}
-						</a>
-					{/if}
-				</div>
-				<a href={`/${resultado.clientId}/${resultado.vehicleId || ''}${resultado.repairId ? '#' + resultado.repairId : ''}`} class="updatedAt">
-					<div>
-						{resultado.updatedAt.toLocaleTimeString([], {
-							hour: '2-digit',
-							minute: '2-digit',
-							hour12: false,
-						})}
-					</div>
-					<div>
-						{resultado.updatedAt.getDate()}/{resultado.updatedAt.toLocaleDateString('default', { month: 'short' }).substring(0, 3)}/{resultado.updatedAt
-							.toLocaleDateString('default', { year: 'numeric' })
-							.substring(2, 4)}
-					</div>
-				</a>
+						{/if}
+					</a>
+					<a href={`/estimate/${resultado.estimateId}`} class="updatedAt">
+						<div>
+							{resultado.updatedAt.getDate()}/{resultado.updatedAt.toLocaleDateString('default', { month: 'short' }).substring(0, 3)}/{resultado.updatedAt
+								.toLocaleDateString('default', { year: 'numeric' })
+								.substring(2, 4)}
+						</div>
+						<div>
+							{resultado.updatedAt.toLocaleTimeString([], {
+								hour: '2-digit',
+								minute: '2-digit',
+								hour12: false,
+							})}
+						</div>
+					</a>
+				{/if}
 			</div>
 		{/each}
 	</Section>
@@ -124,11 +171,12 @@
 		right: 0;
 		left: 0;
 		height: 3rem;
+		margin-bottom: -1px;
 		border-radius: 4px 0 0 0;
 		background: var(--surface);
 		box-shadow: var(--shadow);
 		display: grid;
-		grid-template-columns: 3.5rem 1fr;
+		grid-template-columns: 3.5rem 1fr auto;
 		align-items: center;
 
 		span {
@@ -220,6 +268,56 @@
 			background: var(--on-background-variant);
 		}
 
+		.cont {
+			display: grid;
+			grid-template-columns: auto 1fr;
+			gap: 1rem;
+			align-items: center;
+		}
+
+		.vehiculo {
+			position: relative;
+			flex-grow: 1000;
+			padding: 0.5rem 0 0.5rem 1rem;
+			display: flex;
+			gap: 1rem;
+
+			.vehiculoCont {
+				min-width: 7.5rem;
+				max-width: 7.5rem;
+				flex-grow: 1;
+
+				.vehicleId {
+					font-size: 0.9em;
+				}
+
+				> div {
+					display: grid;
+					align-items: center;
+
+					small {
+						overflow: hidden;
+						text-overflow: ellipsis;
+						white-space: pre;
+						font-size: 0.75em;
+						color: var(--on-background-variant);
+					}
+				}
+			}
+
+			.reparacionCont {
+				position: relative;
+				flex-grow: 1000;
+
+				p {
+					overflow: hidden;
+					text-overflow: ellipsis;
+					white-space: pre;
+					font-size: 0.8em;
+				}
+			}
+		}
+
 		> .cliente {
 			height: 100%;
 			display: flex;
@@ -238,13 +336,9 @@
 					}
 				}
 
-				> div {
+				.cont {
 					padding: 0.5rem 0.5rem;
 					border-radius: 4px;
-					display: grid;
-					grid-template-columns: auto 1fr;
-					gap: 1rem;
-					align-items: center;
 					transition: 0.1s ease-in;
 					outline: 1px solid rgba(0, 0, 0, 0);
 				}
@@ -275,65 +369,7 @@
 				}
 			}
 
-			> .vehiculo {
-				position: relative;
-				flex-grow: 1000;
-				padding: 0.5rem 1rem;
-				display: flex;
-				gap: 2rem;
-
-				.vehiculoCont {
-					min-width: 7.5rem;
-					max-width: 7.5rem;
-					flex-grow: 1;
-					display: grid;
-					grid-template-columns: auto 1fr;
-					gap: 1rem;
-					align-items: center;
-
-					.vehicleId {
-						font-size: 0.9em;
-					}
-
-					> div {
-						display: grid;
-						align-items: center;
-
-						small {
-							overflow: hidden;
-							text-overflow: ellipsis;
-							white-space: pre;
-							font-size: 0.75em;
-							color: var(--on-background-variant);
-						}
-					}
-				}
-
-				.reparacionCont {
-					position: relative;
-					flex-grow: 1000;
-					display: grid;
-					grid-template-columns: auto 1fr;
-					gap: 1rem;
-					align-items: center;
-
-					p {
-						overflow: hidden;
-						text-overflow: ellipsis;
-						white-space: pre;
-						font-size: 0.8em;
-					}
-
-					&::after {
-						content: '';
-						position: absolute;
-						top: calc(50% - 1rem);
-						left: -1rem;
-						height: 2rem;
-						border-left: var(--border-variant);
-					}
-				}
-
+			.vehiculo {
 				&::after {
 					content: '';
 					position: absolute;
@@ -342,6 +378,18 @@
 					height: 2rem;
 					border-left: var(--border-variant);
 				}
+			}
+		}
+
+		> .estimate {
+			height: 100%;
+			display: flex;
+			gap: 1px;
+
+			.estimateCont {
+				flex-grow: 1;
+				min-width: 40%;
+				padding: 0 1rem;
 			}
 		}
 
@@ -364,15 +412,6 @@
 
 			> div:last-child {
 				font-size: 0.7em;
-			}
-
-			&::after {
-				content: '';
-				position: absolute;
-				top: calc(50% - 1rem);
-				left: -1px;
-				height: 2rem;
-				border-left: var(--border-variant);
 			}
 		}
 	}

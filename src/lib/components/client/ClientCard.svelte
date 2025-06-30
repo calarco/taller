@@ -56,15 +56,6 @@
 		>
 			<span class="icon edit"></span>
 		</button>
-		<button
-			type="button"
-			onclick={() => {
-				windowState.activeCard = 'client';
-				windowState.id = '';
-			}}
-		>
-			<span class="icon create">cliente</span>
-		</button>
 	</div>
 	{@render clientContent()}
 	<Dialog bind:dialog title="¿Borrar cliente y sus vehiculos?" action="?/deleteClient">
@@ -123,16 +114,8 @@
 		border-bottom: var(--border-variant);
 		display: grid;
 		gap: 1px;
-		grid-template-columns: 2fr 2fr 2fr auto;
+		grid-template-columns: 2fr 2fr 2fr;
 		grid-auto-flow: column;
-
-		.icon.create {
-			padding-right: 0.5rem;
-
-			&::before {
-				background: var(--secondary);
-			}
-		}
 
 		a,
 		button {

@@ -29,7 +29,7 @@
 		<p>{date.toLocaleDateString('default', { weekday: 'short' }).substring(0, 3)}</p>
 	</div>
 	<div class="list">
-		<div class={['createButton', { isCreate }]}>
+		<div class={['createCont', { isCreate }]}>
 			{#if isCreate}
 				<AppointmentForm {date} />
 			{/if}
@@ -41,7 +41,7 @@
 				}}
 				aria-label="crear"
 			>
-				<span class="icon create">turno</span>
+				<span class="icon create"></span>
 			</button>
 		</div>
 		{#each appointments as appointment (appointment.appointmentId)}
@@ -114,10 +114,10 @@
 		border-radius: 4px;
 		display: flex;
 		flex-direction: column;
-		border: var(--border-variant);
+		outline: var(--border-variant);
 	}
 
-	.createButton {
+	.createCont {
 		position: relative;
 		height: 3rem;
 		padding: 0 0 3rem 0;

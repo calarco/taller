@@ -5,6 +5,7 @@
 	import Search from '$lib/components/Search.svelte';
 	import Bar from '$lib/components/Bar.svelte';
 	import ClientForm from '$lib/components/client/ClientForm.svelte';
+	import EstimateForm from '$lib/components/estimate/EstimateForm.svelte';
 	import '$lib/app.css';
 
 	let { children } = $props();
@@ -37,17 +38,22 @@
 </svelte:head>
 
 <main>
+	<Bar />
 	<div class="panels">
 		<Appointments />
 		<Search />
 		{@render children()}
 		{#if windowState.activeCard === 'client'}
-			<div class="panel">
+			<div class="panel client">
 				<ClientForm />
 			</div>
 		{/if}
+		{#if windowState.activeCard === 'estimate'}
+			<div class="panel estimate">
+				<EstimateForm />
+			</div>
+		{/if}
 	</div>
-	<Bar />
 </main>
 
 <style>
@@ -58,7 +64,7 @@
 		display: grid;
 		justify-content: center;
 		justify-items: center;
-		grid-template-rows: 1fr var(--bar-height);
+		grid-template-rows: var(--bar-height) 1fr;
 	}
 
 	.panels {
@@ -77,8 +83,14 @@
 		}
 	}
 
-	.panel {
+	.client {
 		grid-column-start: panel-left;
+		grid-row-start: panel-top;
+		pointer-events: none;
+	}
+
+	.estimate {
+		grid-column-start: panel-right;
 		grid-row-start: panel-top;
 		pointer-events: none;
 	}

@@ -1,10 +1,11 @@
 import { error } from '@sveltejs/kit';
 import { switchThemeAction } from '$lib/server/controllers/User.controller.js';
-import { createCarMakeAction } from '$lib/server/controllers/CarMake.controller.js'
+import { createCarMakeAction } from '$lib/server/controllers/CarMake.controller.js';
 import { createCarModelAction } from '$lib/server/controllers/CarModel.controller.js';
 import { upsertClientAction, deleteClientAction } from '$lib/server/controllers/Client.controller.js';
 import { findVehicle, upsertVehicleAction, deleteVehicleAction } from '$lib/server/controllers/Vehicle.controller.js';
 import { findRepairs, upsertRepairAction, deleteRepairAction } from '$lib/server/controllers/Repair.controller.js';
+import { upsertEstimateAction } from '$lib/server/controllers/Estimate.controller.js';
 
 export const load = async (event) => {
 	const userId = event.cookies.get('userId');
@@ -35,10 +36,10 @@ export const actions = {
 		event.cookies.delete('userId', { path: '/' });
 	},
 	createCarMake: async (event) => {
-		return await createCarMakeAction(event)
+		return await createCarMakeAction(event);
 	},
 	createCarModel: async (event) => {
-		return await createCarModelAction(event)
+		return await createCarModelAction(event);
 	},
 	upsertClient: async (event) => {
 		return await upsertClientAction(event);
@@ -57,5 +58,8 @@ export const actions = {
 	},
 	deleteRepair: async (event) => {
 		return await deleteRepairAction(event);
-	}
+	},
+	upsertEstimate: async (event) => {
+		return await upsertEstimateAction(event);
+	},
 };

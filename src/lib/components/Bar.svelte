@@ -24,22 +24,58 @@
 
 <div class="bar">
 	<div>
-		<p class="label">© Calarco WEB</p>
-		<form method="POST" action="?/switchTheme" use:enhance>
-			<button type="submit" aria-label="borrar" onclick={() => window.document.body.classList.toggle('dark-mode')}>
-				{#if page.data.darkTheme}
-					<span class="icon lighton"></span>
-				{:else}
-					<span class="icon lightoff"></span>
-				{/if}
+		<div>
+			<div class="createCont">
+				<button
+					type="button"
+					class="createButton"
+					onclick={() => {
+						windowState.activeCard = 'client';
+						windowState.id = '';
+					}}
+					aria-label="crear"
+					in:fade={{ duration: 150, easing: sineIn }}
+					out:fade={{ duration: 200, easing: sineOut }}
+				>
+					<span class="icon client"></span>
+				</button>
+			</div>
+			<div></div>
+			<p class="label">© Calarco WEB</p>
+		</div>
+		<div>
+			<div class="createCont">
+				<button
+					type="button"
+					class="createButton"
+					onclick={() => {
+						windowState.activeCard = 'estimate';
+						windowState.id = '';
+					}}
+					aria-label="crear"
+					in:fade={{ duration: 150, easing: sineIn }}
+					out:fade={{ duration: 200, easing: sineOut }}
+				>
+					<span class="icon estimate"></span>
+				</button>
+			</div>
+			<div></div>
+			<form method="POST" action="?/switchTheme" use:enhance>
+				<button type="submit" aria-label="borrar" onclick={() => (darkTheme = !darkTheme)}>
+					{#if darkTheme}
+						<span class="icon lighton"></span>
+					{:else}
+						<span class="icon lightoff"></span>
+					{/if}
+				</button>
+			</form>
+			<button type="button" onclick={() => dialog.showModal()} aria-label="borrar">
+				<span class="icon logout"></span>
 			</button>
-		</form>
-		<button type="button" onclick={() => dialog.showModal()} aria-label="borrar">
-			<span class="icon logout"></span>
-		</button>
+		</div>
 	</div>
-	<Dialog bind:dialog title={`¿Cerrar la sesión de ${page.data.userId}?`} actionText="Cerrar sesión" action="?/logout" />
 </div>
+<Dialog bind:dialog title={`¿Cerrar la sesión de ${page.data.userId}?`} actionText="Cerrar sesión" action="?/logout" />
 {#if windowState.loading}
 	<div class="loading" in:fade={{ duration: 900, easing: sineOut }} out:fade={{ duration: 250, easing: sineIn }}>
 		<div></div>
@@ -49,62 +85,98 @@
 <style>
 	.bar {
 		width: 100vw;
-		background: var(--surface-variant);
-		border-top: var(--border-variant);
-		box-shadow: var(--shadow-variant);
 		display: grid;
 		justify-items: center;
 
 		> div {
-			position: relative;
-			width: 100%;
-			max-width: 91rem;
-			border-radius: 4px;
-			overflow: hidden;
-			background: var(--surface);
-			box-shadow: var(--shadow);
+			width: 100vw;
+			max-width: 95rem;
+			height: 100%;
+			padding: 0 2rem;
 			display: grid;
-			grid-template-columns: 1fr auto auto;
-			gap: 1px;
+			gap: 2rem;
+			grid-template-columns: [panel-left] 2fr [panel-right] 3fr;
+			grid-template-rows: [panel-top] 1fr;
 
-			p {
-				position: relative;
-				padding: 0 0.75rem;
-				height: 100%;
-				display: grid;
-
-				&::after {
-					content: '';
-					position: absolute;
-					top: 0;
-					bottom: 0;
-					right: -1px;
-					border-right: var(--border-variant);
-				}
+			@media (min-width: 1440px) {
+				gap: 2rem;
 			}
 
-			button {
-				height: 100%;
-				margin: 0;
-				padding: 0 1rem;
-				border: none;
-				border-radius: 0px;
-				font: var(--label);
-				font: 500 0.75rem/1.25rem var(--font-family);
-				color: var(--primary);
+			> div {
+				position: relative;
+				border-radius: 0 0 4px 4px;
+				background: var(--surface-variant);
+				outline: var(--border-variant);
+				box-shadow: var(--shadow-variant);
+				display: grid;
+				gap: 1px;
 
-				&:first-child:after {
-					content: '';
-					position: absolute;
-					top: 0;
-					bottom: 0;
-					right: -1px;
-					border-right: var(--border-variant);
+				&:first-child {
+					grid-template-columns: auto 1fr auto;
+
+					p {
+						padding: 0 1rem;
+						height: 100%;
+						display: grid;
+					}
 				}
 
-				.icon::before {
-					width: 1.25rem;
-					height: 1.25rem;
+				&:last-child {
+					grid-template-columns: auto 1fr auto auto;
+
+					> form > button,
+					> button {
+						height: 100%;
+
+						&:after {
+							content: '';
+							position: absolute;
+							top: 0;
+							bottom: 0;
+							left: -1px;
+							border-left: var(--border-variant);
+						}
+					}
+
+					> button {
+						border-radius: 0 0 4px 0;
+					}
+				}
+
+				button {
+					height: auto;
+					margin: 0;
+					padding: 0 1rem;
+					border-radius: 0px;
+					font: var(--label);
+					font: 500 0.75rem/1.25rem var(--font-family);
+					color: var(--primary);
+
+					.icon::before {
+						width: 1.25rem;
+						height: 1.25rem;
+					}
+				}
+
+				.createCont {
+					position: relative;
+					width: 6rem;
+
+					.createButton {
+						position: absolute;
+						top: 0;
+						bottom: -1px;
+						left: -1px;
+						right: -1px;
+						border-radius: 0 0 5px 5px;
+						backdrop-filter: none;
+						box-shadow: none;
+						border-top: none;
+
+						&:hover {
+							border-top: none;
+						}
+					}
 				}
 			}
 		}

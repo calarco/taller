@@ -16,7 +16,7 @@ export const load = async (event) => {
 			getDarkTheme(userId),
 			findCarMakes(userId).sort({ name: 1 }),
 			findCarModels(userId).sort({ name: 1 }),
-			findAppointments(userId),
+			findAppointments(userId, { date: { $gte: new Date((new Date()).setHours(0, 0, 1)) } }),
 			getSearch(userId),
 		]);
 

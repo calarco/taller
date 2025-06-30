@@ -1,10 +1,11 @@
 import mongoose from 'mongoose';
 import { error } from '@sveltejs/kit';
-import { SECRET_MONGODB_URI } from '$env/static/private';
+import { MONGODB_URI } from '$env/static/private';
 import AppointmentSchema from '$lib/server/models/Appointment.model';
 import CarMakeSchema from '$lib/server/models/CarMake.model';
 import CarModelSchema from '$lib/server/models/CarModel.model';
 import ClientSchema from '$lib/server/models/Client.model';
+import EstimateSchema from '$lib/server/models/Estimate.model';
 import RepairSchema from '$lib/server/models/Repair.model';
 import UserSchema from '$lib/server/models/User.model';
 import VehicleSchema from '$lib/server/models/Vehicle.model';
@@ -22,20 +23,23 @@ function checkModels(db) {
 	if (!db.models['Client']) {
 		db.model('Client', ClientSchema);
 	}
+	if (!db.models['Estimate']) {
+		db.model('Estimate', EstimateSchema);
+	}
 	if (!db.models['Repair']) {
 		db.model('Repair', RepairSchema);
 	}
-	if (!db.models['Vehicle']) {
-		db.model('Vehicle', VehicleSchema);
-	}
 	if (!db.models['User']) {
 		db.model('User', UserSchema);
+	}
+	if (!db.models['Vehicle']) {
+		db.model('Vehicle', VehicleSchema);
 	}
 }
 
 export async function initDatabase() {
 	try {
-		const db = await mongoose.connect(SECRET_MONGODB_URI);
+		const db = await mongoose.connect(MONGODB_URI);
 		if (!db) {
 			throw error(500, 'Database connection failed');
 		}
@@ -50,9 +54,7 @@ export async function initDatabase() {
 export function getModel(userId, model) {
 	let name = 'taller';
 	if (model !== 'User') {
-		if (userId === 'montiel') {
-			name = 'montiel';
-		}
+		name = userId;
 	}
 
 	const db = mongoose.connection.useDb(name, { useCache: true });
@@ -66,98 +68,126 @@ export function getModel(userId, model) {
 
 export async function fixData(userId) {
 	const CarMake = getModel(userId, 'CarMake');
-	await CarMake.updateMany({}, [
-		{
-			$set: {
-				name: {
-					$trim: {
-						input: '$name',
+	await CarMake.updateMany(
+		{},
+		[
+			{
+				$set: {
+					name: {
+						$trim: {
+							input: '$name',
+						},
+					},
+					createdAt: {
+						$toDate: '$createdAt',
+					},
+					updatedAt: {
+						$toDate: '$createdAt',
 					},
 				},
-				createdAt: {
-					$toDate: '$createdAt',
-				},
-				updatedAt: {
-					$toDate: '$createdAt',
-				},
 			},
-		},
-	], { timestamps:false });
+		],
+		{ timestamps: false }
+	);
 	const CarModel = getModel(userId, 'CarModel');
-	await CarModel.updateMany({}, [
-		{
-			$set: {
-				name: {
-					$trim: {
-						input: '$name',
+	await CarModel.updateMany(
+		{},
+		[
+			{
+				$set: {
+					name: {
+						$trim: {
+							input: '$name',
+						},
+					},
+					createdAt: {
+						$toDate: '$createdAt',
+					},
+					updatedAt: {
+						$toDate: '$createdAt',
 					},
 				},
-				createdAt: {
-					$toDate: '$createdAt',
-				},
-				updatedAt: {
-					$toDate: '$createdAt',
-				},
 			},
-		},
-	], { timestamps:false });
+		],
+		{ timestamps: false }
+	);
 	const Client = getModel(userId, 'Client');
-	await Client.updateMany({ phone: { $in: ['0000000000', '00000000', '0000000', '000000000', '2230000000', '""'] } }, [
-		{
-			$set: {
-				phone: '',
+	await Client.updateMany(
+		{ phone: { $in: ['0000000000', '00000000', '0000000', '000000000', '2230000000', '""'] } },
+		[
+			{
+				$set: {
+					phone: '',
+				},
 			},
-		},
-	], { timestamps:false });
-	await Client.updateMany({ dni: { $in: ['NaN', '""'] } }, [
-		{
-			$set: {
-				dni: '',
+		],
+		{ timestamps: false }
+	);
+	await Client.updateMany(
+		{ dni: { $in: ['NaN', '""'] } },
+		[
+			{
+				$set: {
+					dni: '',
+				},
 			},
-		},
-	], { timestamps:false });
-	await Client.updateMany({ work: { $in: ['""'] } }, [
-		{
-			$set: {
-				work: '',
+		],
+		{ timestamps: false }
+	);
+	await Client.updateMany(
+		{ work: { $in: ['""'] } },
+		[
+			{
+				$set: {
+					work: '',
+				},
 			},
-		},
-	], { timestamps:false });
-	await Client.updateMany({ email: { $in: ['""'] } }, [
-		{
-			$set: {
-				email: '',
+		],
+		{ timestamps: false }
+	);
+	await Client.updateMany(
+		{ email: { $in: ['""'] } },
+		[
+			{
+				$set: {
+					email: '',
+				},
 			},
-		},
-	], { timestamps:false });
-	await Client.updateMany({}, [
-		{
-			$set: {
-				name: {
-					$trim: {
-						input: '$name',
+		],
+		{ timestamps: false }
+	);
+	await Client.updateMany(
+		{},
+		[
+			{
+				$set: {
+					name: {
+						$trim: {
+							input: '$name',
+						},
+					},
+					lastName: {
+						$trim: {
+							input: '$lastName',
+						},
+					},
+					phone: {
+						$trim: {
+							input: '$phone',
+							chars: 'x',
+						},
+					},
+					createdAt: {
+						$toDate: '$createdAt',
+					},
+					updatedAt: {
+						$toDate: '$createdAt',
 					},
 				},
-				lastName: {
-					$trim: {
-						input: '$lastName',
-					},
-				},
-				phone: {
-					$trim: {
-						input: '$phone',
-						chars: 'x',
-					},
-				},
-				createdAt: {
-					$toDate: '$createdAt',
-				},
-				updatedAt: {
-					$toDate: '$createdAt',
-				},
 			},
-		},
-	], { timestamps:false });
+		],
+		{ timestamps: false }
+	);
 	const Repair = getModel(userId, 'Repair');
 	await Repair.updateMany({ detail: { $in: ['""'] } }, [
 		{
@@ -166,53 +196,65 @@ export async function fixData(userId) {
 			},
 		},
 	]);
-	await Repair.updateMany({}, [
-		{
-			$set: {
-				date: {
-					$toDate: '$date',
-				},
-				createdAt: {
-					$toDate: '$createdAt',
-				},
-				updatedAt: {
-					$toDate: '$createdAt',
-				},
-				vehicleId: {
-					$replaceAll: {
-						input: '$vehicleId',
-						find: ' ',
-						replacement: '',
+	await Repair.updateMany(
+		{},
+		[
+			{
+				$set: {
+					date: {
+						$toDate: '$date',
+					},
+					createdAt: {
+						$toDate: '$createdAt',
+					},
+					updatedAt: {
+						$toDate: '$createdAt',
+					},
+					vehicleId: {
+						$replaceAll: {
+							input: '$vehicleId',
+							find: ' ',
+							replacement: '',
+						},
 					},
 				},
 			},
-		},
-	], { timestamps:false });
+		],
+		{ timestamps: false }
+	);
 	const Vehicle = getModel(userId, 'Vehicle');
-	await Vehicle.updateMany({ vin: { $in: ['00000000000000000', '""'] } }, [
-		{
-			$set: {
-				vin: '',
+	await Vehicle.updateMany(
+		{ vin: { $in: ['00000000000000000', '""'] } },
+		[
+			{
+				$set: {
+					vin: '',
+				},
 			},
-		},
-	], { timestamps:false });
-	await Vehicle.updateMany({}, [
-		{
-			$set: {
-				createdAt: {
-					$toDate: '$createdAt',
-				},
-				updatedAt: {
-					$toDate: '$createdAt',
-				},
-				vehicleId: {
-					$replaceAll: {
-						input: '$vehicleId',
-						find: ' ',
-						replacement: '',
+		],
+		{ timestamps: false }
+	);
+	await Vehicle.updateMany(
+		{},
+		[
+			{
+				$set: {
+					createdAt: {
+						$toDate: '$createdAt',
+					},
+					updatedAt: {
+						$toDate: '$createdAt',
+					},
+					vehicleId: {
+						$replaceAll: {
+							input: '$vehicleId',
+							find: ' ',
+							replacement: '',
+						},
 					},
 				},
 			},
-		},
-	], { timestamps:false });
+		],
+		{ timestamps: false }
+	);
 }

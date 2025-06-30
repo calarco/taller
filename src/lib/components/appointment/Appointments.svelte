@@ -1,5 +1,4 @@
 <script>
-	import { fade } from 'svelte/transition';
 	import { windowState } from '$lib/shared.svelte';
 	import Section from '$lib/components/Section.svelte';
 	import Day from './Day.svelte';
@@ -53,19 +52,6 @@
 			</div>
 		{/each}
 	</Section>
-	{#if windowState.activeCard === ''}
-		<div class="top" in:fade={{ duration: 150 }} out:fade={{ duration: 200 }}>
-			<button
-				type="button"
-				onclick={() => {
-					windowState.activeCard = 'client';
-					windowState.id = '';
-				}}
-			>
-				<span class="icon create">cliente</span>
-			</button>
-		</div>
-	{/if}
 </div>
 
 <style>
@@ -98,44 +84,6 @@
 
 		h6 {
 			color: var(--on-background-variant);
-		}
-	}
-
-	.top {
-		position: absolute;
-		right: 8px;
-		z-index: 950;
-		width: 100%;
-		min-height: 3rem;
-		display: grid;
-		align-items: center;
-		justify-content: end;
-		text-transform: capitalize;
-
-		> button {
-			height: 100%;
-			padding: 0 1.5rem;
-			margin: 0;
-			border-radius: 0;
-			border: none;
-			color: var(--secondary);
-
-			&::after {
-				content: '';
-				position: absolute;
-				top: 0;
-				left: -1px;
-				bottom: 0;
-				border-left: var(--border-variant);
-			}
-
-			.icon.create {
-				padding-right: 0.5rem;
-
-				&::before {
-					background: var(--secondary);
-				}
-			}
 		}
 	}
 </style>
