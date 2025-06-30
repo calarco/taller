@@ -4,7 +4,7 @@ import { error, fail, redirect, isRedirect } from '@sveltejs/kit';
 import { MAIL_USER, MAIL_PASS } from '$env/static/private';
 import { getModel } from '$lib/server/db';
 import { createCarModel } from '$lib/server/controllers/CarModel.controller.js';
-import Estimate from '$lib/components/estimate/estimate.svelte';
+import Estimate from '$lib/components/estimate/Estimate.svelte';
 
 export function findEstimate(userId, filters) {
 	const Estimate = getModel(userId, 'Estimate');

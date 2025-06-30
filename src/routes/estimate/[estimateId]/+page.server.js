@@ -6,7 +6,7 @@ import { createCarMakeAction } from '$lib/server/controllers/CarMake.controller.
 import { createCarModelAction } from '$lib/server/controllers/CarModel.controller.js';
 import { createAppointmentAction, deleteAppointmentAction } from '$lib/server/controllers/Appointment.controller.js';
 import { findEstimate, upsertEstimateAction, deleteEstimateAction, sendEstimateAction } from '$lib/server/controllers/Estimate.controller.js';
-import Estimate from '$lib/components/estimate/estimate.svelte';
+import Estimate from '$lib/components/estimate/Estimate.svelte';
 
 export const load = async (event) => {
 	const userId = event.cookies.get('userId');
