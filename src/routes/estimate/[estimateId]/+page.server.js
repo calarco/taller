@@ -1,6 +1,6 @@
 import { error } from '@sveltejs/kit';
 import { render } from 'svelte/server';
-import { switchThemeAction } from '$lib/server/controllers/User.controller.js';
+import { findUser, switchThemeAction, editUserAction } from '$lib/server/controllers/User.controller.js';
 import { upsertClientAction } from '$lib/server/controllers/Client.controller.js';
 import { createCarMakeAction } from '$lib/server/controllers/CarMake.controller.js';
 import { createCarModelAction } from '$lib/server/controllers/CarModel.controller.js';
@@ -16,11 +16,17 @@ export const load = async (event) => {
 	}
 
 	try {
-		const estimate = await findEstimate(userId, { estimateId }).populate({ path: 'carModel', populate: { path: 'carMake' } });
+		const [estimate, user] = await Promise.all([
+			findEstimate(userId, { estimateId }).populate({ path: 'carModel', populate: { path: 'carMake' } }),
+			findUser(userId, { userId }),
+		]);
 		if (!estimate) {
 			throw error(500, 'Presupuesto no encontrado');
 		}
-		const rendered = await render(Estimate, { props: { estimate } });
+		if (!user) {
+			throw error(500, 'Usuario no encontrado');
+		}
+		const rendered = await render(Estimate, { props: { estimate, user } });
 		if (!rendered?.html) {
 			throw error(500, 'Presupuesto no renderizado');
 		}
@@ -35,9 +41,13 @@ export const actions = {
 	switchTheme: async (event) => {
 		return await switchThemeAction(event);
 	},
+	editUser: async (event) => {
+		return await editUserAction(event);
+	},
 	logout: async (event) => {
 		event.cookies.delete('auth-token', { path: '/' });
 		event.cookies.delete('userId', { path: '/' });
+		return;
 	},
 	createCarMake: async (event) => {
 		return await createCarMakeAction(event);

@@ -6,7 +6,7 @@ import { getModel } from '$lib/server/db';
 
 export function findUser(userId, filters) {
 	const User = getModel(userId, 'User');
-	return User.findOne(filters).lean();
+	return User.findOne(filters, { __v: 0 }).lean();
 }
 
 export function authenticate(cookies) {
@@ -43,12 +43,12 @@ export async function loginUserAction(event) {
 			return fail(400, { passwordError: 'Contraseña incorrecta' });
 		}
 
-		const token = jwt.sign({ id: user._id.toString() }, JWT_KEY, { expiresIn: '5040h' });
+		const token = jwt.sign({ id: user._id.toString() }, JWT_KEY, { expiresIn: '30d' });
 		const options = {
 			httpOnly: true,
 			secure: true,
 			path: '/',
-			maxAge: 60 * 60 * 24,
+			maxAge: 60 * 60 * 24 * 30,
 		};
 		event.cookies.set('auth-token', token, options);
 		event.cookies.set('userId', user.userId, options);
@@ -87,6 +87,34 @@ export async function createUserAction(event) {
 	}
 }
 
+export async function editUserAction(event) {
+	try {
+		const userId = event.cookies.get('userId');
+		if (!userId) {
+			return;
+		}
+
+		const form = await event.request.formData();
+		const user = {
+			name: (form.get('name') || '').trim(),
+			description: (form.get('description') || '').trim(),
+			phone: (form.get('phone') || '').trim(),
+			address: (form.get('address') || '').trim(),
+			email: (form.get('email') || '').trim().toLowerCase(),
+		};
+
+		if (!user.name) {
+			return fail(400, { nameError: 'Ingrese el nombre' });
+		}
+
+		const User = getModel(userId, 'User');
+		const data = await User.findOneAndUpdate({ userId }, user);
+		return { user: JSON.parse(JSON.stringify(data)) };
+	} catch (err) {
+		throw error(500, err.body || err.toString());
+	}
+}
+
 export async function switchThemeAction(event) {
 	try {
 		const userId = event.cookies.get('userId');
@@ -103,18 +131,6 @@ export async function switchThemeAction(event) {
 		const data = await User.findOneAndUpdate({ userId }, { darkTheme: !user.darkTheme });
 		const message = 'Tema cambiado';
 		return { data: JSON.parse(JSON.stringify(data)), message };
-	} catch (err) {
-		throw error(500, err.body || err.toString());
-	}
-}
-
-export async function getDarkTheme(userId) {
-	try {
-		const user = await findUser(userId, { userId });
-		if (!user) {
-			throw error(400, 'Usuario no encontrado');
-		}
-		return user.darkTheme;
 	} catch (err) {
 		throw error(500, err.body || err.toString());
 	}

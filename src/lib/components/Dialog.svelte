@@ -5,35 +5,41 @@
 	let { dialog = $bindable(), title, actionText, action, children } = $props();
 </script>
 
-<dialog bind:this={dialog} closedby="any">
-	<h4>{title}</h4>
-	<form
-		{action}
-		method="POST"
-		use:enhance={() => {
-			windowState.loading = true;
-			return async ({ result, update }) => {
-				update();
-				windowState.loading = false;
-				if (result.type === 'success' || result.type === 'redirect') {
-					dialog.close();
-				}
-			};
-		}}
-	>
-		{#if children}
-			{@render children()}
-		{/if}
-		<div class="dialogButtons">
-			<button type="button" onclick={() => dialog.close()}>Cancelar</button>
-			<button type="submit" onclick={() => dialog.close()} class={[{ save: actionText === 'Guardar' }]}>{actionText || 'Borrar'}</button>
-		</div>
-	</form>
+<dialog bind:this={dialog} closedby="any" class={[{ save: actionText === 'Guardar' }]}>
+	<div>
+		<h4>{title}</h4>
+		<form
+			{action}
+			method="POST"
+			use:enhance={() => {
+				windowState.loading = true;
+				windowState.error = {};
+				return async ({ result, update }) => {
+					update({ reset: false });
+					windowState.loading = false;
+					if (result.type === 'success' || result.type === 'redirect') {
+						dialog.close();
+					}
+					if (result.type === 'failure' && result.data) {
+						windowState.error = result.data;
+					}
+				};
+			}}
+		>
+			{#if children}
+				{@render children()}
+			{/if}
+			<div class="dialogButtons">
+				<button type="button" onclick={() => dialog.close()}>Cancelar</button>
+				<button type="submit">{actionText || 'Borrar'}</button>
+			</div>
+		</form>
+	</div>
 </dialog>
 
 <style>
 	dialog {
-		min-width: 32rem;
+		min-width: var(--min-width, 32rem);
 		max-width: 47rem;
 		padding: 0;
 		border-radius: 4px;
@@ -50,15 +56,48 @@
 			overlay 0.2s ease-in allow-discrete,
 			display 0.2s ease-in allow-discrete;
 
-		> h4 {
-			width: 100%;
-			text-align: center;
-			padding: 0.75rem 1rem;
-			border-bottom: var(--border-variant);
+		> div {
+			display: grid;
+
+			> h4 {
+				width: 100%;
+				text-align: center;
+				padding: 0.75rem 1rem;
+				border-bottom: var(--border-variant);
+			}
+
+			> form {
+				display: grid;
+				align-items: stretch;
+				grid-template-columns: var(--grid-columns);
+			}
 		}
 
-		.dialogButtons > .save {
-			color: var(--secondary);
+		&.save {
+			outline: 1px solid var(--primary);
+			background: var(--primary);
+
+			> div {
+				gap: 1px;
+
+				> h4 {
+					background: var(--surface);
+					border-bottom: none;
+				}
+
+				> form {
+					gap: 1px;
+				}
+
+				.dialogButtons {
+					background: var(--surface);
+					border-top: none;
+
+					> button[type='submit'] {
+						color: var(--secondary);
+					}
+				}
+			}
 		}
 	}
 

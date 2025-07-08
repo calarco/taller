@@ -10,6 +10,7 @@
 
 	let { children } = $props();
 
+	let darkTheme = $derived(page.data.user?.darkTheme);
 	let url = $derived(page.url.pathname);
 	$effect(() => {
 		if (url) {
@@ -37,8 +38,8 @@
 	<meta name="description" content="Gestión de taller mecánico" />
 </svelte:head>
 
-<main>
-	<Bar />
+<main class={[{ darkTheme }]}>
+	<Bar {darkTheme} switchTheme={() => (darkTheme = !darkTheme)} />
 	<div class="panels">
 		<Appointments />
 		<Search />

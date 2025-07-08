@@ -6,12 +6,12 @@ import { deleteRepairs, moveRepairs } from '$lib/server/controllers/Repair.contr
 
 export function findVehicle(userId, filters) {
 	const Vehicle = getModel(userId, 'Vehicle');
-	return Vehicle.findOne(filters).lean();
+	return Vehicle.findOne(filters, { __v: 0, _id: 0 }).lean();
 }
 
 export function findVehicles(userId, filters) {
 	const Vehicle = getModel(userId, 'Vehicle');
-	return Vehicle.find(filters).lean();
+	return Vehicle.find(filters, { __v: 0, _id: 0 }).lean();
 }
 
 export function deleteByVehicleId(userId, vehicleId) {

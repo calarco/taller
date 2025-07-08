@@ -39,33 +39,6 @@
 		<input type="number" name="labor" placeholder="0" autoComplete="off" bind:value={labor} class="precio" />
 	</Label>
 	<fieldset>
-		<Label title="Cantidad">
-			<input type="number" min="1" name="amount" placeholder="1" bind:value={amount} style="text-align: right;" />
-		</Label>
-		<Label title="Repuesto" error={windowState.error?.nameError}>
-			<input type="text" name="name" placeholder="-" autoComplete="off" bind:value={name} />
-		</Label>
-		<Label title="Precio" --template-columns="max-content 1fr auto">
-			<h6 class="unit">$</h6>
-			<input type="number" name="price" placeholder="0" bind:value={price} class="precio" />
-			<button
-				type="button"
-				onclick={() => {
-					if (name === '') {
-						windowState.error = { nameError: 'Ingrese un repuesto' };
-					} else if (parts.find((x) => x.name === name)) {
-						windowState.error = { nameError: 'Repuesto ya ingresado' };
-					} else {
-						parts = [...parts, { amount: amount || 1, name, price: price || 0 }];
-						amount = name = price = '';
-						windowState.error = {};
-					}
-				}}
-				aria-label="crear"
-			>
-				<span class="icon create"></span>
-			</button>
-		</Label>
 		<div class="parts">
 			<ul>
 				{#each parts as part (part.name)}
@@ -92,6 +65,33 @@
 				{/if}
 			</ul>
 		</div>
+		<Label title="Cantidad">
+			<input type="number" min="1" name="amount" placeholder="1" bind:value={amount}/>
+		</Label>
+		<Label title="Repuesto" error={windowState.error?.nameError}>
+			<input type="text" name="name" placeholder="-" autoComplete="off" bind:value={name} />
+		</Label>
+		<Label title="Precio" --template-columns="max-content 1fr auto">
+			<h6 class="unit">$</h6>
+			<input type="number" name="price" placeholder="0" bind:value={price} class="precio" />
+			<button
+				type="button"
+				onclick={() => {
+					if (name === '') {
+						windowState.error = { nameError: 'Ingrese un repuesto' };
+					} else if (parts.find((x) => x.name === name)) {
+						windowState.error = { nameError: 'Repuesto ya ingresado' };
+					} else {
+						parts = [...parts, { amount: amount || 1, name, price: price || 0 }];
+						amount = name = price = '';
+						windowState.error = {};
+					}
+				}}
+				aria-label="crear"
+			>
+				<span class="icon create"></span>
+			</button>
+		</Label>
 	</fieldset>
 </Form>
 
@@ -100,8 +100,9 @@
 		font-family: var(--font-family-alt);
 
 		> span {
-			font-family: var(--font-family-alt);
 			margin-right: 1rem;
+			font-family: var(--font-family-alt);
+			color: var(--on-background-variant);
 		}
 	}
 
@@ -118,16 +119,17 @@
 
 		.parts {
 			grid-column-end: span 3;
-			padding: 0 1rem 0.75rem 1rem;
+			padding: 0.75rem 1rem 1px 1rem;
 
 			ul {
 				min-height: 2.5rem;
+				max-height: 20rem;
+				overflow: auto;
 				margin: 0;
 				padding: 0;
 				background: var(--surface);
 				border-radius: 4px;
 				outline: var(--border-variant);
-				overflow: hidden;
 				display: grid;
 				align-content: space-between;
 				font: var(--label);
@@ -150,8 +152,6 @@
 						align-items: center;
 
 						&:first-child {
-							text-align: right;
-
 							p {
 								padding: 0 34px 0 1rem;
 							}
@@ -168,7 +168,7 @@
 
 						&:last-child {
 							p {
-								padding: 0 1rem 0 18px;
+								padding: 0 1rem 0 1.5rem;
 							}
 
 							&::after {

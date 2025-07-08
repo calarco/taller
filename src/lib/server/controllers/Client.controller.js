@@ -4,12 +4,12 @@ import { findVehicles, deleteByVehicleId } from '$lib/server/controllers/Vehicle
 
 export function findClient(userId, filters) {
 	const Client = getModel(userId, 'Client');
-	return Client.findOne(filters).lean();
+	return Client.findOne(filters, { __v: 0, _id: 0 }).lean();
 }
 
 export function findClients(userId, filters) {
 	const Client = getModel(userId, 'Client');
-	return Client.find(filters).lean();
+	return Client.find(filters, { __v: 0, _id: 0 }).lean();
 }
 
 export function upsertClient(userId, client) {

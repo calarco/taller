@@ -238,7 +238,7 @@
 	}
 
 	.empty {
-		padding: 1.5rem;
+		min-height: 4.5rem;
 	}
 
 	.result {
@@ -289,6 +289,10 @@
 
 				.vehicleId {
 					font-size: 0.9em;
+
+					span {
+						margin-left: 0.25rem;
+					}
 				}
 
 				> div {

@@ -3,17 +3,18 @@ import nodemailer from 'nodemailer';
 import { error, fail, redirect, isRedirect } from '@sveltejs/kit';
 import { MAIL_USER, MAIL_PASS } from '$env/static/private';
 import { getModel } from '$lib/server/db';
+import { findUser } from '$lib/server/controllers/User.controller.js';
 import { createCarModel } from '$lib/server/controllers/CarModel.controller.js';
 import Estimate from '$lib/components/estimate/Estimate.svelte';
 
 export function findEstimate(userId, filters) {
 	const Estimate = getModel(userId, 'Estimate');
-	return Estimate.findOne(filters).lean();
+	return Estimate.findOne(filters, { __v: 0, _id: 0 }).lean();
 }
 
 export function findEstimates(userId, filters) {
 	const Estimate = getModel(userId, 'Estimate');
-	return Estimate.find(filters).lean();
+	return Estimate.find(filters, { __v: 0, _id: 0 }).lean();
 }
 
 export function upsertEstimate(userId, estimate) {
@@ -121,12 +122,17 @@ export async function sendEstimateAction(event) {
 			return fail(400, { emailError: 'Ingrese un email' });
 		}
 
-		const estimate = await findEstimate(userId, { estimateId });
+		const [estimate, user] = await Promise.all([
+			findEstimate(userId, { estimateId }).populate({ path: 'carModel', populate: { path: 'carMake' } }),
+			findUser(userId, { userId }),
+		]);
 		if (!estimate) {
 			throw error(500, 'Presupuesto no encontrado');
 		}
-
-		const rendered = render(Estimate, { props: { estimate } });
+		if (!user) {
+			throw error(500, 'Usuario no encontrado');
+		}
+		const rendered = render(Estimate, { props: { estimate, user } });
 		if (!rendered?.html) {
 			throw error(500, 'Presupuesto no renderizado');
 		}

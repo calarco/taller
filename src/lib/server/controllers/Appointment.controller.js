@@ -4,12 +4,12 @@ import { createCarModel } from '$lib/server/controllers/CarModel.controller.js';
 
 export function findAppointment(userId, filters) {
 	const Appointment = getModel(userId, 'Appointment');
-	return Appointment.findOne(filters).lean();
+	return Appointment.findOne(filters, { __v: 0, _id: 0 }).lean();
 }
 
 export function findAppointments(userId, filters) {
 	const Appointment = getModel(userId, 'Appointment');
-	return Appointment.find(filters).lean();
+	return Appointment.find(filters, { __v: 0, _id: 0 }).lean();
 }
 
 async function getNewId(userId) {

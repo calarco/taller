@@ -87,6 +87,10 @@
 		.vehicleId {
 			text-align: center;
 			font-size: 1.1em;
+
+			span {
+				margin-left: 0.25rem;
+			}
 		}
 
 		.subtitle {

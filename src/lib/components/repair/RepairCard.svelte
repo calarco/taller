@@ -65,7 +65,7 @@
 		{#if windowState.activeCard === 'repair' && windowState.id === repair.repairId}
 			<RepairForm {repair} />
 		{/if}
-		<Dialog bind:dialog title="¿Borrar reparacion?" action="?/deleteRepair">
+		<Dialog bind:dialog title="¿Borrar reparación?" action="?/deleteRepair">
 			<input type="hidden" name="repairId" value={repair?.repairId} />
 			{@render repairContent()}
 		</Dialog>

@@ -3,12 +3,12 @@ import { getModel } from '$lib/server/db';
 
 export function findCarMake(userId, filters) {
 	const CarMake = getModel(userId, 'CarMake');
-	return CarMake.findOne(filters).lean();
+	return CarMake.findOne(filters, { __v: 0, _id: 0 }).lean();
 }
 
 export function findCarMakes(userId, filters) {
 	const CarMake = getModel(userId, 'CarMake');
-	return CarMake.find(filters).lean();
+	return CarMake.find(filters, { __v: 0, _id: 0 }).lean();
 }
 
 async function getNewId(userId) {

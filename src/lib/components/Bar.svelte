@@ -5,19 +5,17 @@
 	import { enhance } from '$app/forms';
 	import { windowState } from '$lib/shared.svelte.js';
 	import Dialog from '$lib/components/Dialog.svelte';
+	import Label from '$lib/components/Label.svelte';
 
-	let dialog = $state();
+	let { darkTheme, switchTheme } = $props();
+
+	let logoutDialog = $state();
+	let settingsDialog = $state();
 	let url = $derived(page.url.pathname);
-	let darkTheme = $derived(page.data.darkTheme);
+	let user = $derived(page.data.user || {});
 	$effect(() => {
-		if (url !== '/login') {
-			if (darkTheme) {
-				window.document.body.classList.add('dark-mode');
-			} else {
-				window.document.body.classList.remove('dark-mode');
-			}
-		} else {
-			dialog.close();
+		if (url === '/login') {
+			logoutDialog.close();
 		}
 	});
 </script>
@@ -30,7 +28,11 @@
 					type="button"
 					class="createButton"
 					onclick={() => {
-						windowState.activeCard = 'client';
+						if (windowState.activeCard !== 'client') {
+							windowState.activeCard = 'client';
+						} else {
+							windowState.activeCard = '';
+						}
 						windowState.id = '';
 					}}
 					aria-label="crear"
@@ -49,7 +51,11 @@
 					type="button"
 					class="createButton"
 					onclick={() => {
-						windowState.activeCard = 'estimate';
+						if (windowState.activeCard !== 'estimate') {
+							windowState.activeCard = 'estimate';
+						} else {
+							windowState.activeCard = '';
+						}
 						windowState.id = '';
 					}}
 					aria-label="crear"
@@ -60,8 +66,11 @@
 				</button>
 			</div>
 			<div></div>
+			<button type="button" onclick={() => settingsDialog.showModal()} aria-label="settings">
+				<span>{user.name || user.userId}</span>
+			</button>
 			<form method="POST" action="?/switchTheme" use:enhance>
-				<button type="submit" aria-label="borrar" onclick={() => (darkTheme = !darkTheme)}>
+				<button type="submit" aria-label="borrar" onclick={switchTheme}>
 					{#if darkTheme}
 						<span class="icon lighton"></span>
 					{:else}
@@ -69,13 +78,30 @@
 					{/if}
 				</button>
 			</form>
-			<button type="button" onclick={() => dialog.showModal()} aria-label="borrar">
+			<button type="button" onclick={() => logoutDialog.showModal()} aria-label="borrar">
 				<span class="icon logout"></span>
 			</button>
 		</div>
 	</div>
 </div>
-<Dialog bind:dialog title={`¿Cerrar la sesión de ${page.data.userId}?`} actionText="Cerrar sesión" action="?/logout" />
+<Dialog bind:dialog={settingsDialog} title={user.userId} action="?/editUser" actionText="Guardar" --grid-columns="1fr 1fr [end]" --min-width="40rem">
+	<Label title="Nombre" error={windowState.error?.nameError}>
+		<input type="text" name="name" placeholder="-" autoComplete="off" value={user.name || ''} />
+	</Label>
+	<Label title="Dirección" error={windowState.error?.addressError}>
+		<input type="text" name="address" placeholder="-" autoComplete="off" value={user.address || ''} />
+	</Label>
+	<Label title="Teléfono" error={windowState.error?.phoneError}>
+		<input type="tel" name="phone" pattern="\d*" placeholder="-" autoComplete="off" value={user.phone || ''} />
+	</Label>
+	<Label title="Correo electrónico" error={windowState.error?.emailError}>
+		<input style="text-transform: lowercase;" type="email" name="email" placeholder="-" autoComplete="off" value={user.email || ''} />
+	</Label>
+	<Label title="Descripción" error={windowState.error?.descriptionError} --column-end="span 2">
+		<input type="text" name="description" placeholder="-" autoComplete="off" value={user.description || ''} />
+	</Label>
+</Dialog>
+<Dialog bind:dialog={logoutDialog} title={`¿Cerrar la sesión de ${user.name || user.userId}?`} action="?/logout" actionText="Cerrar sesión" />
 {#if windowState.loading}
 	<div class="loading" in:fade={{ duration: 900, easing: sineOut }} out:fade={{ duration: 250, easing: sineIn }}>
 		<div></div>
@@ -122,7 +148,7 @@
 				}
 
 				&:last-child {
-					grid-template-columns: auto 1fr auto auto;
+					grid-template-columns: auto 1fr auto auto auto;
 
 					> form > button,
 					> button {
@@ -138,7 +164,7 @@
 						}
 					}
 
-					> button {
+					> button:last-child {
 						border-radius: 0 0 4px 0;
 					}
 				}

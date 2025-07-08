@@ -11,8 +11,8 @@ export async function getSearch(userId, value) {
 				findClients(userId)
 					.sort({ updatedAt: -1 })
 					.populate({ path: 'vehicles', perDocumentLimit: 1, options: { sort: { updatedAt: -1 } }, populate: { path: 'repairs', perDocumentLimit: 1, options: { sort: { updatedAt: -1 } } } })
-					.limit(50),
-				findEstimates(userId).sort({ updatedAt: -1 }).limit(50),
+					.limit(25),
+				findEstimates(userId).sort({ updatedAt: -1 }).limit(25),
 			]);
 		} else {
 			const filter = { $regex: value, $options: 'i' };
@@ -55,7 +55,7 @@ export async function getSearch(userId, value) {
 		];
 
 		if (!value) {
-			return search.sort((a, b) => b.updatedAt - a.updatedAt);
+			return search.sort((a, b) => b.updatedAt - a.updatedAt).slice(0, 25);
 		} else {
 			return search;
 		}

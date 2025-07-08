@@ -4,12 +4,12 @@ import { upsertVehicle } from '$lib/server/controllers/Vehicle.controller';
 
 export function findRepair(userId, filters) {
 	const Repair = getModel(userId, 'Repair');
-	return Repair.findOne(filters).lean();
+	return Repair.findOne(filters, { __v: 0, _id: 0 }).lean();
 }
 
 export function findRepairs(userId, filters) {
 	const Repair = getModel(userId, 'Repair');
-	return Repair.find(filters).lean();
+	return Repair.find(filters, { __v: 0, _id: 0 }).lean();
 }
 
 export function deleteRepairs(userId, filters) {

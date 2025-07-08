@@ -105,7 +105,7 @@ body {
 	color: var(--on-background);
 	user-select: none;
 
-	&.dark-mode {
+	&:has(main.darkTheme) {
 		color-scheme: dark;
 
 		::-webkit-scrollbar-track {
@@ -236,6 +236,14 @@ body {
 	mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='m15.489 21.27l-3.558-3.558l.708-.708l2.85 2.85l5.688-5.688l.708.707zM12 11l7.692-5H4.308zm0 1.116L4 6.885v10.5q0 .269.173.442t.443.173H9.4l1 1H4.616q-.691 0-1.153-.462T3 17.384V6.616q0-.691.463-1.153T4.615 5h14.77q.69 0 1.152.463T21 6.616v4.926l-1 1V6.885zm0 0'/%3E%3C/svg%3E");
 }
 
+.icon.settings::before {
+	mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='m10.135 21l-.362-2.892q-.479-.145-1.035-.454q-.557-.31-.947-.664l-2.668 1.135l-1.865-3.25l2.306-1.739q-.045-.27-.073-.558q-.03-.288-.03-.559q0-.252.03-.53q.028-.278.073-.626L3.258 9.126l1.865-3.212L7.771 7.03q.448-.373.97-.673q.52-.3 1.013-.464L10.134 3h3.732l.361 2.912q.575.202 1.016.463t.909.654l2.725-1.115l1.865 3.211l-2.382 1.796q.082.31.092.569t.01.51q0 .233-.02.491q-.019.259-.088.626l2.344 1.758l-1.865 3.25l-2.681-1.154q-.467.393-.94.673t-.985.445L13.866 21zM11 20h1.956l.369-2.708q.756-.2 1.36-.549q.606-.349 1.232-.956l2.495 1.063l.994-1.7l-2.189-1.644q.125-.427.166-.786q.04-.358.04-.72q0-.38-.04-.72t-.166-.747l2.227-1.683l-.994-1.7l-2.552 1.07q-.454-.499-1.193-.935q-.74-.435-1.4-.577L13 4h-1.994l-.312 2.689q-.756.161-1.39.52q-.633.358-1.26.985L5.55 7.15l-.994 1.7l2.169 1.62q-.125.336-.175.73t-.05.82q0 .38.05.755t.156.73l-2.15 1.645l.994 1.7l2.475-1.05q.589.594 1.222.953q.634.359 1.428.559zm.973-5.5q1.046 0 1.773-.727T14.473 12t-.727-1.773t-1.773-.727q-1.052 0-1.776.727T9.473 12t.724 1.773t1.776.727M12 12'/%3E%3C/svg%3E");
+}
+
+.icon.taller::before {
+	mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='M11.5 20.77v-3h-7v-1h15v1h-7v3zm-2.884-8.731q.309 0 .539-.23t.23-.54t-.23-.54t-.54-.229t-.539.23t-.23.54t.23.539t.54.23m6.769 0q.31 0 .539-.23t.23-.54t-.23-.54t-.54-.229t-.539.23t-.23.54t.23.539t.54.23M6 9.522l1.496-4.3q.067-.215.241-.334t.386-.12h7.754q.212 0 .386.12q.173.119.24.334L18 9.523v5.793q0 .198-.128.326q-.127.127-.326.127h-.092q-.199 0-.326-.127q-.128-.128-.128-.326v-1.547H7v1.546q0 .199-.128.327q-.127.127-.326.127h-.092q-.199 0-.326-.127Q6 15.514 6 15.316zm1.304-.754h9.392l-1.046-3h-7.3z'/%3E%3C/svg%3E");
+}
+
 pre,
 p,
 h6,
@@ -249,12 +257,6 @@ label,
 	display: inline-block;
 	margin: 0;
 	color: var(--on-background);
-
-	> span,
-	small {
-		margin-left: 0.25em;
-		color: var(--on-background-variant);
-	}
 }
 
 p {
@@ -266,10 +268,6 @@ p {
 		height: 0;
 		width: 0;
 		margin-top: calc((1 - 1.25) * 0.5em);
-	}
-
-	small {
-		font: var(--label);
 	}
 }
 
@@ -283,14 +281,6 @@ h6 {
 		width: 0;
 		margin-top: calc((1 - 1.5) * 0.5em);
 	}
-
-	small {
-		font: var(--body1);
-	}
-
-	span {
-		font: var(--subhead1);
-	}
 }
 
 h5 {
@@ -303,10 +293,6 @@ h5 {
 		width: 0;
 		margin-top: calc((1 - 1.5) * 0.5em);
 	}
-
-	small {
-		font: var(--body1);
-	}
 }
 
 h4 {
@@ -318,10 +304,6 @@ h4 {
 		height: 0;
 		width: 0;
 		margin-top: calc((1 - 2.25) * 0.5em);
-	}
-
-	small {
-		font: var(--body1);
 	}
 }
 
@@ -346,10 +328,6 @@ h2 {
 		height: 0;
 		width: 0;
 		margin-top: calc((1 - 2) * 0.5em);
-	}
-
-	small {
-		font: var(--subhead1);
 	}
 }
 
@@ -435,6 +413,7 @@ input[type='search'] {
 }
 
 input[type='number'] {
+	padding: 0.25rem 1.5rem 0.25rem 0.5rem;
 	width: 100%;
 	text-align: inherit;
 
@@ -642,7 +621,6 @@ input[type='submit'] {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	text-transform: uppercase;
 	font: var(--body2);
 	color: var(--primary);
 	transition: 0.1s ease-in;
@@ -777,6 +755,7 @@ a {
 		padding: 0 1.5rem;
 		border-radius: 0px;
 		background: none;
+		text-transform: uppercase;
 
 		&:hover {
 			cursor: pointer;
@@ -813,6 +792,7 @@ a {
 		border-radius: 0px;
 		background: none;
 		border: none;
+		text-transform: uppercase;
 
 		&:hover {
 			cursor: pointer;
@@ -831,6 +811,8 @@ a {
 }
 
 .dialogButtons {
+	grid-column-start: 1;
+	grid-column-end: span end;
 	position: relative;
 	width: 100%;
 	height: 3rem;
@@ -843,10 +825,6 @@ a {
 		border-top: none;
 	}
 
-	button[type='submit'] {
-		color: var(--error);
-	}
-
 	button {
 		width: 100%;
 		height: 3rem;
@@ -854,6 +832,7 @@ a {
 		border-radius: 0px;
 		background: none;
 		border: none;
+		text-transform: uppercase;
 
 		&:focus {
 			background: none;
@@ -873,12 +852,18 @@ a {
 			border-left: var(--border-variant);
 		}
 	}
+
+	button[type='submit'] {
+		color: var(--error);
+	}
 }
 
 .empty {
 	width: 100%;
 	position: relative;
 	padding: 0.5rem 2rem;
+	display: grid;
+	align-items: center;
 	text-align: center;
 	color: var(--on-background-variant);
 
