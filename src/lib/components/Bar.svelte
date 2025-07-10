@@ -186,7 +186,7 @@
 
 				.createCont {
 					position: relative;
-					width: 6rem;
+					width: 5.25rem;
 
 					.createButton {
 						position: absolute;

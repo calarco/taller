@@ -18,11 +18,11 @@
 	<Preview preview={estimate.description} />
 	<Container align="center" style={{ maxWidth: '100%', padding: '1rem', display: 'grid' }}>
 		{#if user.description}
-			<Heading as="h5">
+			<Heading as="h5" style={{ margin: '0' }}>
 				{user.description}
 			</Heading>
 		{/if}
-		<Heading as="h1" style={{ padding: '1.5rem' }}>
+		<Heading as="h1" style={{ margin: '0', padding: '1.5rem' }}>
 			{user.name || user.userId}
 		</Heading>
 		<Container align="center" style={{ maxWidth: '100%' }}>
@@ -41,7 +41,7 @@
 	</Container>
 	<Hr style={{ borderColor: 'rgba(128,128,128,0.2)', margin: '1rem 0' }} />
 	<Container align="center" style={{ maxWidth: '100%', padding: '1rem', display: 'grid' }}>
-		<Heading as="h4">
+		<Heading as="h4" style={{ margin: '0' }}>
 			Presupuesto - {Intl.DateTimeFormat('es-AR', { year: 'numeric', month: 'long', day: 'numeric' }).format(estimate.createdAt)}
 		</Heading>
 		<Text style={{ margin: '1rem 0 0 0' }}>
@@ -58,12 +58,12 @@
 	</Container>
 	<table style={styleToString({ padding: '1rem' })}>
 		<tbody style={styleToString({ outline: '1px solid rgba(128,128,128,0.2)' })}>
-			<tr style={styleToString({ color: 'rgba(128,128,128,0.75)' })}>
+			<tr style={styleToString({ color: 'rgba(128,128,128,0.75)', fontWeight: 800 })}>
 				<td align="left" colspan="2" width="100%">
-					<Text style={{ padding: '0 1.5rem', color: 'inherit' }}>Reparacion</Text>
+					<Text style={{ padding: '0 1.5rem', color: 'inherit', fontWeight: 'inherit' }}>Reparación</Text>
 				</td>
 				<td align="right">
-					<Text style={{ padding: '0 1.5rem', color: 'inherit', minWidth: '150px', borderLeft: '1px solid rgba(128,128,128,0.2)' }}>Mano de obra</Text>
+					<Text style={{ padding: '0 1.5rem', color: 'inherit', fontWeight: 'inherit', minWidth: '150px', borderLeft: '1px solid rgba(128,128,128,0.2)' }}>Mano de obra</Text>
 				</td>
 			</tr>
 			<tr>
@@ -79,15 +79,15 @@
 	{#if estimate.parts.length}
 		<table style={styleToString({ padding: '0 1rem' })}>
 			<tbody style={styleToString({ outline: '1px solid rgba(128,128,128,0.2)' })}>
-				<tr style={styleToString({ color: 'rgba(128,128,128,0.75)' })}>
+				<tr style={styleToString({ color: 'rgba(128,128,128,0.75)', fontWeight: 800 })}>
 					<td align="center">
-						<Text style={{ padding: '0 1.5rem', color: 'inherit', minWidth: '100px', borderRight: '1px solid rgba(128,128,128,0.2)' }}>Cantidad</Text>
+						<Text style={{ padding: '0 1.5rem', color: 'inherit', fontWeight: 'inherit', minWidth: '100px', borderRight: '1px solid rgba(128,128,128,0.2)' }}>Cantidad</Text>
 					</td>
 					<td align="left" width="100%">
-						<Text style={{ padding: '0 1.5rem', color: 'inherit' }}>Repuesto</Text>
+						<Text style={{ padding: '0 1.5rem', color: 'inherit', fontWeight: 'inherit' }}>Repuesto</Text>
 					</td>
 					<td align="right">
-						<Text style={{ padding: '0 1.5rem', color: 'inherit', minWidth: '150px', borderLeft: '1px solid rgba(128,128,128,0.2)' }}>Precio</Text>
+						<Text style={{ padding: '0 1.5rem', color: 'inherit', fontWeight: 'inherit', minWidth: '150px', borderLeft: '1px solid rgba(128,128,128,0.2)' }}>Precio</Text>
 					</td>
 				</tr>
 				{#each estimate.parts as part (part.name)}
@@ -107,10 +107,10 @@
 		</table>
 		<table style={styleToString({ padding: '1rem' })}>
 			<tbody style={styleToString({ outline: '1px solid rgba(128,128,128,0.2)' })}>
-				<tr style={styleToString({ color: 'rgba(128,128,128,0.75)' })}>
+				<tr style={styleToString({ color: 'rgba(128,128,128,0.75)', fontWeight: 800 })}>
 					<td align="left" colspan="2" width="100%"></td>
 					<td align="right">
-						<Text style={{ padding: '0 1.5rem', color: 'inherit', minWidth: '150px', borderLeft: '1px solid rgba(128,128,128,0.2)' }}>Total</Text>
+						<Text style={{ padding: '0 1.5rem', color: 'inherit', fontWeight: 'inherit', minWidth: '150px', borderLeft: '1px solid rgba(128,128,128,0.2)' }}>Total</Text>
 					</td>
 				</tr>
 				<tr>

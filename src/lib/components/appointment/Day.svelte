@@ -56,7 +56,7 @@
 		padding: 0.75rem 1.5rem;
 		display: grid;
 		align-items: start;
-		grid-template-columns: 3rem 1fr;
+		grid-template-columns: 2.5rem 1fr;
 		gap: 1.5rem;
 		z-index: 10;
 		transition: z-index 0.35s step-end;
@@ -80,7 +80,6 @@
 	.day {
 		position: relative;
 		height: 3rem;
-		padding: 0 0.5rem;
 		text-transform: uppercase;
 		text-align: center;
 		display: grid;

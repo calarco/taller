@@ -71,12 +71,12 @@
 		margin-top: -1px;
 		width: 100%;
 		min-height: calc(3rem + 1px);
-		padding: 0.5rem 2rem;
+		padding: 0.5rem 1.75rem;
 		border-top: var(--border-variant);
 		background: var(--surface);
 		box-shadow: var(--shadow);
 		display: grid;
-		gap: 2rem;
+		gap: 1.75rem;
 		grid-auto-flow: column;
 		align-items: center;
 		justify-content: start;

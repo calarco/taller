@@ -63,3 +63,28 @@ COPY (SELECT
 	ON
     	"vehiculoId"=vehiculos.id
 ) TO '/tmp/repairs.tsv' WITH (FORMAT CSV, HEADER TRUE, DELIMITER E'\t');
+
+COPY (SELECT
+    	id AS "appointmentId.string()",
+    	fecha AS "date.auto()",
+		motivo AS "description.string()",
+		"modeloId" AS "carModelId.string()",
+    	"createdAt" AS "createdAt.auto()",
+    	"updatedAt" AS "updatedAt.auto()"
+	FROM
+    	turnos
+) TO '/tmp/appointments.tsv' WITH (FORMAT CSV, HEADER TRUE, DELIMITER E'\t');
+
+COPY (SELECT
+    	id AS "estimateId.string()",
+		km AS "km.int32()",
+		motivo AS "description.string()",
+		labor AS "labor.int32()",
+		(repuestos #>> '{}') AS "parts.string()",
+		patente AS "vehicleId.string()",
+		"modeloId" AS "carModelId.string()",
+    	"createdAt" AS "createdAt.auto()",
+    	"updatedAt" AS "updatedAt.auto()"
+	FROM
+    	presupuestos
+) TO '/tmp/estimates.tsv' WITH (FORMAT CSV, HEADER TRUE, DELIMITER E'\t');

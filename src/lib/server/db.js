@@ -157,6 +157,17 @@ export async function fixData(userId) {
 		{ timestamps: false }
 	);
 	await Client.updateMany(
+		{ lastName: { $in: ['""'] } },
+		[
+			{
+				$set: {
+					lastName: '',
+				},
+			},
+		],
+		{ timestamps: false }
+	);
+	await Client.updateMany(
 		{},
 		[
 			{
@@ -239,6 +250,64 @@ export async function fixData(userId) {
 		[
 			{
 				$set: {
+					createdAt: {
+						$toDate: '$createdAt',
+					},
+					updatedAt: {
+						$toDate: '$createdAt',
+					},
+					vehicleId: {
+						$replaceAll: {
+							input: '$vehicleId',
+							find: ' ',
+							replacement: '',
+						},
+					},
+				},
+			},
+		],
+		{ timestamps: false }
+	);
+	const Appointment = getModel(userId, 'Appointment');
+	await Appointment.updateMany(
+		{},
+		[
+			{
+				$set: {
+					date: {
+						$toDate: '$date',
+					},
+					createdAt: {
+						$toDate: '$createdAt',
+					},
+					updatedAt: {
+						$toDate: '$createdAt',
+					},
+					vehicleId: {
+						$replaceAll: {
+							input: '$vehicleId',
+							find: ' ',
+							replacement: '',
+						},
+					},
+				},
+			},
+		],
+		{ timestamps: false }
+	);
+	const Estimate = getModel(userId, 'Estimate');
+	await Estimate.updateMany(
+		{},
+		[
+			{
+				$set: {
+					parts: {
+						$function: {
+							lang: 'js',
+							args: ['$parts'],
+							body: 'function(infoStr) { let str = infoStr.slice(1).slice(0, -1).replaceAll(`""`, `"`); try { str = JSON.parse(str); if (Array.isArray(str) && str.length) { str = str.map(function(x) { return { amount: x.cantidad || 1, name: x.repuesto || "", price: x.precio || 0 } }) } } catch(e) {} return str; }',
+						},
+					},
 					createdAt: {
 						$toDate: '$createdAt',
 					},

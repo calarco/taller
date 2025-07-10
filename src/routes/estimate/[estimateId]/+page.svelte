@@ -39,9 +39,10 @@
 						windowState.loading = true;
 						windowState.error = {};
 						return async ({ result, update }) => {
-							update();
+							update({ reset: false });
 							windowState.loading = false;
 							if (result.type === 'success') {
+								console.log('email sent');
 							}
 							if (result.type === 'failure' && result.data) {
 								windowState.error = result.data;
@@ -69,9 +70,21 @@
 			</div>
 			<Dialog bind:dialog title="¿Borrar presupuesto?" action="?/deleteEstimate">
 				<input type="hidden" name="estimateId" value={estimate.estimateId} />
-				<div>
-					{estimate.description}
-				</div>
+				<article>
+					<div>
+						{#if estimate.vehicleId.length === 6}
+							<h4 class="vehicleId">{estimate.vehicleId?.slice(0, 3)}<span>{estimate.vehicleId?.slice(-3)}</span></h4>
+						{:else if estimate.vehicleId.length === 7}
+							<h4 class="vehicleId">{estimate.vehicleId?.slice(0, 2)}<span>{estimate.vehicleId?.slice(2, 5)}</span><span>{resultado.vehicleId?.slice(-2)}</span></h4>
+						{:else}
+							<h4 class="vehicleId">{estimate.vehicleId}</h4>
+						{/if}
+						{#if estimate.carModel}
+							<small>{estimate.carModel?.carMake?.name} {estimate.carModel?.name}</small>
+						{/if}
+					</div>
+					<p>{estimate.description}</p>
+				</article>
 			</Dialog>
 		</div>
 	{/key}
@@ -185,5 +198,36 @@
 		left: 0;
 		border-radius: 4px;
 		border-top: var(--border-variant);
+	}
+
+	article {
+		min-width: 40rem;
+		padding: 1rem 1.5rem;
+		display: flex;
+		align-items: center;
+		gap: 2rem;
+
+		> div {
+			min-width: 5rem;
+			max-width: 8rem;
+			display: grid;
+			align-items: center;
+
+			.vehicleId {
+				font-size: 0.9em;
+
+				span {
+					margin-left: 0.25rem;
+				}
+			}
+
+			small {
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: pre;
+				font-size: 0.75em;
+				color: var(--on-background-variant);
+			}
+		}
 	}
 </style>

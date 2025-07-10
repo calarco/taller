@@ -15,30 +15,32 @@
 	{#key data.client.clientId}
 		<div in:fly={{ y: '-1rem', duration: 300, easing: sineOut }} out:blur={{ amount: 32, duration: 900, easing: sineIn }}>
 			<div class="vehiculos">
-				<Section overlay={windowState.activeCard === 'vehicle' || windowState.activeCard === 'client'} cards>
-					<div class={['createCont', { isCreate }]}>
-						{#if isCreate}
-							<VehicleForm />
+				<div>
+					<Section overlay={windowState.activeCard === 'vehicle' || windowState.activeCard === 'client'} cards>
+						<div class={['createCont', { isCreate }]}>
+							{#if isCreate}
+								<VehicleForm />
+							{/if}
+							<button
+								type="button"
+								class="createButton"
+								onclick={() => {
+									windowState.activeCard = 'vehicle';
+									windowState.id = '';
+								}}
+								aria-label="crear"
+							>
+								<span class="icon vehicle"></span>
+							</button>
+						</div>
+						{#if !data.vehicles?.length}
+							<h5 class="empty">Sin vehiculos</h5>
 						{/if}
-						<button
-							type="button"
-							class="createButton"
-							onclick={() => {
-								windowState.activeCard = 'vehicle';
-								windowState.id = '';
-							}}
-							aria-label="crear"
-						>
-							<span class="icon vehicle"></span>
-						</button>
-					</div>
-					{#if !data.vehicles?.length}
-						<h5 class="empty">Sin vehiculos</h5>
-					{/if}
-					{#each data.vehicles as vehicle (vehicle.vehicleId)}
-						<VehicleCard {vehicle} />
-					{/each}
-				</Section>
+						{#each data.vehicles as vehicle (vehicle.vehicleId)}
+							<VehicleCard {vehicle} />
+						{/each}
+					</Section>
+				</div>
 			</div>
 			<ClientCard />
 		</div>
@@ -66,8 +68,17 @@
 	}
 
 	.vehiculos {
+		position: relative;
 		border-radius: 4px;
 		border-top: var(--border-variant);
+
+		> div {
+			position: absolute;
+			top: 0;
+			bottom: 0;
+			left: 0;
+			right: 0;
+		}
 	}
 
 	.createCont {
