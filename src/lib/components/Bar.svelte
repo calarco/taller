@@ -124,7 +124,7 @@
 </Dialog>
 <Dialog bind:dialog={logoutDialog} title={`¿Cerrar la sesión de ${user.name || user.userId}?`} action="?/logout" actionText="Cerrar sesión" />
 {#if windowState.loading}
-	<div class="loading" in:fade={{ duration: 900, easing: sineOut }} out:fade={{ duration: 250, easing: sineIn }}>
+	<div class="loading" in:fade={{ duration: 1800, easing: sineIn }} out:fade={{ duration: 250, easing: sineIn }}>
 		<div></div>
 		<div></div>
 	</div>

@@ -16,7 +16,7 @@
 				windowState.loading = true;
 				windowState.error = {};
 				return async ({ result, update }) => {
-					update({ reset: false });
+					update();
 					windowState.loading = false;
 					if (result.type === 'success' || result.type === 'redirect') {
 						hide = true;
