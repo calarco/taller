@@ -1,7 +1,6 @@
 <script>
 	import { slide } from 'svelte/transition';
 	import { sineIn, sineOut } from 'svelte/easing';
-	import { getCarName } from '$lib/shared.svelte';
 	import Dialog from '$lib/components/Dialog.svelte';
 
 	let { appointment } = $props();
@@ -11,7 +10,9 @@
 {#snippet appointmentContent()}
 	<article>
 		<h5>{appointment?.description}</h5>
-		<p>{getCarName(appointment?.carModelId)}</p>
+		{#if appointment?.carModel}
+			<p>{appointment.carModel.carMake?.name} {appointment.carModel.name}</p>
+		{/if}
 	</article>
 {/snippet}
 

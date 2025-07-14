@@ -12,7 +12,7 @@
 	const id = date.toISOString().substring(0, 10);
 	const isCurrent = id === today.toISOString().substring(0, 10);
 	const isWeekend = [0, 6].indexOf(date.getDay()) !== -1;
-	let isCreate = $derived(windowState.activeCard === 'appointment' && windowState.id === id);
+	let isCreate = $derived(windowState.form === 'appointment' && windowState.id === id);
 	let appointments = $derived(page.data.appointments?.filter((x) => new Date(x.date).toISOString().substring(0, 10) === id));
 
 	let element;
@@ -36,7 +36,7 @@
 			<button
 				type="button"
 				onclick={() => {
-					windowState.activeCard = 'appointment';
+					windowState.form = 'appointment';
 					windowState.id = id;
 				}}
 				aria-label="crear"

@@ -46,7 +46,7 @@
 		</Heading>
 		<Text style={{ margin: '1rem 0 0 0' }}>
 			{#if estimate.carModel}
-				<span style={styleToString({ padding: '0 0.5rem' })}>{estimate.carModel?.carMake?.name} {estimate.carModel?.name}</span>
+				<span style={styleToString({ padding: '0 0.5rem' })}>{estimate.carModel.carMake?.name} {estimate.carModel.name}</span>
 			{/if}
 			{#if estimate.vehicleId}
 				<span style={styleToString({ padding: '0 0.5rem' })}>{estimate.vehicleId}</span>

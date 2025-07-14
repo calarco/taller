@@ -13,7 +13,7 @@
 				href="/"
 				aria-label="cerrar"
 				onclick={() => {
-					windowState.activeCard = '';
+					windowState.form = '';
 					windowState.id = '';
 				}}
 			>

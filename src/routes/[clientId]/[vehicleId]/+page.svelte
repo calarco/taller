@@ -8,13 +8,13 @@
 
 	let { data } = $props();
 
-	let isCreate = $derived(windowState.activeCard === 'repair' && windowState.id === '');
+	let isCreate = $derived(windowState.form === 'repair' && windowState.id === '');
 </script>
 
 <div class="panel" in:fly={{ x: '-1rem', duration: 300, easing: sineOut }} out:blur={{ amount: 32, duration: 250, easing: sineIn }}>
 	{#key data.vehicle.vehicleId}
 		<div class="container" in:fly={{ x: '-1rem', duration: 300, easing: sineOut }} out:blur={{ amount: 32, duration: 900, easing: sineIn }}>
-			<Section overlay={windowState.activeCard === 'repair' || windowState.activeCard === 'estimate'} cards>
+			<Section overlay={windowState.form === 'repair' || windowState.form === 'estimate'} cards>
 				<div class={['createCont', { isCreate }]}>
 					{#if isCreate}
 						<RepairForm />
@@ -23,7 +23,7 @@
 						type="button"
 						class="createButton"
 						onclick={() => {
-							windowState.activeCard = 'repair';
+							windowState.form = 'repair';
 							windowState.id = '';
 						}}
 						aria-label="crear"

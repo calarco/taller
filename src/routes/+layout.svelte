@@ -14,13 +14,13 @@
 	let url = $derived(page.url.pathname);
 	$effect(() => {
 		if (url) {
-			windowState.activeCard = '';
+			windowState.form = '';
 			windowState.id = '';
 			windowState.loading = false;
 		}
 	});
 	$effect(() => {
-		if (windowState.activeCard === '') {
+		if (windowState.form === '') {
 			windowState.error = {};
 		}
 	});
@@ -44,12 +44,12 @@
 		<Appointments />
 		<Search />
 		{@render children()}
-		{#if windowState.activeCard === 'client'}
+		{#if windowState.form === 'client'}
 			<div class="panel client">
 				<ClientForm />
 			</div>
 		{/if}
-		{#if windowState.activeCard === 'estimate'}
+		{#if windowState.form === 'estimate'}
 			<div class="panel estimate">
 				<EstimateForm />
 			</div>

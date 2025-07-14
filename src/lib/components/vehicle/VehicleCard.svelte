@@ -2,39 +2,41 @@
 	import { slide } from 'svelte/transition';
 	import { sineIn, sineOut } from 'svelte/easing';
 	import { page } from '$app/state';
-	import { windowState, getCarName } from '$lib/shared.svelte.js';
+	import { windowState } from '$lib/shared.svelte.js';
 	import Card from '$lib/components/Card.svelte';
 	import Dialog from '$lib/components/Dialog.svelte';
 	import VehicleForm from '$lib/components/vehicle/VehicleForm.svelte';
 
 	let { vehicle } = $props();
 
-	let isActive = $derived(page.url.pathname.split('/')[2] === vehicle.vehicleId);
+	let isActive = $derived(page.url.pathname.split('/')[2] === vehicle?.vehicleId);
 	let dialog = $state();
 </script>
 
 {#snippet vehicleContent()}
 	<article>
-		{#if vehicle.vehicleId.length === 6}
+		{#if vehicle?.vehicleId?.length === 6}
 			<h4 class="vehicleId">{vehicle.vehicleId.slice(0, 3)}<span>{vehicle.vehicleId.slice(3)}</span></h4>
-		{:else if vehicle.vehicleId.length === 7}
+		{:else if vehicle?.vehicleId?.length === 7}
 			<h4 class="vehicleId">{vehicle.vehicleId.slice(0, 2)}<span>{vehicle.vehicleId.slice(2, 5)}</span><span>{vehicle.vehicleId.slice(-2)}</span></h4>
 		{:else}
-			<h4 class="vehicleId">{vehicle.vehicleId}</h4>
+			<h4 class="vehicleId">{vehicle?.vehicleId}</h4>
 		{/if}
 		<div class="subtitle">
-			<h6>{getCarName(vehicle.carModelId)}</h6>
-			{#if vehicle.year || vehicle.fuel || vehicle.displacement}
+			{#if vehicle?.carModel}
+				<h6>{vehicle.carModel.carMake?.name} {vehicle.carModel.name}</h6>
+			{/if}
+			{#if vehicle?.year || vehicle?.fuel || vehicle?.displacement}
 				<div>
-					{#if vehicle.year}
+					{#if vehicle?.year}
 						<p>{vehicle.year}</p>
 					{/if}
-					<span>{vehicle.fuel} {vehicle.displacement}{vehicle.displacement ? 'L' : ''}</span>
+					<span>{vehicle?.fuel} {vehicle?.displacement}{vehicle?.displacement ? 'L' : ''}</span>
 				</div>
 			{/if}
 		</div>
 		<div class="details">
-			{#if vehicle.vin}
+			{#if vehicle?.vin}
 				<div>
 					<p>{vehicle.vin}</p>
 					<div class="label">VIN</div>
@@ -44,8 +46,8 @@
 	</article>
 {/snippet}
 
-<Card {isActive} isForm={windowState.activeCard === 'vehicle' && windowState.id === vehicle.vehicleId}>
-	<a href={isActive ? `/${page.data.client.clientId}` : `/${page.data.client.clientId}/${vehicle.vehicleId}`}>
+<Card {isActive} isForm={windowState.form === 'vehicle' && windowState.id === vehicle?.vehicleId}>
+	<a href={isActive ? `/${page.data.client.clientId}` : `/${page.data.client.clientId}/${vehicle?.vehicleId}`}>
 		{@render vehicleContent()}
 	</a>
 	{#if isActive}
@@ -56,19 +58,19 @@
 			<button
 				type="button"
 				onclick={() => {
-					windowState.activeCard = 'vehicle';
-					windowState.id = vehicle.vehicleId;
+					windowState.form = 'vehicle';
+					windowState.id = vehicle?.vehicleId;
 				}}
 				aria-label="editar"
 			>
 				<span class="icon edit"></span>
 			</button>
 		</div>
-		{#if windowState.activeCard === 'vehicle' && windowState.id === vehicle.vehicleId}
+		{#if windowState.form === 'vehicle' && windowState.id === vehicle?.vehicleId}
 			<VehicleForm {vehicle} />
 		{/if}
 		<Dialog bind:dialog title="¿Borrar vehiculo y sus reparaciones?" action="?/deleteVehicle">
-			<input type="hidden" name="vehicleId" value={vehicle.vehicleId} />
+			<input type="hidden" name="vehicleId" value={vehicle?.vehicleId} />
 			{@render vehicleContent()}
 		</Dialog>
 	{/if}

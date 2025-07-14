@@ -368,6 +368,7 @@ input[type='tel'],
 input[type='date'],
 input[type='time'],
 input[type='password'],
+input:is(:-webkit-autofill, :autofill),
 textarea {
 	display: block;
 	width: 100%;
@@ -380,17 +381,25 @@ textarea {
 	color: var(--on-background);
 	transition: 0.1s ease-in;
 
+	&:is(:-webkit-autofill, :autofill):hover,
 	&:hover {
+		border: none;
 		outline: 1px solid var(--primary-variant);
 		transition: 0.15s ease-out;
 	}
 
+	&:is(:-webkit-autofill, :autofill):focus,
 	&:focus {
+		border: none;
 		outline: 1px solid rgba(0, 0, 0, 0);
 		background: var(--primary-variant);
 		box-shadow: var(--shadow-variant);
 		color: var(--on-background);
 		transition: 0.15s ease-out;
+	}
+
+	&:is(:-webkit-autofill, :autofill) {
+		border: none;
 	}
 }
 

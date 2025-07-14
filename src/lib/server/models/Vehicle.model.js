@@ -17,6 +17,13 @@ VehicleSchema.index({ vehicleId: 1 });
 VehicleSchema.set('toObject', { virtuals: true });
 VehicleSchema.set('toJSON', { virtuals: true });
 
+VehicleSchema.virtual('carModel', {
+	ref: 'CarModel',
+	localField: 'carModelId',
+	foreignField: 'carModelId',
+	justOne: true
+});
+
 VehicleSchema.virtual('client', {
 	ref: 'Client',
 	localField: 'clientId',

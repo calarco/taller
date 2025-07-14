@@ -80,8 +80,7 @@ export async function createUserAction(event) {
 		const hashedPassword = await bcrypt.hash(password, 10);
 		const User = getModel(userId, 'User');
 		const data = await User.create({ userId, password: hashedPassword });
-		const message = 'Usuario creado';
-		return { data: JSON.parse(JSON.stringify(data)), message };
+		return { data: JSON.parse(JSON.stringify(data)) };
 	} catch (err) {
 		throw error(500, err.body || err.toString());
 	}
@@ -129,8 +128,7 @@ export async function switchThemeAction(event) {
 
 		const User = getModel(userId, 'User');
 		const data = await User.findOneAndUpdate({ userId }, { darkTheme: !user.darkTheme });
-		const message = 'Tema cambiado';
-		return { data: JSON.parse(JSON.stringify(data)), message };
+		return { data: JSON.parse(JSON.stringify(data)) };
 	} catch (err) {
 		throw error(500, err.body || err.toString());
 	}

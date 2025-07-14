@@ -17,7 +17,7 @@
 			update();
 			windowState.loading = false;
 			if (result.type === 'success' || result.type === 'redirect') {
-				windowState.activeCard = '';
+				windowState.form = '';
 				windowState.id = '';
 			}
 			if (result.type === 'failure' && result.data) {
@@ -33,7 +33,7 @@
 		<button
 			type="button"
 			onclick={() => {
-				windowState.activeCard = '';
+				windowState.form = '';
 				windowState.id = '';
 			}}
 		>

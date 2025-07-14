@@ -13,7 +13,7 @@
 	{/if}
 	{#if overlay}
 		<div class="overlay" role="button" tabindex="0" aria-pressed="false" onkeyup={() => {}} onkeydown={() => {}} onclick={() => {
-			windowState.activeCard = '';
+			windowState.form = '';
 			windowState.id = '';
 		}} in:fade={{ duration: 300, easing: sineOut }} out:fade={{ duration: 250, easing: sineIn }}></div>
 	{/if}

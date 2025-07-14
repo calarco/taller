@@ -1,5 +1,5 @@
 <script>
-	import { fade } from 'svelte/transition';
+	import { fade, blur } from 'svelte/transition';
 	import { sineIn, sineOut } from 'svelte/easing';
 	import { page } from '$app/state';
 	import { enhance } from '$app/forms';
@@ -28,10 +28,10 @@
 					type="button"
 					class="createButton"
 					onclick={() => {
-						if (windowState.activeCard !== 'client') {
-							windowState.activeCard = 'client';
+						if (windowState.form !== 'client') {
+							windowState.form = 'client';
 						} else {
-							windowState.activeCard = '';
+							windowState.form = '';
 						}
 						windowState.id = '';
 					}}
@@ -39,7 +39,11 @@
 					in:fade={{ duration: 150, easing: sineIn }}
 					out:fade={{ duration: 200, easing: sineOut }}
 				>
-					<span class="icon client"></span>
+					{#if windowState.form === 'client'}
+						<span class="icon close" in:blur={{ amount: 16, duration: 200, easing: sineOut }} out:blur={{ amount: 16, duration: 150, easing: sineIn }}></span>
+					{:else}
+						<span class="icon client" in:blur={{ amount: 16, duration: 200, easing: sineOut }} out:blur={{ amount: 16, duration: 150, easing: sineIn }}></span>
+					{/if}
 				</button>
 			</div>
 			<div></div>
@@ -51,10 +55,10 @@
 					type="button"
 					class="createButton"
 					onclick={() => {
-						if (windowState.activeCard !== 'estimate') {
-							windowState.activeCard = 'estimate';
+						if (windowState.form !== 'estimate') {
+							windowState.form = 'estimate';
 						} else {
-							windowState.activeCard = '';
+							windowState.form = '';
 						}
 						windowState.id = '';
 					}}
@@ -62,14 +66,31 @@
 					in:fade={{ duration: 150, easing: sineIn }}
 					out:fade={{ duration: 200, easing: sineOut }}
 				>
-					<span class="icon estimate"></span>
+					{#if windowState.form === 'estimate'}
+						<span class="icon close" in:blur={{ amount: 16, duration: 200, easing: sineOut }} out:blur={{ amount: 16, duration: 150, easing: sineIn }}></span>
+					{:else}
+						<span class="icon estimate" in:blur={{ amount: 16, duration: 200, easing: sineOut }} out:blur={{ amount: 16, duration: 150, easing: sineIn }}></span>
+					{/if}
 				</button>
 			</div>
 			<div></div>
 			<button type="button" onclick={() => settingsDialog.showModal()} aria-label="settings">
 				<span>{user.name || user.userId}</span>
 			</button>
-			<form method="POST" action="?/switchTheme" use:enhance>
+			<form
+				method="POST"
+				action="?/switchTheme"
+				use:enhance={() => {
+					return async ({ result, update }) => {
+						update({ invalidateAll: false });
+						if (result.type === 'success') {
+							page.data.user.darkTheme = darkTheme;
+						} else {
+							switchTheme();
+						}
+					};
+				}}
+			>
 				<button type="submit" aria-label="borrar" onclick={switchTheme}>
 					{#if darkTheme}
 						<span class="icon lighton"></span>
@@ -105,11 +126,13 @@
 {#if windowState.loading}
 	<div class="loading" in:fade={{ duration: 900, easing: sineOut }} out:fade={{ duration: 250, easing: sineIn }}>
 		<div></div>
+		<div></div>
 	</div>
 {/if}
 
 <style>
 	.bar {
+		z-index: 10;
 		width: 100vw;
 		display: grid;
 		justify-items: center;
@@ -202,6 +225,10 @@
 						&:hover {
 							border-top: none;
 						}
+
+						.icon {
+							position: absolute;
+						}
 					}
 				}
 			}
@@ -241,22 +268,33 @@
 	.loading {
 		position: absolute;
 		z-index: 2100;
-		bottom: -5rem;
-		height: 6rem;
-		width: 100vw;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
 		display: grid;
 		justify-items: center;
-		filter: blur(1rem);
 		pointer-events: none;
 
 		> div {
-			border-radius: 100%;
-			width: 80vw;
-			max-width: 75rem;
+			position: absolute;
+			width: 100%;
 			--c: no-repeat linear-gradient(var(--secondary) 0 0);
 			background: var(--c), var(--c);
 			background-size: 60% 100%;
 			animation: l16 3s ease-in-out infinite;
+		}
+
+		> div:first-child {
+			top: -5rem;
+			height: 6rem;
+			filter: blur(1rem);
+			--c: no-repeat linear-gradient(var(--secondary-variant) 0 0);
+		}
+
+		> div:last-child {
+			top: 0;
+			height: 1px;
 		}
 	}
 </style>

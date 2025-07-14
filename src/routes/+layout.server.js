@@ -16,7 +16,7 @@ export const load = async (event) => {
 			findUser(userId, { userId }),
 			findCarMakes(userId).sort({ name: 1 }),
 			findCarModels(userId).sort({ name: 1 }),
-			findAppointments(userId, { date: { $gte: new Date((new Date()).setHours(0, 0, 1)) } }),
+			findAppointments(userId, { date: { $gte: new Date((new Date()).setHours(0, 0, 1)) } }).populate({ path: 'carModel', populate: { path: 'carMake', select: 'name' }, select: 'name carMakeId' }),
 			getSearch(userId),
 		]);
 		delete user.password;

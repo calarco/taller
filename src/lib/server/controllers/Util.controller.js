@@ -10,9 +10,20 @@ export async function getSearch(userId, value) {
 			[clients, estimates] = await Promise.all([
 				findClients(userId)
 					.sort({ updatedAt: -1 })
-					.populate({ path: 'vehicles', perDocumentLimit: 1, options: { sort: { updatedAt: -1 } }, populate: { path: 'repairs', perDocumentLimit: 1, options: { sort: { updatedAt: -1 } } } })
+					.populate({
+						path: 'vehicles',
+						perDocumentLimit: 1,
+						options: { sort: { updatedAt: -1 } },
+						populate: [
+							{ path: 'carModel', populate: { path: 'carMake', select: 'name' }, select: 'name carMakeId' },
+							{ path: 'repairs', perDocumentLimit: 1, options: { sort: { updatedAt: -1 } } },
+						],
+					})
 					.limit(25),
-				findEstimates(userId).sort({ updatedAt: -1 }).limit(25),
+				findEstimates(userId)
+					.sort({ updatedAt: -1 })
+					.populate({ path: 'carModel', populate: { path: 'carMake', select: 'name' }, select: 'name carMakeId' })
+					.limit(25),
 			]);
 		} else {
 			const filter = { $regex: value, $options: 'i' };
@@ -20,7 +31,13 @@ export async function getSearch(userId, value) {
 				findClients(userId, { $or: [{ name: filter }, { lastName: filter }] })
 					.sort({ name: 1, lastName: 1 })
 					.limit(25),
-				findVehicles(userId, { vehicleId: filter }).sort({ vehicleId: 1 }).populate({ path: 'client', select: 'name lastName' }).limit(25),
+				findVehicles(userId, { vehicleId: filter })
+					.sort({ vehicleId: 1 })
+					.populate([
+						{ path: 'carModel', populate: { path: 'carMake', select: 'name' }, select: 'name carMakeId' },
+						{ path: 'client', select: 'name lastName' },
+					])
+					.limit(25),
 			]);
 		}
 
@@ -30,6 +47,7 @@ export async function getSearch(userId, value) {
 				estimateId: x.estimateId,
 				vehicleId: x.vehicleId,
 				carModelId: x.carModelId,
+				carModel: x.carModel,
 				description: x.description,
 				email: x.email,
 				updatedAt: x.updatedAt,
@@ -40,6 +58,7 @@ export async function getSearch(userId, value) {
 				clientId: x.clientId,
 				clientName: x.client?.name + ' ' + x.client?.lastName,
 				carModelId: x.carModelId,
+				carModel: x.carModel,
 				updatedAt: x.updatedAt,
 			})),
 			...(clients || []).map((x) => ({
@@ -48,6 +67,7 @@ export async function getSearch(userId, value) {
 				clientName: x.name + ' ' + x.lastName,
 				vehicleId: x.vehicles?.vehicleId,
 				carModelId: x.vehicles?.carModelId,
+				carModel: x.vehicles?.carModel,
 				repairId: x.vehicles?.repairs?.length ? x.vehicles.repairs[0].repairId : '',
 				description: x.vehicles?.repairs?.length ? x.vehicles.repairs[0].description : '',
 				updatedAt: new Date(Math.max(x.vehicles?.repairs?.length ? x.vehicles.repairs[0].updatedAt : 0, x.vehicles?.updatedAt || 0, x.updatedAt)),
@@ -55,9 +75,9 @@ export async function getSearch(userId, value) {
 		];
 
 		if (!value) {
-			return search.sort((a, b) => b.updatedAt - a.updatedAt).slice(0, 25);
+			return structuredClone(search.sort((a, b) => b.updatedAt - a.updatedAt).slice(0, 25));
 		} else {
-			return search;
+			return structuredClone(search);
 		}
 	} catch (err) {
 		throw error(500, err.body || err.toString());

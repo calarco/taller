@@ -2,7 +2,7 @@
 	import { slide, blur } from 'svelte/transition';
 	import { sineIn, sineOut } from 'svelte/easing';
 	import { page } from '$app/state';
-	import { getCarName, windowState } from '$lib/shared.svelte';
+	import { windowState } from '$lib/shared.svelte';
 	import Section from '$lib/components/Section.svelte';
 
 	let value = $state('');
@@ -28,7 +28,7 @@
 </script>
 
 <div class="panel">
-	<Section overlay={windowState.activeCard === 'estimate'}>
+	<Section overlay={windowState.form === 'estimate'}>
 		<label class="buscador">
 			<div>
 				{#if !value}
@@ -78,7 +78,9 @@
 										{:else}
 											<h4 class="vehicleId">{resultado.vehicleId}</h4>
 										{/if}
-										<small>{getCarName(resultado.carModelId)}</small>
+										{#if resultado.carModel}
+											<small>{resultado.carModel.carMake?.name} {resultado.carModel.name}</small>
+										{/if}
 									</div>
 								</div>
 								{#if resultado.repairId}
@@ -123,7 +125,9 @@
 										{:else}
 											<h4 class="vehicleId">{resultado.vehicleId}</h4>
 										{/if}
-										<small>{getCarName(resultado.carModelId)}</small>
+										{#if resultado.carModel}
+											<small>{resultado.carModel.carMake?.name} {resultado.carModel.name}</small>
+										{/if}
 									</div>
 								</div>
 								{#if resultado.email}
@@ -345,6 +349,7 @@
 					border-radius: 4px;
 					transition: 0.1s ease-in;
 					outline: 1px solid rgba(0, 0, 0, 0);
+					text-transform: capitalize;
 				}
 
 				.icon::before {

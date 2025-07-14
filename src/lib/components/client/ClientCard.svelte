@@ -49,7 +49,7 @@
 		<button
 			type="button"
 			onclick={() => {
-				windowState.activeCard = 'client';
+				windowState.form = 'client';
 				windowState.id = client.clientId;
 			}}
 			aria-label="editar"
@@ -85,6 +85,9 @@
 			gap: 0.5rem;
 			align-content: center;
 			user-select: text;
+			h2 {
+				text-transform: capitalize;
+			}
 		}
 
 		.details {

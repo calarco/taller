@@ -42,7 +42,7 @@
 	</article>
 {/snippet}
 
-<Card {isActive} isForm={windowState.activeCard === 'repair' && windowState.id === repair?.repairId}>
+<Card {isActive} isForm={windowState.form === 'repair' && windowState.id === repair?.repairId}>
 	<a href={isActive ? `#` : `#${repair.repairId}`}>
 		{@render repairContent()}
 	</a>
@@ -54,7 +54,7 @@
 			<button
 				type="button"
 				onclick={() => {
-					windowState.activeCard = 'repair';
+					windowState.form = 'repair';
 					windowState.id = repair.repairId;
 				}}
 				aria-label="editar"
@@ -62,7 +62,7 @@
 				<span class="icon edit"></span>
 			</button>
 		</div>
-		{#if windowState.activeCard === 'repair' && windowState.id === repair.repairId}
+		{#if windowState.form === 'repair' && windowState.id === repair.repairId}
 			<RepairForm {repair} />
 		{/if}
 		<Dialog bind:dialog title="¿Borrar reparación?" action="?/deleteRepair">

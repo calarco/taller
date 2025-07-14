@@ -25,7 +25,7 @@
 				<button
 					type="button"
 					onclick={() => {
-						windowState.activeCard = 'estimate';
+						windowState.form = 'estimate';
 						windowState.id = estimate.estimateId;
 					}}
 					aria-label="editar"
@@ -54,15 +54,15 @@
 					<input type="email" name="email" placeholder="Dirección de correo" value={estimate.email || ''} />
 					<button type="submit" aria-label="editar">
 						{#if estimate.email}
-							<span class="icon mailok"></span>
+							<span class="icon mailok" in:blur={{ amount: 16, duration: 200, easing: sineOut }} out:blur={{ amount: 16, duration: 150, easing: sineIn }}></span>
 						{:else}
-							<span class="icon mailsend"></span>
+							<span class="icon mailsend" in:blur={{ amount: 16, duration: 200, easing: sineOut }} out:blur={{ amount: 16, duration: 150, easing: sineIn }}></span>
 						{/if}
 					</button>
 				</form>
 			</div>
 			<div class="estimate">
-				<Section overlay={windowState.activeCard === 'estimate'} cards>
+				<Section overlay={windowState.form === 'estimate'} cards>
 					<div class="content">
 						{@html data.html}
 					</div>
@@ -143,21 +143,6 @@
 				bottom: 0;
 				border-left: var(--border-variant);
 			}
-
-			&:last-child {
-				height: 100%;
-				padding-left: 1.5rem;
-				padding-right: calc(1.5rem + 8px);
-				margin: 0;
-				border-radius: 0 4px 0 0;
-				border: none;
-				color: var(--secondary);
-
-				&:hover {
-					cursor: pointer;
-					background: var(--primary-variant);
-				}
-			}
 		}
 
 		> form {
@@ -181,11 +166,26 @@
 			}
 
 			button {
-				position: absolute;
-				top: 0.5rem;
-				right: 0.5rem;
-				bottom: 0.5rem;
-				padding: 0.25rem 0.75rem;
+				border-radius: 0px;
+				min-width: 4rem;
+				padding: 0 1rem;
+
+				&::after {
+					content: '';
+					position: absolute;
+					top: 0.75rem;
+					left: 0;
+					bottom: 0.75rem;
+					border-left: var(--border-variant);
+				}
+
+				.mailsend {
+					padding-top: 3px;
+				}
+
+				.icon {
+					position: absolute;
+				}
 			}
 		}
 	}

@@ -37,7 +37,7 @@
 </script>
 
 <div class="panel">
-	<Section overlay={windowState.activeCard === 'appointment' || windowState.activeCard === 'client'}>
+	<Section overlay={windowState.form === 'appointment' || windowState.form === 'client'}>
 		{#each calendar as month (month.year + month.month)}
 			<div use:loadDays>
 				<div class="month">
