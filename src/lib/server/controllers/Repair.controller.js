@@ -2,6 +2,18 @@ import { error, fail, redirect, isRedirect } from '@sveltejs/kit';
 import { getModel } from '$lib/server/db';
 import { upsertVehicle } from '$lib/server/controllers/Vehicle.controller';
 
+async function getNewId(userId) {
+	let max = 1;
+	const repair = await findRepair(userId, {}, { repairId: 1 }).sort({ repairId: -1 }).collation({ locale: 'en_US', numericOrdering: true });
+	if (repair?.repairId) {
+		max = Number(repair.repairId) + 1;
+	}
+	if (isNaN(max)) {
+		throw error(500, 'ID invalida');
+	}
+	return String(max);
+}
+
 export function findRepair(userId, filters) {
 	const Repair = getModel(userId, 'Repair');
 	return Repair.findOne(filters, { __v: 0, _id: 0 }).lean();
@@ -27,15 +39,6 @@ export async function upsertRepair(userId, repair) {
 export function moveRepairs(userId, oldId, newId) {
 	const Repair = getModel(userId, 'Repair');
 	return Repair.updateMany({ vehicleId: oldId }, { vehicleId: newId });
-}
-
-async function getNewId(userId) {
-	let max = 1;
-	const repair = await findRepair(userId, {}, { repairId: 1 }).sort({ repairId: -1 }).collation({ locale: 'en_US', numericOrdering: true });
-	if (repair?.repairId) {
-		max = Number(repair.repairId) + 1;
-	}
-	return String(max);
 }
 
 export async function upsertRepairAction(event) {

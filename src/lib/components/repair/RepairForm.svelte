@@ -18,11 +18,11 @@
 	</Label>
 	<Label title="Mano de obra" --template-columns="max-content 1fr">
 		<h6 class="unit">$</h6>
-		<input class="precio" type="number" name="labor" placeholder="0" autoComplete="off" bind:value={labor} />
+		<input class="precio" type="number" min="0" name="labor" placeholder="0" autoComplete="off" bind:value={labor} />
 	</Label>
 	<Label title="Repuestos" --template-columns="max-content 1fr">
 		<h6 class="unit">$</h6>
-		<input class="precio" type="number" name="cost" placeholder="0" autoComplete="off" bind:value={cost} />
+		<input class="precio" type="number" min="0" name="cost" placeholder="0" autoComplete="off" bind:value={cost} />
 	</Label>
 	<Label title="Total" --template-columns="max-content 1fr">
 		<h6 class="unit">$</h6>
@@ -32,7 +32,7 @@
 		<input type="text" name="description" placeholder="-" autoComplete="off" value={repair?.description || ''} />
 	</Label>
 	<Label title="KM">
-		<input type="number" name="km" placeholder="-" autoComplete="off" value={repair?.km || ''} />
+		<input type="number" min="0" name="km" placeholder="-" autoComplete="off" value={repair?.km || ''} />
 	</Label>
 	<Label title="Detalle" --column-end="span 4">
 		<textarea rows="5" name="detail" placeholder="-" autoComplete="off">{repair?.detail || ''}</textarea>

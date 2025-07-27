@@ -368,7 +368,6 @@ input[type='tel'],
 input[type='date'],
 input[type='time'],
 input[type='password'],
-input:is(:-webkit-autofill, :autofill),
 textarea {
 	display: block;
 	width: 100%;

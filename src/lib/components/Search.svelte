@@ -10,6 +10,7 @@
 	$effect(() => {
 		if (value) {
 			(async () => {
+				windowState.loading = true;
 				const response = await fetch('/search/' + value);
 				const data = await response.json();
 				if (data?.length) {
@@ -20,6 +21,7 @@
 				} else {
 					search = [];
 				}
+				windowState.loading = false;
 			})();
 		} else {
 			search = page.data.search;

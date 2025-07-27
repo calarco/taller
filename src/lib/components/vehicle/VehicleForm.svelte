@@ -13,6 +13,7 @@
 	$effect(() => {
 		if (value) {
 			(async () => {
+				windowState.loading = true;
 				const response = await fetch('/search/' + value);
 				const data = await response.json();
 				if (data?.length) {
@@ -20,11 +21,12 @@
 				} else {
 					search = [];
 				}
+				const client = search.find((x) => x.clientName === value);
+				if (client) {
+					clientId = client.clientId;
+				}
+				windowState.loading = false;
 			})();
-			const client = search.find(x => x.clientName === value);
-			if (client) {
-				clientId = client.clientId;
-			}
 		} else {
 			search = page.data.search;
 		}
@@ -36,7 +38,7 @@
 		<input type="hidden" name="oldVehicleId" value={vehicle.vehicleId} />
 		<input type="hidden" name="clientId" value={clientId} />
 		<Label title="Cliente" error={windowState.error?.clientIdError} --column-end="span 3">
-			<input list="clients" name="clientName" placeholder={page.data.client.name + ' ' + page.data.client.lastName} autoComplete="off" bind:value />
+			<input class="client" list="clients" name="clientName" placeholder={page.data.client.name + ' ' + page.data.client.lastName} autoComplete="off" bind:value />
 			<datalist id="clients">
 				{#each search as client (client.id)}
 					<option key={client.clientId} value={client.clientName}></option>
@@ -68,6 +70,10 @@
 </Form>
 
 <style>
+	.client {
+		text-transform: capitalize;
+	}
+
 	.patente {
 		text-transform: uppercase;
 		font-family: var(--font-family-alt);

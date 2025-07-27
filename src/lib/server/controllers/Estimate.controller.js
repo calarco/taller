@@ -7,6 +7,18 @@ import { findUser } from '$lib/server/controllers/User.controller.js';
 import { createCarModel } from '$lib/server/controllers/CarModel.controller.js';
 import Estimate from '$lib/components/estimate/Estimate.svelte';
 
+async function getNewId(userId) {
+	let max = 1;
+	const estimate = await findEstimate(userId, {}, { estimateId: 1 }).sort({ estimateId: -1 }).collation({ locale: 'en_US', numericOrdering: true });
+	if (estimate?.estimateId) {
+		max = Number(estimate.estimateId) + 1;
+	}
+	if (isNaN(max)) {
+		throw error(500, 'ID invalida');
+	}
+	return String(max);
+}
+
 export function findEstimate(userId, filters) {
 	const Estimate = getModel(userId, 'Estimate');
 	return Estimate.findOne(filters, { __v: 0, _id: 0 }).lean();
@@ -20,15 +32,6 @@ export function findEstimates(userId, filters) {
 export function upsertEstimate(userId, estimate) {
 	const Estimate = getModel(userId, 'Estimate');
 	return Estimate.findOneAndUpdate({ estimateId: estimate.estimateId }, estimate, { new: true, upsert: true });
-}
-
-async function getNewId(userId) {
-	let max = 1;
-	const estimate = await findEstimate(userId, {}, { estimateId: 1 }).sort({ estimateId: -1 }).collation({ locale: 'en_US', numericOrdering: true });
-	if (estimate?.estimateId) {
-		max = Number(estimate.estimateId) + 1;
-	}
-	return String(max);
 }
 
 export async function upsertEstimateAction(event) {

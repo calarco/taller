@@ -1,6 +1,18 @@
 import { error, fail } from '@sveltejs/kit';
 import { getModel } from '$lib/server/db';
 
+async function getNewId(userId) {
+	let max = 1;
+	const carMake = await findCarMake(userId, {}, { carMakeId: 1 }).sort({ carMakeId: -1 }).collation({ locale: 'en_US', numericOrdering: true });
+	if (carMake?.carMakeId) {
+		max = Number(carMake.carMakeId) + 1;
+	}
+	if (isNaN(max)) {
+		throw error(500, 'ID invalida');
+	}
+	return String(max);
+}
+
 export function findCarMake(userId, filters) {
 	const CarMake = getModel(userId, 'CarMake');
 	return CarMake.findOne(filters, { __v: 0, _id: 0 }).lean();
@@ -9,15 +21,6 @@ export function findCarMake(userId, filters) {
 export function findCarMakes(userId, filters) {
 	const CarMake = getModel(userId, 'CarMake');
 	return CarMake.find(filters, { __v: 0, _id: 0 }).lean();
-}
-
-async function getNewId(userId) {
-	let max = 1;
-	const carMake = await findCarMake(userId, {}, { carMakeId: 1 }).sort({ carMakeId: -1 }).collation({ locale: 'en_US', numericOrdering: true });
-	if (carMake?.carMakeId) {
-		max = Number(carMake.carMakeId) + 1;
-	}
-	return String(max);
 }
 
 export async function createCarMakeAction(event) {

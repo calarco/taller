@@ -89,6 +89,7 @@ export async function fixData(userId) {
 		],
 		{ timestamps: false }
 	);
+
 	const CarModel = getModel(userId, 'CarModel');
 	await CarModel.updateMany(
 		{},
@@ -111,6 +112,7 @@ export async function fixData(userId) {
 		],
 		{ timestamps: false }
 	);
+
 	const Client = getModel(userId, 'Client');
 	await Client.updateMany(
 		{ phone: { $in: ['0000000000', '00000000', '0000000', '000000000', '2230000000', '""'] } },
@@ -199,6 +201,7 @@ export async function fixData(userId) {
 		],
 		{ timestamps: false }
 	);
+
 	const Repair = getModel(userId, 'Repair');
 	await Repair.updateMany({ detail: { $in: ['""'] } }, [
 		{
@@ -233,6 +236,13 @@ export async function fixData(userId) {
 		],
 		{ timestamps: false }
 	);
+	const repairs = await Repair.find({}, { __v: 0, _id: 0 }).lean();
+	for (const repair of repairs) {
+		if (isNaN(repair.repairId)) {
+			await Repair.deleteOne(repair);
+		}
+	}
+
 	const Vehicle = getModel(userId, 'Vehicle');
 	await Vehicle.updateMany(
 		{ vin: { $in: ['00000000000000000', '""'] } },
@@ -268,6 +278,7 @@ export async function fixData(userId) {
 		],
 		{ timestamps: false }
 	);
+
 	const Appointment = getModel(userId, 'Appointment');
 	await Appointment.updateMany(
 		{},
@@ -295,6 +306,7 @@ export async function fixData(userId) {
 		],
 		{ timestamps: false }
 	);
+
 	const Estimate = getModel(userId, 'Estimate');
 	await Estimate.updateMany(
 		{},

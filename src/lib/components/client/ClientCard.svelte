@@ -85,6 +85,7 @@
 			gap: 0.5rem;
 			align-content: center;
 			user-select: text;
+
 			h2 {
 				text-transform: capitalize;
 			}

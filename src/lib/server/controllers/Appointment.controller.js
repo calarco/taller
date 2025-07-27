@@ -2,6 +2,18 @@ import { error, fail } from '@sveltejs/kit';
 import { getModel } from '$lib/server/db';
 import { createCarModel } from '$lib/server/controllers/CarModel.controller.js';
 
+async function getNewId(userId) {
+	let max = 1;
+	const appointment = await findAppointment(userId, {}, { appointmentId: 1 }).sort({ appointmentId: -1 }).collation({ locale: 'en_US', numericOrdering: true });
+	if (appointment?.appointmentId) {
+		max = Number(appointment.appointmentId) + 1;
+	}
+	if (isNaN(max)) {
+		throw error(500, 'ID invalida');
+	}
+	return String(max);
+}
+
 export function findAppointment(userId, filters) {
 	const Appointment = getModel(userId, 'Appointment');
 	return Appointment.findOne(filters, { __v: 0, _id: 0 }).lean();
@@ -10,15 +22,6 @@ export function findAppointment(userId, filters) {
 export function findAppointments(userId, filters) {
 	const Appointment = getModel(userId, 'Appointment');
 	return Appointment.find(filters, { __v: 0, _id: 0 }).lean();
-}
-
-async function getNewId(userId) {
-	let max = 1;
-	const appointment = await findAppointment(userId, {}, { appointmentId: 1 }).sort({ appointmentId: -1 }).collation({ locale: 'en_US', numericOrdering: true });
-	if (appointment?.appointmentId) {
-		max = Number(appointment.appointmentId) + 1;
-	}
-	return String(max);
 }
 
 export async function createAppointmentAction(event) {

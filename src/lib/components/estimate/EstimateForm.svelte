@@ -21,7 +21,7 @@
 		<input type="hidden" name="estimateId" value={estimate.estimateId} />
 	{/if}
 	<Label title="Patente" error={windowState.error?.vehicleIdError}>
-		<input type="text" name="vehicleId" placeholder="-" autoComplete="off" value={estimate.vehicleId || ''} />
+		<input class="patente" type="text" name="vehicleId" placeholder="-" autoComplete="off" value={estimate.vehicleId || ''} />
 	</Label>
 	<CarForm carModelProp={estimate?.carModelId} --flow="row" --row-end="span 1" />
 	<Label title="Total" --template-columns="max-content 1fr">
@@ -29,14 +29,14 @@
 		<h5 class="precio">{new Intl.NumberFormat('es-AR').format(total)}</h5>
 	</Label>
 	<Label title="KM">
-		<input type="number" name="km" placeholder="-" autoComplete="off" value={estimate.km || ''} />
+		<input type="number" min="0" name="km" placeholder="-" autoComplete="off" value={estimate.km || ''} />
 	</Label>
 	<Label title="Descripción" error={windowState.error?.descriptionError}>
 		<input type="text" name="description" placeholder="-" autoComplete="off" value={estimate.description || ''} />
 	</Label>
 	<Label title="Mano de obra" --template-columns="max-content 1fr">
 		<h6 class="unit">$</h6>
-		<input type="number" name="labor" placeholder="0" autoComplete="off" bind:value={labor} class="precio" />
+		<input type="number" min="1" name="labor" placeholder="0" autoComplete="off" bind:value={labor} class="precio" />
 	</Label>
 	<fieldset>
 		<div class="parts">
@@ -66,14 +66,14 @@
 			</ul>
 		</div>
 		<Label title="Cantidad">
-			<input type="number" min="1" name="amount" placeholder="1" bind:value={amount}/>
+			<input type="number" min="0" name="amount" placeholder="1" bind:value={amount}/>
 		</Label>
 		<Label title="Repuesto" error={windowState.error?.nameError}>
 			<input type="text" name="name" placeholder="-" autoComplete="off" bind:value={name} />
 		</Label>
 		<Label title="Precio" --template-columns="max-content 1fr auto">
 			<h6 class="unit">$</h6>
-			<input type="number" name="price" placeholder="0" bind:value={price} class="precio" />
+			<input type="number" min="0" name="price" placeholder="0" bind:value={price} class="precio" />
 			<button
 				type="button"
 				onclick={() => {
@@ -96,6 +96,11 @@
 </Form>
 
 <style>
+	.patente {
+		text-transform: uppercase;
+		font-family: var(--font-family-alt);
+	}
+
 	.precio {
 		font-family: var(--font-family-alt);
 

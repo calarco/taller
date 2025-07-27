@@ -11,6 +11,19 @@
 			return str + key + ':' + style[key] + ';';
 		}, '');
 	};
+
+	const text = {
+		margin: '0',
+	};
+
+	const table = {
+		outline: '1px solid rgba(128,128,128,0.2)',
+	};
+
+	const label = {
+		color: 'rgba(128,128,128,0.75)',
+		fontWeight: 800,
+	};
 </script>
 
 <Html lang="en">
@@ -18,7 +31,7 @@
 	<Preview preview={estimate.description} />
 	<Container align="center" style={{ maxWidth: '100%', padding: '1rem', display: 'grid' }}>
 		{#if user.description}
-			<Heading as="h5" style={{ margin: '0' }}>
+			<Heading as="h5" style={text}>
 				{user.description}
 			</Heading>
 		{/if}
@@ -26,7 +39,7 @@
 			{user.name || user.userId}
 		</Heading>
 		<Container align="center" style={{ maxWidth: '100%' }}>
-			<Text style={{ margin: 0 }}>
+			<Text style={text}>
 				{#if user.address}
 					<span style={styleToString({ padding: '0 0.5rem' })}>{user.address}</span>
 				{/if}
@@ -41,7 +54,7 @@
 	</Container>
 	<Hr style={{ borderColor: 'rgba(128,128,128,0.2)', margin: '1rem 0' }} />
 	<Container align="center" style={{ maxWidth: '100%', padding: '1rem', display: 'grid' }}>
-		<Heading as="h4" style={{ margin: '0' }}>
+		<Heading as="h4" style={text}>
 			Presupuesto - {Intl.DateTimeFormat('es-AR', { year: 'numeric', month: 'long', day: 'numeric' }).format(estimate.createdAt)}
 		</Heading>
 		<Text style={{ margin: '1rem 0 0 0' }}>
@@ -57,8 +70,8 @@
 		</Text>
 	</Container>
 	<table style={styleToString({ padding: '1rem' })}>
-		<tbody style={styleToString({ outline: '1px solid rgba(128,128,128,0.2)' })}>
-			<tr style={styleToString({ color: 'rgba(128,128,128,0.75)', fontWeight: 800 })}>
+		<tbody style={styleToString(table)}>
+			<tr style={styleToString(label)}>
 				<td align="left" colspan="2" width="100%">
 					<Text style={{ padding: '0 1.5rem', color: 'inherit', fontWeight: 'inherit' }}>Reparación</Text>
 				</td>
@@ -78,8 +91,8 @@
 	</table>
 	{#if estimate.parts.length}
 		<table style={styleToString({ padding: '0 1rem' })}>
-			<tbody style={styleToString({ outline: '1px solid rgba(128,128,128,0.2)' })}>
-				<tr style={styleToString({ color: 'rgba(128,128,128,0.75)', fontWeight: 800 })}>
+			<tbody style={styleToString(table)}>
+				<tr style={styleToString(label)}>
 					<td align="center">
 						<Text style={{ padding: '0 1.5rem', color: 'inherit', fontWeight: 'inherit', minWidth: '100px', borderRight: '1px solid rgba(128,128,128,0.2)' }}>Cantidad</Text>
 					</td>
@@ -106,8 +119,8 @@
 			</tbody>
 		</table>
 		<table style={styleToString({ padding: '1rem' })}>
-			<tbody style={styleToString({ outline: '1px solid rgba(128,128,128,0.2)' })}>
-				<tr style={styleToString({ color: 'rgba(128,128,128,0.75)', fontWeight: 800 })}>
+			<tbody style={styleToString(table)}>
+				<tr style={styleToString(label)}>
 					<td align="left" colspan="2" width="100%"></td>
 					<td align="right">
 						<Text style={{ padding: '0 1.5rem', color: 'inherit', fontWeight: 'inherit', minWidth: '150px', borderLeft: '1px solid rgba(128,128,128,0.2)' }}>Total</Text>
@@ -116,7 +129,9 @@
 				<tr>
 					<td align="left" colspan="2" width="100%"></td>
 					<td align="right">
-						<Text style={{ padding: '0 1.5rem', minWidth: '150px' }}><span style={styleToString({ padding: '0 0.25rem' })}>$</span> {new Intl.NumberFormat('es-AR').format(estimate.labor + estimate.parts.reduce((a, { price }) => a + price, 0))}</Text>
+						<Text style={{ padding: '0 1.5rem', minWidth: '150px' }}
+							><span style={styleToString({ padding: '0 0.25rem' })}>$</span> {new Intl.NumberFormat('es-AR').format(estimate.labor + estimate.parts.reduce((a, { price }) => a + price, 0))}</Text
+						>
 					</td>
 				</tr>
 			</tbody>
