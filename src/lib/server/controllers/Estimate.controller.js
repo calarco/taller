@@ -125,30 +125,30 @@ export async function sendEstimateAction(event) {
 			return fail(400, { emailError: 'Ingrese un email' });
 		}
 
-		const [estimate, user] = await Promise.all([
-			findEstimate(userId, { estimateId }).populate({ path: 'carModel', populate: { path: 'carMake' } }),
-			findUser(userId, { userId }),
-		]);
+		const [estimate, user] = await Promise.all([findEstimate(userId, { estimateId }).populate({ path: 'carModel', populate: { path: 'carMake' } }), findUser(userId, { userId })]);
 		if (!estimate) {
 			throw error(500, 'Presupuesto no encontrado');
 		}
 		if (!user) {
 			throw error(500, 'Usuario no encontrado');
 		}
+
 		const rendered = render(Estimate, { props: { estimate, user } });
 		if (!rendered?.html) {
 			throw error(500, 'Presupuesto no renderizado');
 		}
 
 		const transporter = nodemailer.createTransport({
-			service: 'gmail',
+			host: 'mail.smtp2go.com',
+			port: 2525,
+			secure: false,
 			auth: {
 				user: MAIL_USER,
 				pass: MAIL_PASS,
 			},
 		});
 		const data = await transporter.sendMail({
-			from: MAIL_USER,
+			from: 'taller@calarco.com.ar',
 			to: email,
 			subject: 'Presupuesto',
 			html: rendered.html,
