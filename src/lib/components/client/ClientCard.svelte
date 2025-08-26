@@ -145,18 +145,7 @@
 			}
 
 			&:last-child {
-				height: 100%;
-				padding-left: 1.5rem;
-				padding-right: calc(1.5rem + 8px);
-				margin: 0;
 				border-radius: 0 4px 0 0;
-				border: none;
-				color: var(--secondary);
-
-				&:hover {
-					cursor: pointer;
-					background: var(--primary-variant);
-				}
 			}
 		}
 	}

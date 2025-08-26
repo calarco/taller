@@ -165,7 +165,7 @@
 								content: '';
 								position: absolute;
 								top: 0;
-								right: 8px;
+								right: 9px;
 								bottom: 0;
 								border-right: var(--border-variant);
 							}
@@ -180,7 +180,7 @@
 								content: '';
 								position: absolute;
 								top: 0;
-								left: 7px;
+								left: 6px;
 								bottom: 0;
 								border-left: var(--border-variant);
 							}

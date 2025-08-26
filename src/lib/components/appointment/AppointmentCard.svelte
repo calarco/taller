@@ -9,10 +9,12 @@
 
 {#snippet appointmentContent()}
 	<article>
-		<h5>{appointment?.description}</h5>
-		{#if appointment?.carModel}
-			<p>{appointment.carModel.carMake?.name} {appointment.carModel.name}</p>
-		{/if}
+		<h5>
+			{appointment?.description}
+			{#if appointment?.carModel}
+				<span>{appointment.carModel.carMake?.name} {appointment.carModel.name}</span>
+			{/if}
+		</h5>
 	</article>
 {/snippet}
 
@@ -69,9 +71,9 @@
 		padding: 0.5rem 1rem;
 		display: flex;
 		align-items: center;
-		gap: 0.75rem;
 
-		p {
+		> h5 > span {
+			padding-left: 0.5rem;
 			color: var(--on-background-variant);
 			font-size: 0.9em;
 		}

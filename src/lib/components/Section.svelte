@@ -31,14 +31,14 @@
 		display: flex;
 		flex-direction: column;
 		gap: 1px;
-		border-right: 8px solid rgba(0, 0, 0, 0.08);
+		border-right: 12px solid rgba(0, 0, 0, 0.08);
 		overflow-y: hidden;
 
 		&.cards {
 			background: var(--surface);
 			box-shadow: var(--shadow);
 			padding: 1.5rem;
-			padding-left: calc(1.5rem + 8px);
+			padding-left: calc(1.5rem + 12px);
 			gap: 1.5rem;
 
 			.padding {
@@ -55,7 +55,7 @@
 
 	@keyframes delay-overflow {
 		from {
-			border-right: 8px solid rgba(0, 0, 0, 0.08);
+			border-right: 12px solid rgba(0, 0, 0, 0.08);
 			overflow-y: hidden;
 		}
 	}
