@@ -55,6 +55,7 @@
 			</div>
 		{/if}
 	</div>
+	<div id="print-container"></div>
 </main>
 
 <style>
@@ -94,5 +95,36 @@
 		grid-column-start: panel-right;
 		grid-row-start: panel-top;
 		pointer-events: none;
+	}
+
+	#print-container {
+		display: none;
+		pointer-events: none;
+		position: absolute;
+		z-index: 9000;
+		left: 0;
+		right: 0;
+		top: 0;
+		bottom: 0;
+		background: #fff;
+		color: #000;
+		--on-background: #000;
+	}
+
+	@media print {
+		@page {
+			size: auto;
+			margin: 0;
+		}
+
+		:global(body) {
+			print-color-adjust: exact;
+			visibility: hidden;
+		}
+
+		#print-container {
+			display: block;
+			visibility: visible;
+		}
 	}
 </style>

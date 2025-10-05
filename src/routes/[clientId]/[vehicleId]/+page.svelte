@@ -28,7 +28,10 @@
 						}}
 						aria-label="crear"
 					>
-						<span class="icon repair"></span>
+						<div>
+							<span class="icon repair"></span>
+							<span>Reparación</span>
+						</div>
 					</button>
 				</div>
 				{#each data.repairs as repair (repair.repairId)}

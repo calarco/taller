@@ -30,7 +30,10 @@
 								}}
 								aria-label="crear"
 							>
-								<span class="icon vehicle"></span>
+								<div>
+									<span class="icon vehicle"></span>
+									<span>Vehículo</span>
+								</div>
 							</button>
 						</div>
 						{#if !data.vehicles?.length}

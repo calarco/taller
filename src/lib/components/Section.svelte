@@ -31,15 +31,14 @@
 		display: flex;
 		flex-direction: column;
 		gap: 1px;
-		border-right: 12px solid rgba(0, 0, 0, 0.08);
+		border-right: var(--scrollbar-width) solid rgba(0, 0, 0, 0.08);
 		overflow-y: hidden;
 
 		&.cards {
 			background: var(--surface);
 			box-shadow: var(--shadow);
-			padding: 1.5rem;
-			padding-left: calc(1.5rem + 12px);
-			gap: 1.5rem;
+			padding: 1rem;
+			gap: 1rem;
 
 			.padding {
 				min-height: 15rem;
@@ -55,7 +54,7 @@
 
 	@keyframes delay-overflow {
 		from {
-			border-right: 12px solid rgba(0, 0, 0, 0.08);
+			border-right: var(--scrollbar-width) solid rgba(0, 0, 0, 0.08);
 			overflow-y: hidden;
 		}
 	}

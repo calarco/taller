@@ -75,7 +75,6 @@
 <style>
 	article {
 		padding: 1rem 1.5rem;
-		min-width: 40rem;
 		display: grid;
 		grid-template-columns: 1fr auto;
 		gap: 1rem;

@@ -16,9 +16,6 @@
 	{#key estimate.estimateId}
 		<div class="container" in:fly={{ y: '-1rem', duration: 300, easing: sineOut }} out:blur={{ amount: 32, duration: 900, easing: sineIn }}>
 			<div class="buttons">
-				<a class="button" href="/" aria-label="cerrar">
-					<span class="icon back"></span>
-				</a>
 				<button type="button" onclick={() => dialog.showModal()} aria-label="borrar">
 					<span class="icon delete"></span>
 				</button>
@@ -31,6 +28,20 @@
 					aria-label="editar"
 				>
 					<span class="icon edit"></span>
+				</button>
+				<button
+					type="button"
+					onclick={(e) => {
+						e.preventDefault();
+						var printContainer = document.getElementById('print-container');
+						var printContent = document.getElementById('print-content').innerHTML;
+						printContainer.innerHTML = printContent;
+						window.print();
+						printContainer.innerHTML = '';
+					}}
+					aria-label="imprimir"
+				>
+					<span class="icon print"></span>
 				</button>
 				<form
 					method="POST"
@@ -63,7 +74,7 @@
 			</div>
 			<div class="estimate">
 				<Section overlay={windowState.form === 'estimate'} cards>
-					<div class="content">
+					<div id="print-content">
 						{@html data.html}
 					</div>
 				</Section>
@@ -75,7 +86,7 @@
 						{#if estimate.vehicleId.length === 6}
 							<h4 class="vehicleId">{estimate.vehicleId?.slice(0, 3)}<span>{estimate.vehicleId?.slice(-3)}</span></h4>
 						{:else if estimate.vehicleId.length === 7}
-							<h4 class="vehicleId">{estimate.vehicleId?.slice(0, 2)}<span>{estimate.vehicleId?.slice(2, 5)}</span><span>{resultado.vehicleId?.slice(-2)}</span></h4>
+							<h4 class="vehicleId">{estimate.vehicleId?.slice(0, 2)}<span>{estimate.vehicleId?.slice(2, 5)}</span><span>{estimate.vehicleId?.slice(-2)}</span></h4>
 						{:else}
 							<h4 class="vehicleId">{estimate.vehicleId}</h4>
 						{/if}
@@ -121,7 +132,6 @@
 		gap: 1px;
 		grid-template-columns: 2fr 2fr 2fr 5fr;
 
-		> a,
 		> button {
 			width: 100%;
 			height: 3rem;
@@ -185,6 +195,19 @@
 
 				.icon {
 					position: absolute;
+				}
+			}
+
+			button:last-child {
+				margin-left: 1px;
+
+				&::after {
+					content: '';
+					position: absolute;
+					top: 0;
+					left: -1px;
+					bottom: 0;
+					border-left: var(--border-variant);
 				}
 			}
 		}

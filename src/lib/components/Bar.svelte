@@ -1,5 +1,5 @@
 <script>
-	import { fade, blur } from 'svelte/transition';
+	import { fade, blur, fly } from 'svelte/transition';
 	import { sineIn, sineOut } from 'svelte/easing';
 	import { page } from '$app/state';
 	import { enhance } from '$app/forms';
@@ -11,10 +11,11 @@
 
 	let logoutDialog = $state();
 	let settingsDialog = $state();
-	let url = $derived(page.url.pathname);
+	let url = $derived(page.url.pathname.split('/'));
 	let user = $derived(page.data.user || {});
 	$effect(() => {
-		if (url === '/login') {
+		console.log(url);
+		if (url.length && url[1] === '/login') {
 			logoutDialog.close();
 		}
 	});
@@ -23,6 +24,19 @@
 <div class="bar">
 	<div>
 		<div>
+			<div class="titleCont">
+				{#if !url[1] || url[1] === 'estimate'}
+					<div in:blur={{ amount: 16, duration: 200, easing: sineOut }} out:blur={{ amount: 16, duration: 150, easing: sineIn }}>
+						<p>Turnos</p>
+					</div>
+				{:else}
+					<div in:fly={{ y: '-1rem', duration: 300, easing: sineOut }} out:blur={{ amount: 32, duration: 250, easing: sineIn }}>
+						<a class="button" href="/" aria-label="cerrar">
+							<span class="icon back"></span>Cliente
+						</a>
+					</div>
+				{/if}
+			</div>
 			<div class="createCont">
 				<button
 					type="button"
@@ -40,16 +54,40 @@
 					out:fade={{ duration: 200, easing: sineOut }}
 				>
 					{#if windowState.form === 'client'}
-						<span class="icon close" in:blur={{ amount: 16, duration: 200, easing: sineOut }} out:blur={{ amount: 16, duration: 150, easing: sineIn }}></span>
+						<div in:blur={{ amount: 16, duration: 200, easing: sineOut }} out:blur={{ amount: 16, duration: 150, easing: sineIn }}>
+							<span class="icon close"></span>
+							<span>Cliente</span>
+						</div>
 					{:else}
-						<span class="icon client" in:blur={{ amount: 16, duration: 200, easing: sineOut }} out:blur={{ amount: 16, duration: 150, easing: sineIn }}></span>
+						<div in:blur={{ amount: 16, duration: 200, easing: sineOut }} out:blur={{ amount: 16, duration: 150, easing: sineIn }}>
+							<span class="icon client"></span>
+							<span>Cliente</span>
+						</div>
 					{/if}
 				</button>
 			</div>
-			<div></div>
 			<p class="label">© Calarco WEB</p>
 		</div>
 		<div>
+			<div class="titleCont">
+				{#if url[1] === 'estimate'}
+					<div in:fly={{ y: '-1rem', duration: 300, easing: sineOut }} out:blur={{ amount: 32, duration: 250, easing: sineIn }}>
+						<a class="button" href="/" aria-label="cerrar">
+							<span class="icon back"></span>Presupuesto
+						</a>
+					</div>
+				{:else if url[2]}
+					<div in:fly={{ x: '-1rem', duration: 300, easing: sineOut }} out:blur={{ amount: 32, duration: 900, easing: sineIn }}>
+						<a class="button" href={`/${url[1]}`} aria-label="cerrar">
+							<span class="icon back"></span>Reparaciones
+						</a>
+					</div>
+				{:else}
+					<div in:blur={{ amount: 16, duration: 200, easing: sineOut }} out:blur={{ amount: 16, duration: 150, easing: sineIn }}>
+						<p>Recientes</p>
+					</div>
+				{/if}
+			</div>
 			<div class="createCont">
 				<button
 					type="button"
@@ -67,41 +105,48 @@
 					out:fade={{ duration: 200, easing: sineOut }}
 				>
 					{#if windowState.form === 'estimate'}
-						<span class="icon close" in:blur={{ amount: 16, duration: 200, easing: sineOut }} out:blur={{ amount: 16, duration: 150, easing: sineIn }}></span>
+						<div in:blur={{ amount: 16, duration: 200, easing: sineOut }} out:blur={{ amount: 16, duration: 150, easing: sineIn }}>
+							<span class="icon close"></span>
+							<span>Presupuesto</span>
+						</div>
 					{:else}
-						<span class="icon estimate" in:blur={{ amount: 16, duration: 200, easing: sineOut }} out:blur={{ amount: 16, duration: 150, easing: sineIn }}></span>
+						<div in:blur={{ amount: 16, duration: 200, easing: sineOut }} out:blur={{ amount: 16, duration: 150, easing: sineIn }}>
+							<span class="icon estimate"></span>
+							<span>Presupuesto</span>
+						</div>
 					{/if}
 				</button>
 			</div>
-			<div></div>
-			<button type="button" onclick={() => settingsDialog.showModal()} aria-label="settings">
-				<span>{user.name || user.userId}</span>
-			</button>
-			<form
-				method="POST"
-				action="?/switchTheme"
-				use:enhance={() => {
-					return async ({ result, update }) => {
-						update({ invalidateAll: false });
-						if (result.type === 'success') {
-							page.data.user.darkTheme = darkTheme;
-						} else {
-							switchTheme();
-						}
-					};
-				}}
-			>
-				<button type="submit" aria-label="borrar" onclick={switchTheme}>
-					{#if darkTheme}
-						<span class="icon lighton"></span>
-					{:else}
-						<span class="icon lightoff"></span>
-					{/if}
+			<div class="buttonsCont">
+				<button type="button" onclick={() => settingsDialog.showModal()} aria-label="settings">
+					<span>{user.name || user.userId}</span>
 				</button>
-			</form>
-			<button type="button" onclick={() => logoutDialog.showModal()} aria-label="borrar">
-				<span class="icon logout"></span>
-			</button>
+				<form
+					method="POST"
+					action="?/switchTheme"
+					use:enhance={() => {
+						return async ({ result, update }) => {
+							update({ invalidateAll: false });
+							if (result.type === 'success') {
+								page.data.user.darkTheme = darkTheme;
+							} else {
+								switchTheme();
+							}
+						};
+					}}
+				>
+					<button type="submit" aria-label="borrar" onclick={switchTheme}>
+						{#if darkTheme}
+							<span class="icon lighton"></span>
+						{:else}
+							<span class="icon lightoff"></span>
+						{/if}
+					</button>
+				</form>
+				<button type="button" onclick={() => logoutDialog.showModal()} aria-label="borrar">
+					<span class="icon logout"></span>
+				</button>
+			</div>
 		</div>
 	</div>
 </div>
@@ -161,55 +206,88 @@
 				gap: 1px;
 
 				&:first-child {
-					grid-template-columns: auto 1fr auto;
+					grid-template-columns: 1fr auto 1fr;
 
-					p {
+					.label {
 						padding: 0 1rem;
 						height: 100%;
 						display: grid;
+						text-align: right;
 					}
 				}
 
 				&:last-child {
-					grid-template-columns: auto 1fr auto auto auto;
+					grid-template-columns: 1fr auto 1fr;
 
-					> form > button,
-					> button {
-						height: 100%;
+					.buttonsCont {
+						display: flex;
+						justify-content: flex-end;
+						gap: 1px;
 
-						&:after {
-							content: '';
-							position: absolute;
-							top: 0;
-							bottom: 0;
-							left: -1px;
-							border-left: var(--border-variant);
+						> form > button,
+						> button {
+							height: 100%;
+							padding: 0 1rem;
+							font: var(--label);
+							font: 500 0.75rem/1.25rem var(--font-family);
+
+							&:after {
+								content: '';
+								position: absolute;
+								top: 0;
+								bottom: 0;
+								left: -1px;
+								border-left: var(--border-variant);
+							}
+
+							.icon::before {
+								width: 1.25rem;
+								height: 1.25rem;
+							}
 						}
-					}
 
-					> button:last-child {
-						border-radius: 0 0 4px 0;
+						> button:last-child {
+							border-radius: 0 0 4px 0;
+						}
 					}
 				}
 
-				button {
-					height: auto;
-					margin: 0;
-					padding: 0 1rem;
-					border-radius: 0px;
-					font: var(--label);
-					font: 500 0.75rem/1.25rem var(--font-family);
-					color: var(--primary);
+				.titleCont {
+					height: 100%;
+					display: grid;
 
-					.icon::before {
-						width: 1.25rem;
-						height: 1.25rem;
+					> div {
+						height: 100%;
+						position: absolute;
+						display: flex;
+
+						> .button {
+							border-radius: 0 0 0px 4px;
+							padding: 0 1.5rem 0 1rem;
+							gap: 1rem;
+							font-family: var(--font-family-alt);
+						}
+
+						> p {
+							padding: 0 1.5rem;
+							height: 100%;
+							display: flex;
+							align-items: center;
+							font-family: var(--font-family-alt);
+							color: var(--on-background-variant);
+						}
 					}
+				}
+
+				button,
+				.button {
+					height: auto;
+					border-radius: 0px;
 				}
 
 				.createCont {
 					position: relative;
-					width: 5.25rem;
+					width: 10rem;
 
 					.createButton {
 						position: absolute;
@@ -226,8 +304,8 @@
 							border-top: none;
 						}
 
-						.icon {
-							position: absolute;
+						> div {
+							gap: 0.25rem;
 						}
 					}
 				}

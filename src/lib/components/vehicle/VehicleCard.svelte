@@ -69,7 +69,7 @@
 		{#if windowState.form === 'vehicle' && windowState.id === vehicle?.vehicleId}
 			<VehicleForm {vehicle} />
 		{/if}
-		<Dialog bind:dialog title="¿Borrar vehiculo y sus reparaciones?" action="?/deleteVehicle">
+		<Dialog bind:dialog title="¿Borrar vehículo y sus reparaciones?" action="?/deleteVehicle">
 			<input type="hidden" name="vehicleId" value={vehicle?.vehicleId} />
 			{@render vehicleContent()}
 		</Dialog>

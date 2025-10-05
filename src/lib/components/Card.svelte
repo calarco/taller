@@ -12,7 +12,7 @@
 	});
 </script>
 
-<div bind:this={element} class={["container", { isActive, isForm }]} in:slide={{ axis: 'y', duration: 200, easing: sineOut }} out:slide={{ axis: 'y', duration: 150, easing: sineIn }}>
+<div bind:this={element} class={['container', { isActive, isForm }]} in:slide={{ axis: 'y', duration: 200, easing: sineOut }} out:slide={{ axis: 'y', duration: 150, easing: sineIn }}>
 	{@render children()}
 </div>
 
@@ -24,18 +24,19 @@
 		border: 1px solid rgba(0, 0, 0, 0);
 		transition:
 			border 0.2s ease-in,
-			background 0.2s ease-in,
+			background 0.15s ease-in,
 			z-index 0.25s step-end;
 
 		&:hover {
+			transition: background 0s;
 			cursor: pointer;
 			background: var(--primary-variant);
 		}
 
 		&:not(:first-child)::after {
-			content: "";
+			content: '';
 			position: absolute;
-			top: calc(-0.75rem - 1px);
+			top: calc(-0.5rem - 1px);
 			z-index: 0;
 			width: 100%;
 			border-top: var(--border-variant);
@@ -43,7 +44,7 @@
 
 		&.isActive {
 			position: sticky;
-			top: calc(4.5rem + 2px);
+			top: 4rem;
 			z-index: 1000;
 			background: var(--primary-variant);
 			backdrop-filter: var(--backdrop-filter);
@@ -57,7 +58,7 @@
 
 		&.isForm {
 			position: sticky;
-			top: 4.5rem;
+			top: 4rem;
 			z-index: 1500;
 			backdrop-filter: none;
 			transition: z-index 0s;

@@ -34,9 +34,11 @@ body {
 }
 
 body {
+	--scrollbar-width: 10px;
+
 	::-webkit-scrollbar {
-		width: 12px;
-		height: 12px;
+		width: var(--scrollbar-width);
+		height: var(--scrollbar-width);
 		border-radius: 0 4px 4px 0;
 	}
 	::-webkit-scrollbar-track {
@@ -51,9 +53,9 @@ body {
 		background: rgba(0, 0, 0, 0.16);
 	}
 	@-moz-document url-prefix() {
+		--scrollbar-width: 15px;
 		scrollbar-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.08);
 	}
-
 
 	--font-family: 'Supreme-Variable';
 	--font-family-alt: 'SpaceMono-Regular';
@@ -67,7 +69,7 @@ body {
 	--headline: 300 1.5rem/2rem var(--font-family);
 	--display-1: 300 2rem/2.5rem var(--font-family);
 
-	--bar-height: 2.25rem;
+	--bar-height: 3rem;
 
 	--shadow: 0 0.5px 0.7px rgba(0, 0, 0, 0.079), 0 1.6px 2.5px rgba(0, 0, 0, 0.059), 5px 7px 11px hsla(202, 0%, 35%, 0.1), -5px -5px 10px rgba(255, 255, 255, 0.5);
 	--shadow-variant: 0 0.5px 0.7px rgba(0, 0, 0, 0.05), 0 1.6px 2.5px rgba(0, 0, 0, 0.03), 5px 7px 11px rgba(0, 0, 0, 0.01), -5px -5px 10px rgba(255, 255, 255, 0.3);
@@ -244,6 +246,10 @@ body {
 
 .icon.taller::before {
 	mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='M11.5 20.77v-3h-7v-1h15v1h-7v3zm-2.884-8.731q.309 0 .539-.23t.23-.54t-.23-.54t-.54-.229t-.539.23t-.23.54t.23.539t.54.23m6.769 0q.31 0 .539-.23t.23-.54t-.23-.54t-.54-.229t-.539.23t-.23.54t.23.539t.54.23M6 9.522l1.496-4.3q.067-.215.241-.334t.386-.12h7.754q.212 0 .386.12q.173.119.24.334L18 9.523v5.793q0 .198-.128.326q-.127.127-.326.127h-.092q-.199 0-.326-.127q-.128-.128-.128-.326v-1.547H7v1.546q0 .199-.128.327q-.127.127-.326.127h-.092q-.199 0-.326-.127Q6 15.514 6 15.316zm1.304-.754h9.392l-1.046-3h-7.3z'/%3E%3C/svg%3E");
+}
+
+.icon.print::before {
+	mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='M16 8.616v-3H8v3H7v-4h10v4zm-11.423 1h14.846zm13.038 2.5q.425 0 .713-.288t.287-.712t-.287-.713t-.713-.288t-.712.288t-.288.713t.288.712t.713.288M16 19v-4.538H8V19zm1 1H7v-4H3.577v-5.384q0-.85.577-1.425t1.423-.576h12.846q.85 0 1.425.576t.575 1.424V16H17zm2.423-5v-4.384q0-.425-.287-.713t-.713-.288H5.577q-.425 0-.712.288t-.288.713V15H7v-1.538h10V15z'/%3E%3C/svg%3E");
 }
 
 pre,
@@ -643,13 +649,13 @@ input[type='submit'] {
 	&:hover {
 		cursor: pointer;
 		background: var(--primary-variant);
-		transition: 0.15s ease-out;
+		transition: 0s;
 	}
 
 	&.createButton:hover {
 		background: var(--secondary-variant);
 		border: 1px solid var(--secondary);
-		transition: 0.15s ease-out;
+		transition: 0s;
 	}
 
 	&:disabled {
@@ -738,9 +744,17 @@ a {
 	box-shadow: var(--shadow-variant);
 	transition: 0.1s ease-in;
 
-	.icon {
-		padding: 0 0.25rem;
+	> div {
+		position: absolute;
+		display: flex;
+		gap: 0.5rem;
+	}
 
+	span {
+		padding: 0 0.25rem;
+	}
+
+	.icon {
 		&::before {
 			background: var(--secondary);
 		}

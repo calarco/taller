@@ -25,7 +25,7 @@
 			{#if client.phone}
 				<div>
 					<p>{client.phone}</p>
-					<div class="label">Telefono</div>
+					<div class="label">Teléfono</div>
 				</div>
 			{/if}
 			{#if client.email}
@@ -39,10 +39,8 @@
 {/snippet}
 
 <div class="container">
-	<div class="buttons">
-		<a class="button" href="/" aria-label="cerrar">
-			<span class="icon back"></span>
-		</a>
+	{@render clientContent()}
+	<div class="cardButtons">
 		<button type="button" onclick={() => dialog.showModal()} aria-label="borrar">
 			<span class="icon delete"></span>
 		</button>
@@ -57,7 +55,6 @@
 			<span class="icon edit"></span>
 		</button>
 	</div>
-	{@render clientContent()}
 	<Dialog bind:dialog title="¿Borrar cliente y sus vehiculos?" action="?/deleteClient">
 		<input type="hidden" name="clientId" value={client.clientId} />
 		{@render clientContent()}
@@ -77,7 +74,7 @@
 		padding: 1rem 1.5rem;
 		display: grid;
 		gap: 1rem;
-		grid-template-columns: 1fr auto;
+		grid-template-columns: 1fr 1fr;
 		align-items: center;
 
 		.title {
@@ -106,47 +103,8 @@
 		}
 	}
 
-	.buttons {
+	.cardButtons {
 		grid-row: 5;
-		grid-column-start: 1;
-		grid-column-end: span 3;
-		position: relative;
-		width: 100%;
-		height: 3rem;
-		border-radius: 4px 4px 0 0;
-		overflow: hidden;
-		border-bottom: var(--border-variant);
-		display: grid;
-		gap: 1px;
-		grid-template-columns: 2fr 2fr 2fr;
-		grid-auto-flow: column;
-
-		a,
-		button {
-			width: 100%;
-			height: 3rem;
-			padding: 0 1.5rem;
-			border-radius: 0px;
-			background: none;
-			border: none;
-
-			&:hover {
-				cursor: pointer;
-				background: var(--primary-variant);
-			}
-
-			&:not(:first-child)::after {
-				content: '';
-				position: absolute;
-				top: 0;
-				left: -1px;
-				bottom: 0;
-				border-left: var(--border-variant);
-			}
-
-			&:last-child {
-				border-radius: 0 4px 0 0;
-			}
-		}
+		border-radius: 0;
 	}
 </style>
