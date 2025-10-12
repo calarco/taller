@@ -110,7 +110,7 @@
 
 	.list {
 		position: relative;
-		border-radius: 4px;
+		border-radius: var(--border-radius);
 		display: flex;
 		flex-direction: column;
 		outline: 1px solid var(--border-variant);
@@ -121,14 +121,14 @@
 		height: 3rem;
 		padding: 0 0 3rem 0;
 		color: var(--primary);
-		border-radius: 4px 4px 0px 0px;
+		border-radius: var(--border-radius) var(--border-radius) 0 0;
 		margin-bottom: 1px;
 
 		&:last-child {
 			margin-bottom: 0px;
 
 			> button {
-				border-radius: 4px;
+				border-radius: var(--border-radius);
 			}
 		}
 
@@ -138,7 +138,7 @@
 		}
 
 		> button {
-			border-radius: 4px 4px 0px 0px;
+			border-radius: var(--border-radius) var(--border-radius) 0 0;
 			position: relative;
 			width: 100%;
 			height: 3rem;

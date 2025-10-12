@@ -35,27 +35,28 @@ body {
 
 body {
 	--bar-height: 3rem;
-	--scrollbar-width: 10px;
+	--border-radius: 6px;
+	--scrollbar-width: 12px;
 
 	::-webkit-scrollbar {
 		width: var(--scrollbar-width);
 		height: var(--scrollbar-width);
-		border-radius: 0 4px 4px 0;
+		border-radius: 0 var(--border-radius) var(--border-radius) 0;
 	}
 	::-webkit-scrollbar-track {
 		background: rgba(0, 0, 0, 0.08);
-		border-radius: 0 4px 4px 0;
+		border-radius: 0 var(--border-radius) var(--border-radius) 0;
 	}
 	::-webkit-scrollbar-thumb {
 		background: rgba(0, 0, 0, 0.1);
-		border-radius: 0 4px 4px 0;
+		border-radius: 0 var(--border-radius) var(--border-radius) 0;
 	}
 	::-webkit-scrollbar-thumb:hover {
 		background: rgba(0, 0, 0, 0.16);
 	}
 	@-moz-document url-prefix() {
-		--scrollbar-width: 15px;
-		scrollbar-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.08);
+		scrollbar-width: thin;
+		scrollbar-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0);
 	}
 
 	--font-family: 'Supreme-Variable';
@@ -120,7 +121,7 @@ body {
 			background: hsla(202, 15%, 60%, 0.12);
 		}
 		@-moz-document url-prefix() {
-			scrollbar-color: hsla(202, 15%, 40%, 0.1) hsla(202, 15%, 20%, 0.08);
+			scrollbar-color: hsla(202, 15%, 40%, 0.1) hsla(202, 15%, 20%, 0);
 		}
 
 		--on-background: rgba(255, 255, 255, 1);
@@ -380,7 +381,7 @@ textarea {
 	display: block;
 	width: 100%;
 	padding: 0.25rem 0.5rem;
-	border-radius: 4px;
+	border-radius: var(--border-radius);
 	background: none;
 	border: none;
 	outline: 1px solid var(--border-variant);
@@ -391,15 +392,15 @@ textarea {
 	&:is(:-webkit-autofill, :autofill):hover,
 	&:hover {
 		border: none;
-		outline: 1px solid var(--primary-border);
-		transition: 0.15s ease-out;
+		background: var(--highlight);
+		transition: 0s;
 	}
 
 	&:is(:-webkit-autofill, :autofill):focus,
 	&:focus {
 		border: none;
-		outline: 1px solid rgba(0, 0, 0, 0);
-		background: var(--highlight);
+		outline: 1px solid var(--primary-border);
+		background: var(--primary-variant);
 		box-shadow: var(--shadow-variant);
 		color: var(--on-background);
 		transition: 0.15s ease-out;
@@ -413,7 +414,7 @@ textarea {
 input[type='search'] {
 	height: 3rem;
 	padding: 0 1.5rem;
-	border-radius: 4px 4px 0 0;
+	border-radius: var(--border-radius) var(--border-radius) 0 0;
 	outline: none;
 	text-transform: uppercase;
 
@@ -435,7 +436,7 @@ input[type='number'] {
 
 	&::-webkit-inner-spin-button {
 		cursor: pointer;
-		border-radius: 4px;
+		border-radius: var(--border-radius);
 		margin: 0;
 		position: absolute;
 		top: 0;
@@ -475,10 +476,10 @@ select {
 	appearance: none;
 	width: 100%;
 	padding: 0.25rem 0.5rem;
-	border-radius: 4px;
-	background: var(--overlay);
-	border: 1px solid rgba(0, 0, 0, 0);
-	outline: none;
+	border-radius: var(--border-radius);
+	border: none;
+	background: var(--highlight);
+	outline: 1px solid var(--border-variant);
 	font: var(--subhead1);
 	color: var(--on-background);
 	transition: 0.15s ease-in;
@@ -497,12 +498,17 @@ select {
 
 	&:not(:disabled):hover {
 		cursor: pointer;
+		transition: 0s;
+	}
+
+	&:not(:disabled):not(:focus):hover {
 		background: var(--highlight);
+		outline: 1px solid var(--primary);
 	}
 
 	&:focus {
-		background: var(--highlight);
-		border: 1px solid var(--primary-border);
+		background: var(--primary-variant);
+		outline: 1px solid var(--primary-border);
 		box-shadow: var(--shadow-variant);
 	}
 
@@ -523,7 +529,7 @@ select,
 ::picker(select) {
 	top: calc(anchor(bottom) + 1px);
 	left: calc(anchor(left) + 1px);
-	border-radius: 4px;
+	border-radius: var(--border-radius);
 	background: var(--surface);
 	box-shadow: var(--shadow);
 	border: none;
@@ -629,7 +635,7 @@ button,
 input[type='submit'] {
 	position: relative;
 	padding: 0.5rem 1rem;
-	border-radius: 4px;
+	border-radius: var(--border-radius);
 	border: none;
 	background: none;
 	text-align: center;
@@ -691,7 +697,7 @@ a {
 	color: var(--on-foreground);
 	font: var(--body2);
 	font-size: 0.95em;
-	border-radius: 4px;
+	border-radius: var(--border-radius);
 	box-shadow: var(--shadow);
 	width: max-content;
 	display: grid;
@@ -726,14 +732,14 @@ a {
 .panel {
 	position: relative;
 	height: calc(100vh - var(--bar-height) - 2rem);
-	border-radius: 4px;
+	border-radius: var(--border-radius);
 	display: grid;
 }
 
 .section-card {
 	position: relative;
 	z-index: 1;
-	padding: 1rem 0;
+	padding: 0.5rem 0;
 	background: var(--surface);
 
 	&:not(:last-child)::after {
@@ -791,7 +797,7 @@ a {
 	width: 100%;
 	height: 3rem;
 	overflow: hidden;
-	border-radius: 0px 0 4px 4px;
+	border-radius: 0 0 var(--border-radius) var(--border-radius);
 	background: var(--surface);
 	display: flex;
 	gap: 1px;
@@ -817,7 +823,7 @@ a {
 			top: 0;
 			left: -1px;
 			bottom: 0;
-			border-left: 1px solid var(--primary-border);
+			border-left: 1px solid var(--border-variant);
 		}
 	}
 }
@@ -828,7 +834,7 @@ a {
 	position: relative;
 	width: 100%;
 	height: 3rem;
-	border-radius: 0px 0px 4px 4px;
+	border-radius: 0 0 var(--border-radius) var(--border-radius);
 	overflow: hidden;
 	border-top: 1px solid var(--primary-border);
 	display: flex;

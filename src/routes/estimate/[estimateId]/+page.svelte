@@ -116,7 +116,7 @@
 		right: 0;
 		bottom: 0;
 		left: 0;
-		border-radius: 4px;
+		border-radius: var(--border-radius);
 		background: var(--surface-variant);
 		display: grid;
 		grid-template-rows: auto 1fr;
@@ -126,7 +126,7 @@
 		position: relative;
 		width: 100%;
 		height: 3rem;
-		border-radius: 4px 4px 0 0;
+		border-radius: var(--border-radius) var(--border-radius) 0 0;
 		overflow: hidden;
 		display: grid;
 		gap: 1px;
@@ -206,7 +206,7 @@
 		right: 0;
 		bottom: 0;
 		left: 0;
-		border-radius: 4px;
+		border-radius: var(--border-radius);
 		border-top: 1px solid var(--border-variant);
 	}
 

@@ -67,7 +67,7 @@
 
 	form {
 		position: relative;
-		border-radius: 4px;
+		border-radius: var(--border-radius);
 		border: 1px solid var(--primary);
 		box-shadow: var(--shadow);
 		background: var(--primary);
@@ -84,14 +84,14 @@
 		}
 
 		label:first-child {
-			border-radius: 4px 4px 0 0;
+			border-radius: var(--border-radius) var(--border-radius) 0 0;
 		}
 	}
 
 	.buttons {
 		width: 100%;
 		height: 3rem;
-		border-radius: 0 0 4px 4px;
+		border-radius: 0 0 var(--border-radius) var(--border-radius);
 		overflow: hidden;
 		background: var(--surface);
 		display: flex;

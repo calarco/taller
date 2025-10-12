@@ -76,7 +76,7 @@
 					</button>
 				</form>
 			{:else}
-				<select name="carMakeId" autoComplete="off" bind:value={carMakeId} in:fade={{ duration: 200, easing: sineIn }} out:fade={{ duration: 150, easing: sineOut }}>
+				<select name="carMakeId" placeholder="-" autoComplete="off" bind:value={carMakeId} in:fade={{ duration: 200, easing: sineIn }} out:fade={{ duration: 150, easing: sineOut }}>
 					{#each carMakes as carMake (carMake.carMakeId)}
 						<option value={carMake.carMakeId}>
 							{carMake.name}

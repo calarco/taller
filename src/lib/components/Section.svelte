@@ -12,10 +12,20 @@
 		<div class="padding"></div>
 	{/if}
 	{#if overlay}
-		<div class="overlay" role="button" tabindex="0" aria-pressed="false" onkeyup={() => {}} onkeydown={() => {}} onclick={() => {
-			windowState.form = '';
-			windowState.id = '';
-		}} in:fade={{ duration: 300, easing: sineOut }} out:fade={{ duration: 250, easing: sineIn }}></div>
+		<div
+			class="overlay"
+			role="button"
+			tabindex="0"
+			aria-pressed="false"
+			onkeyup={() => {}}
+			onkeydown={() => {}}
+			onclick={() => {
+				windowState.form = '';
+				windowState.id = '';
+			}}
+			in:fade={{ duration: 300, easing: sineOut }}
+			out:fade={{ duration: 250, easing: sineIn }}
+		></div>
 	{/if}
 </section>
 
@@ -27,7 +37,7 @@
 		height: 100%;
 		min-height: 25rem;
 		max-height: 100%;
-		border-radius: 4px;
+		border-radius: var(--border-radius);
 		display: flex;
 		flex-direction: column;
 		gap: 1px;

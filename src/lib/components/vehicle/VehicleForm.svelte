@@ -58,7 +58,7 @@
 		<h6 class="unit">L</h6>
 	</Label>
 	<Label title="Combustible" --column-end="span 2">
-		<select name="fuel" autoComplete="off" value={vehicle?.fuel || ''}>
+		<select name="fuel" placeholder="-" autoComplete="off" value={vehicle?.fuel || ''}>
 			<option value="Nafta">Nafta</option>
 			<option value="Diesel">Diesel</option>
 			<option value="GNC">GNC</option>

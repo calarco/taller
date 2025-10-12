@@ -19,7 +19,7 @@
 	.section-card {
 		&.isActive {
 			position: sticky;
-			top: 5rem;
+			top: 4.5rem;
 			bottom: 0;
 			z-index: 1000;
 
@@ -36,9 +36,11 @@
 
 		&.isForm {
 			position: sticky;
-			top: 5rem;
+			top: 4.5rem;
 			z-index: 1500;
-			transition: z-index 0s;
+			transition:
+				z-index 0s,
+				background 0.4s cubic-bezier(0.895, 0.03, 0.685, 0.22);
 			background: rgba(0, 0, 0, 0);
 
 			&:not(:first-child)::after {
@@ -48,7 +50,7 @@
 
 		> div {
 			position: relative;
-			border-radius: 4px;
+			border-radius: var(--border-radius);
 			outline: 1px solid rgba(0, 0, 0, 0);
 			transition:
 				outline 0.2s ease-in,

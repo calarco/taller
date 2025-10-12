@@ -94,7 +94,7 @@
 							</a>
 						{/if}
 					</div>
-					<a href={`/${resultado.clientId}/${resultado.vehicleId || ''}${resultado.repairId ? '#' + resultado.repairId : ''}`} class="updatedAt">
+					<a href={`/${resultado.clientId}/${resultado.vehicleId || ''}${resultado.repairId ? '#' + resultado.repairId : ''}`} class="updated-at">
 						<div>
 							{resultado.updatedAt.getDate()}/{resultado.updatedAt.toLocaleDateString('default', { month: 'short' }).substring(0, 3)}/{resultado.updatedAt
 								.toLocaleDateString('default', { year: 'numeric' })
@@ -141,7 +141,7 @@
 							</div>
 						{/if}
 					</a>
-					<a href={`/estimate/${resultado.estimateId}`} class="updatedAt">
+					<a href={`/estimate/${resultado.estimateId}`} class="updated-at">
 						<div>
 							{resultado.updatedAt.getDate()}/{resultado.updatedAt.toLocaleDateString('default', { month: 'short' }).substring(0, 3)}/{resultado.updatedAt
 								.toLocaleDateString('default', { year: 'numeric' })
@@ -178,7 +178,7 @@
 		left: 0;
 		height: 3rem;
 		margin-bottom: -1px;
-		border-radius: 4px 0 0 0;
+		border-radius: var(--border-radius) 0 0 0;
 		background: var(--surface);
 		box-shadow: var(--shadow);
 		display: grid;
@@ -348,7 +348,7 @@
 
 				.cont {
 					padding: 0.5rem 0.5rem;
-					border-radius: 4px;
+					border-radius: var(--border-radius);
 					transition: 0.1s ease-in;
 					outline: 1px solid rgba(0, 0, 0, 0);
 					text-transform: capitalize;
@@ -404,11 +404,11 @@
 			}
 		}
 
-		> .updatedAt {
+		> .updated-at {
 			height: 100%;
 			position: relative;
 			padding: 0 1rem;
-			width: 6rem;
+			width: 6.25rem;
 			text-align: right;
 			text-transform: uppercase;
 			font-family: var(--font-family-alt);

@@ -14,7 +14,7 @@
 		top: 0;
 		right: 0;
 		left: 0;
-		border-radius: 4px;
+		border-radius: var(--border-radius);
 		background: var(--overlay);
 		backdrop-filter: blur(0.4rem);
 		height: 1000%;

@@ -52,7 +52,7 @@
 		left: 0;
 		right: 0;
 		min-width: 18.5rem;
-		border-radius: 4px;
+		border-radius: var(--border-radius);
 		outline: 1px solid var(--primary);
 		background: var(--primary);
 		box-shadow: var(--shadow);

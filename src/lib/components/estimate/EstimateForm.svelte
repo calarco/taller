@@ -133,7 +133,7 @@
 				margin: 0;
 				padding: 0;
 				background: var(--surface);
-				border-radius: 4px;
+				border-radius: var(--border-radius);
 				outline: 1px solid var(--border-variant);
 				display: grid;
 				align-content: space-between;

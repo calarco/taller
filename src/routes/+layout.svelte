@@ -20,7 +20,7 @@
 		}
 	});
 	$effect(() => {
-		if (windowState.form === '') {
+		if (typeof windowState.form === "string") {
 			windowState.error = {};
 		}
 	});

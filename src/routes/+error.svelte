@@ -43,7 +43,7 @@
 
 		> div {
 			width: 40rem;
-			border-radius: 4px;
+			border-radius: var(--border-radius);
 			overflow: hidden;
 			background: var(--error);
 			box-shadow: var(--shadow);

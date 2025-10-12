@@ -65,7 +65,7 @@
 			bottom: 0;
 			left: 0;
 			right: 0;
-			border-radius: 4px;
+			border-radius: var(--border-radius);
 			background: var(--surface-variant);
 			display: grid;
 			grid-template-rows: auto 1fr;
@@ -74,7 +74,7 @@
 
 	.vehiculos {
 		position: relative;
-		border-radius: 4px;
+		border-radius: var(--border-radius);
 		border-top: 1px solid var(--border-variant);
 
 		> div {
@@ -88,13 +88,16 @@
 
 	.section-card {
 		position: sticky;
-		z-index: 100;
 		top: 0;
+		z-index: 100;
 		transition: z-index 0.35s step-end;
+		padding: 1rem 0 0.5rem 0;
 
 		&.isCreate {
 			z-index: 1500;
-			transition: z-index 0s;
+			transition:
+				z-index 0s,
+				background 0.4s cubic-bezier(0.895, 0.03, 0.685, 0.22);
 			background: rgba(0, 0, 0, 0);
 		}
 

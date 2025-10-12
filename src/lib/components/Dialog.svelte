@@ -42,7 +42,7 @@
 		min-width: var(--min-width, 32rem);
 		max-width: 47rem;
 		padding: 0;
-		border-radius: 4px;
+		border-radius: var(--border-radius);
 		border: none;
 		outline: 1px solid var(--border-variant);
 		background: var(--surface);

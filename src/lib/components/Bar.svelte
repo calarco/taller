@@ -14,7 +14,6 @@
 	let url = $derived(page.url.pathname.split('/'));
 	let user = $derived(page.data.user || {});
 	$effect(() => {
-		console.log(url);
 		if (url.length && url[1] === '/login') {
 			logoutDialog.close();
 		}
@@ -184,7 +183,7 @@
 
 			> div {
 				position: relative;
-				border-radius: 0 0 4px 4px;
+				border-radius: 0 0 var(--border-radius) var(--border-radius);
 				background: var(--surface-variant);
 				outline: 1px solid var(--border-variant);
 				box-shadow: var(--shadow-variant);
@@ -234,7 +233,7 @@
 						}
 
 						> button:last-child {
-							border-radius: 0 0 4px 0;
+							border-radius: 0 0 var(--border-radius) 0;
 						}
 					}
 				}
@@ -249,7 +248,7 @@
 						display: flex;
 
 						> .button {
-							border-radius: 0 0 0px 4px;
+							border-radius: 0 0 0 var(--border-radius);
 							padding: 0 1.5rem 0 1rem;
 							gap: 1rem;
 							font-family: var(--font-family-alt);
@@ -270,7 +269,7 @@
 					position: relative;
 
 					.createButton {
-						border-radius: 0 0 4px 4px;
+						border-radius: 0 0 var(--border-radius) var(--border-radius);
 						box-shadow: none;
 						border-top: none;
 

@@ -83,7 +83,7 @@
 			top: 0;
 			bottom: 0;
 			left: -1px;
-			border-radius: 4px;
+			border-radius: var(--border-radius);
 			background: var(--error);
 			display: grid;
 			cursor: pointer;
@@ -127,7 +127,7 @@
 			right: 0;
 			top: 0;
 			bottom: 0;
-			border-radius: 4px;
+			border-radius: var(--border-radius);
 			display: grid;
 			cursor: pointer;
 			transition: 0.1s ease-in;
