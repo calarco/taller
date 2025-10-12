@@ -166,7 +166,7 @@
 		grid-column-start: panel-right;
 		grid-row-start: panel-top;
 		background: var(--surface-variant);
-		outline: var(--border-variant);
+		outline: 1px solid var(--border-variant);
 		box-shadow: var(--shadow-variant);
 	}
 
@@ -210,7 +210,7 @@
 				top: calc(50% - 1rem);
 				right: -1px;
 				height: 2rem;
-				border-right: var(--border-variant);
+				border-right: 1px solid var(--border-variant);
 			}
 
 			> div {
@@ -234,7 +234,7 @@
 			}
 
 			> div.close:hover {
-				background: var(--primary-variant);
+				background: var(--highlight);
 			}
 
 			.icon.search::before {
@@ -258,7 +258,7 @@
 
 		&:hover {
 			cursor: pointer;
-			background: var(--primary-variant);
+			background: var(--highlight);
 			transition: 0.15s ease-out;
 		}
 
@@ -267,7 +267,7 @@
 			position: absolute;
 			bottom: -1px;
 			width: 100%;
-			border-bottom: var(--border-variant);
+			border-bottom: 1px solid var(--border-variant);
 		}
 
 		.icon::before {
@@ -341,7 +341,7 @@
 
 				&.isVehicle:hover {
 					div {
-						outline: var(--border-variant);
+						outline: 1px solid var(--border-variant);
 						transition: 0.15s ease-out;
 					}
 				}
@@ -387,7 +387,7 @@
 					top: calc(50% - 1rem);
 					left: -1px;
 					height: 2rem;
-					border-left: var(--border-variant);
+					border-left: 1px solid var(--border-variant);
 				}
 			}
 		}

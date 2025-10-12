@@ -50,20 +50,15 @@
 						windowState.id = '';
 					}}
 					aria-label="crear"
-					in:fade={{ duration: 150, easing: sineIn }}
-					out:fade={{ duration: 200, easing: sineOut }}
 				>
-					{#if windowState.form === 'client'}
-						<div in:blur={{ amount: 16, duration: 200, easing: sineOut }} out:blur={{ amount: 16, duration: 150, easing: sineIn }}>
-							<span class="icon close"></span>
-							<span>Cliente</span>
-						</div>
-					{:else}
-						<div in:blur={{ amount: 16, duration: 200, easing: sineOut }} out:blur={{ amount: 16, duration: 150, easing: sineIn }}>
-							<span class="icon client"></span>
-							<span>Cliente</span>
-						</div>
-					{/if}
+					<div>
+						{#if windowState.form === 'client'}
+							<span class="icon close" in:blur={{ amount: 16, duration: 200, easing: sineOut }} out:blur={{ amount: 16, duration: 150, easing: sineIn }}> </span>
+						{:else}
+							<span class="icon client" in:blur={{ amount: 16, duration: 200, easing: sineOut }} out:blur={{ amount: 16, duration: 150, easing: sineIn }}> </span>
+						{/if}
+					</div>
+					<span>Cliente</span>
 				</button>
 			</div>
 			<p class="label">© Calarco WEB</p>
@@ -101,20 +96,15 @@
 						windowState.id = '';
 					}}
 					aria-label="crear"
-					in:fade={{ duration: 150, easing: sineIn }}
-					out:fade={{ duration: 200, easing: sineOut }}
 				>
-					{#if windowState.form === 'estimate'}
-						<div in:blur={{ amount: 16, duration: 200, easing: sineOut }} out:blur={{ amount: 16, duration: 150, easing: sineIn }}>
-							<span class="icon close"></span>
-							<span>Presupuesto</span>
-						</div>
-					{:else}
-						<div in:blur={{ amount: 16, duration: 200, easing: sineOut }} out:blur={{ amount: 16, duration: 150, easing: sineIn }}>
-							<span class="icon estimate"></span>
-							<span>Presupuesto</span>
-						</div>
-					{/if}
+					<div>
+						{#if windowState.form === 'estimate'}
+							<span class="icon close" in:blur={{ amount: 16, duration: 200, easing: sineOut }} out:blur={{ amount: 16, duration: 150, easing: sineIn }}> </span>
+						{:else}
+							<span class="icon estimate" in:blur={{ amount: 16, duration: 200, easing: sineOut }} out:blur={{ amount: 16, duration: 150, easing: sineIn }}> </span>
+						{/if}
+					</div>
+					<span>Presupuesto</span>
 				</button>
 			</div>
 			<div class="buttonsCont">
@@ -186,21 +176,17 @@
 			width: 100vw;
 			max-width: 95rem;
 			height: 100%;
-			padding: 0 2rem;
+			padding: 0 1rem;
 			display: grid;
-			gap: 2rem;
+			gap: 1rem;
 			grid-template-columns: [panel-left] 2fr [panel-right] 3fr;
 			grid-template-rows: [panel-top] 1fr;
-
-			@media (min-width: 1440px) {
-				gap: 2rem;
-			}
 
 			> div {
 				position: relative;
 				border-radius: 0 0 4px 4px;
 				background: var(--surface-variant);
-				outline: var(--border-variant);
+				outline: 1px solid var(--border-variant);
 				box-shadow: var(--shadow-variant);
 				display: grid;
 				gap: 1px;
@@ -228,16 +214,17 @@
 						> button {
 							height: 100%;
 							padding: 0 1rem;
+							border-radius: 0px;
 							font: var(--label);
 							font: 500 0.75rem/1.25rem var(--font-family);
 
 							&:after {
 								content: '';
 								position: absolute;
-								top: 0;
-								bottom: 0;
+								top: 0.5rem;
+								bottom: 0.5rem;
 								left: -1px;
-								border-left: var(--border-variant);
+								border-left: 1px solid var(--border-variant);
 							}
 
 							.icon::before {
@@ -279,24 +266,11 @@
 					}
 				}
 
-				button,
-				.button {
-					height: auto;
-					border-radius: 0px;
-				}
-
 				.createCont {
 					position: relative;
-					width: 10rem;
 
 					.createButton {
-						position: absolute;
-						top: 0;
-						bottom: -1px;
-						left: -1px;
-						right: -1px;
-						border-radius: 0 0 5px 5px;
-						backdrop-filter: none;
+						border-radius: 0 0 4px 4px;
 						box-shadow: none;
 						border-top: none;
 

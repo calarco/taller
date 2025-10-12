@@ -73,15 +73,13 @@
 		width: 100vw;
 		max-width: 95rem;
 		height: 100%;
-		padding: 1.5rem 2rem;
+		padding: 1rem;
 		display: grid;
-		gap: 2rem;
+		gap: 1rem;
 		grid-template-columns: [panel-left] 2fr [panel-right] 3fr;
 		grid-template-rows: [panel-top] 1fr;
 
 		@media (min-width: 1440px) {
-			padding: 1.5rem 2rem;
-			gap: 2rem;
 		}
 	}
 

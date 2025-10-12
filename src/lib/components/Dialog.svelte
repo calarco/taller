@@ -44,7 +44,7 @@
 		padding: 0;
 		border-radius: 4px;
 		border: none;
-		outline: var(--border-variant);
+		outline: 1px solid var(--border-variant);
 		background: var(--surface);
 		box-shadow: var(--shadow);
 		opacity: 0;
@@ -63,7 +63,7 @@
 				width: 100%;
 				text-align: center;
 				padding: 0.75rem 1rem;
-				border-bottom: var(--border-variant);
+				border-bottom: 1px solid var(--border-variant);
 			}
 
 			> form {

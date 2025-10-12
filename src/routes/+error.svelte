@@ -47,7 +47,7 @@
 			overflow: hidden;
 			background: var(--error);
 			box-shadow: var(--shadow);
-			outline: var(--border-variant);
+			outline: 1px solid var(--border-variant);
 			display: grid;
 			grid-template-columns: auto 1fr;
 			align-items: center;

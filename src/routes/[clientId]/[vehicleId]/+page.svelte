@@ -15,9 +15,11 @@
 	{#key data.vehicle.vehicleId}
 		<div class="container" in:fly={{ x: '-1rem', duration: 300, easing: sineOut }} out:blur={{ amount: 32, duration: 900, easing: sineIn }}>
 			<Section overlay={windowState.form === 'repair' || windowState.form === 'estimate'} cards>
-				<div class={['createCont', { isCreate }]}>
+				<div class={['section-card', { isCreate }]}>
 					{#if isCreate}
-						<RepairForm />
+						<div style="position: relative">
+							<RepairForm />
+						</div>
 					{/if}
 					<button
 						type="button"
@@ -30,8 +32,8 @@
 					>
 						<div>
 							<span class="icon repair"></span>
-							<span>Reparación</span>
 						</div>
+						<span>Reparación</span>
 					</button>
 				</div>
 				{#each data.repairs as repair (repair.repairId)}
@@ -62,17 +64,16 @@
 		left: 0;
 	}
 
-	.createCont {
+	.section-card {
 		position: sticky;
 		z-index: 100;
 		top: 0;
-		height: 3rem;
-		padding: 0 0 3rem 0;
 		transition: z-index 0.35s step-end;
 
 		&.isCreate {
 			z-index: 1500;
 			transition: z-index 0s;
+			background: rgba(0, 0, 0, 0);
 		}
 
 		> button {

@@ -133,7 +133,7 @@
 			transition: 0.1s ease-in;
 
 			&:hover {
-				background: var(--primary-variant);
+				background: var(--highlight);
 				transition: 0.15s ease-out;
 			}
 

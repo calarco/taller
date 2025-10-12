@@ -134,7 +134,7 @@
 				padding: 0;
 				background: var(--surface);
 				border-radius: 4px;
-				outline: var(--border-variant);
+				outline: 1px solid var(--border-variant);
 				display: grid;
 				align-content: space-between;
 				font: var(--label);
@@ -167,7 +167,7 @@
 								top: 0;
 								right: 9px;
 								bottom: 0;
-								border-right: var(--border-variant);
+								border-right: 1px solid var(--border-variant);
 							}
 						}
 
@@ -182,7 +182,7 @@
 								top: 0;
 								left: 6px;
 								bottom: 0;
-								border-left: var(--border-variant);
+								border-left: 1px solid var(--border-variant);
 							}
 						}
 
@@ -201,7 +201,7 @@
 								top: 0;
 								bottom: 0;
 								left: -1px;
-								border-left: 1px solid var(--primary-variant);
+								border-left: 1px solid var(--primary-border);
 							}
 						}
 					}

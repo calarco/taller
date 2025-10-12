@@ -75,7 +75,7 @@ export async function getSearch(userId, value) {
 		];
 
 		if (!value) {
-			return structuredClone(search.sort((a, b) => b.updatedAt - a.updatedAt).slice(0, 250));
+			return structuredClone(search.sort((a, b) => b.updatedAt - a.updatedAt).slice(0, 25));
 		} else {
 			return structuredClone(search);
 		}

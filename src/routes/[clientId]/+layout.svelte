@@ -17,9 +17,11 @@
 			<div class="vehiculos">
 				<div>
 					<Section overlay={windowState.form === 'vehicle' || windowState.form === 'client'} cards>
-						<div class={['createCont', { isCreate }]}>
+						<div class={['section-card', { isCreate }]}>
 							{#if isCreate}
-								<VehicleForm />
+								<div style="position: relative">
+									<VehicleForm />
+								</div>
 							{/if}
 							<button
 								type="button"
@@ -32,8 +34,8 @@
 							>
 								<div>
 									<span class="icon vehicle"></span>
-									<span>Vehículo</span>
 								</div>
+								<span>Vehículo</span>
 							</button>
 						</div>
 						{#if !data.vehicles?.length}
@@ -73,7 +75,7 @@
 	.vehiculos {
 		position: relative;
 		border-radius: 4px;
-		border-top: var(--border-variant);
+		border-top: 1px solid var(--border-variant);
 
 		> div {
 			position: absolute;
@@ -84,21 +86,16 @@
 		}
 	}
 
-	.createCont {
+	.section-card {
 		position: sticky;
-		top: 0;
-		height: 3rem;
-		padding: 0 0 3rem 0;
 		z-index: 100;
+		top: 0;
 		transition: z-index 0.35s step-end;
 
 		&.isCreate {
 			z-index: 1500;
 			transition: z-index 0s;
-		}
-
-		&:hover {
-			cursor: pointer;
+			background: rgba(0, 0, 0, 0);
 		}
 
 		> button {

@@ -37,8 +37,8 @@
 		&.cards {
 			background: var(--surface);
 			box-shadow: var(--shadow);
-			padding: 1rem;
-			gap: 1rem;
+			padding: 0 1rem;
+			gap: 0;
 
 			.padding {
 				min-height: 15rem;

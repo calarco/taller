@@ -142,7 +142,7 @@
 
 			&:hover {
 				cursor: pointer;
-				background: var(--primary-variant);
+				background: var(--highlight);
 			}
 
 			&:not(:first-child)::after {
@@ -151,7 +151,7 @@
 				top: 0;
 				left: -1px;
 				bottom: 0;
-				border-left: var(--border-variant);
+				border-left: 1px solid var(--border-variant);
 			}
 		}
 
@@ -166,7 +166,7 @@
 				top: 0;
 				left: -1px;
 				bottom: 0;
-				border-left: var(--border-variant);
+				border-left: 1px solid var(--border-variant);
 			}
 
 			input {
@@ -183,10 +183,10 @@
 				&::after {
 					content: '';
 					position: absolute;
-					top: 0.75rem;
-					left: 0;
-					bottom: 0.75rem;
-					border-left: var(--border-variant);
+					top: 0.5rem;
+					left: -1px;
+					bottom: 0.5rem;
+					border-left: 1px solid var(--border-variant);
 				}
 
 				.mailsend {
@@ -195,19 +195,6 @@
 
 				.icon {
 					position: absolute;
-				}
-			}
-
-			button:last-child {
-				margin-left: 1px;
-
-				&::after {
-					content: '';
-					position: absolute;
-					top: 0;
-					left: -1px;
-					bottom: 0;
-					border-left: var(--border-variant);
 				}
 			}
 		}
@@ -220,7 +207,7 @@
 		bottom: 0;
 		left: 0;
 		border-radius: 4px;
-		border-top: var(--border-variant);
+		border-top: 1px solid var(--border-variant);
 	}
 
 	article {

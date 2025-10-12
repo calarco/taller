@@ -113,7 +113,7 @@
 		border-radius: 4px;
 		display: flex;
 		flex-direction: column;
-		outline: var(--border-variant);
+		outline: 1px solid var(--border-variant);
 	}
 
 	.createCont {

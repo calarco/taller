@@ -34,6 +34,7 @@ body {
 }
 
 body {
+	--bar-height: 3rem;
 	--scrollbar-width: 10px;
 
 	::-webkit-scrollbar {
@@ -69,33 +70,32 @@ body {
 	--headline: 300 1.5rem/2rem var(--font-family);
 	--display-1: 300 2rem/2.5rem var(--font-family);
 
-	--bar-height: 3rem;
-
-	--shadow: 0 0.5px 0.7px rgba(0, 0, 0, 0.079), 0 1.6px 2.5px rgba(0, 0, 0, 0.059), 5px 7px 11px hsla(202, 0%, 35%, 0.1), -5px -5px 10px rgba(255, 255, 255, 0.5);
-	--shadow-variant: 0 0.5px 0.7px rgba(0, 0, 0, 0.05), 0 1.6px 2.5px rgba(0, 0, 0, 0.03), 5px 7px 11px rgba(0, 0, 0, 0.01), -5px -5px 10px rgba(255, 255, 255, 0.3);
-
-	--border: 1px solid rgba(0, 0, 0, 0.2);
-	--border-variant: 1px solid rgba(0, 0, 0, 0.1);
-	--border-primary: 1px solid rgba(80, 152, 206, 0.3);
-
-	--background: hsla(202, 15%, 80%, 1);
-	--surface: hsla(202, 30%, 99%, 1);
-	--surface-t: hsla(202, 30%, 99%, 0.6);
-	--surface-variant: hsla(202, 15%, 90%, 1);
-	--overlay: hsla(202, 15%, 90%, 0.6);
-	--primary: hsla(202, 39%, 43%, 1);
-	--primary-variant: hsla(202, 49%, 43%, 0.2);
-	--secondary: hsla(17, 42%, 58%, 1);
-	--secondary-variant: hsla(17, 50%, 75%, 0.5);
 	--on-background: hsla(17, 0%, 0%, 0.9);
 	--on-background-variant: hsla(17, 0%, 0%, 0.5);
 	--on-background-disabled: hsla(17, 0%, 50%, 0.3);
 	--on-foreground: hsla(17, 0%, 100%, 1);
 	--on-foreground-variant: hsla(17, 0%, 100%, 0.3);
+
+	--background: hsla(202, 15%, 80%, 1);
+	--surface: hsla(202, 30%, 99%, 1);
+	--surface-variant: hsla(202, 15%, 90%, 1);
+	--overlay: hsla(202, 15%, 90%, 0.6);
+	--highlight: hsla(202, 19%, 30%, 0.1);
+
+	--border-variant: hsla(202, 22%, 50%, 0.25);
+
+	--primary: hsla(202, 39%, 43%, 1);
+	--primary-variant: hsla(202, 40%, 90%, 1);
+	--primary-border: hsla(202, 49%, 78%, 1);
+	--secondary: hsla(17, 42%, 58%, 1);
+	--secondary-variant: hsla(17, 40%, 85%, 1);
+	--secondary-border: hsla(17, 50%, 78%, 1);
+
 	--error: hsla(354, 50%, 60%, 1);
 	--error-variant: hsla(354, 80%, 60%, 0.2);
 
-	--backdrop-filter: blur(0.5rem) contrast(65%) brightness(125%);
+	--shadow: 0 0.5px 0.7px rgba(0, 0, 0, 0.079), 0 1.6px 2.5px rgba(0, 0, 0, 0.059), 5px 7px 11px hsla(202, 0%, 35%, 0.1), -5px -5px 10px rgba(255, 255, 255, 0.5);
+	--shadow-variant: 0 0.5px 0.7px rgba(0, 0, 0, 0.05), 0 1.6px 2.5px rgba(0, 0, 0, 0.03), 5px 7px 11px rgba(0, 0, 0, 0.01), -5px -5px 10px rgba(255, 255, 255, 0.3);
 
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
@@ -103,9 +103,8 @@ body {
 	font-feature-settings: 'kern' 1;
 	font-kerning: normal;
 	font-family: var(--font-family), var(--font-family-alt), sans-serif;
-
-	background: var(--background);
 	color: var(--on-background);
+	background: var(--background);
 	user-select: none;
 
 	&:has(main.darkTheme) {
@@ -124,31 +123,32 @@ body {
 			scrollbar-color: hsla(202, 15%, 40%, 0.1) hsla(202, 15%, 20%, 0.08);
 		}
 
-		--shadow: 0 0.5px 0.7px rgba(0, 0, 0, 0.079), 0 1.6px 2.5px rgba(0, 0, 0, 0.059), 5px 7px 11px hsla(202, 0%, 0%, 0.1), -5px -5px 10px hsla(202, 100%, 50%, 0.01);
-		--shadow-variant: 0 0.5px 0.7px rgba(0, 0, 0, 0.079), 0 1.6px 2.5px rgba(0, 0, 0, 0.059), 5px 7px 11px hsla(202, 0%, 0%, 0.03), -5px -5px 10px hsla(202, 100%, 50%, 0.01);
-
-		--border: 1px solid rgba(255, 255, 255, 0.3);
-		--border-variant: 1px solid hsla(202, 22%, 58%, 0.06);
-		--border-primary: 1px solid hsla(202, 39%, 53%, 0.3);
-
-		--background: hsla(202, 15%, 3%, 1);
-		--surface: hsla(210, 16%, 7%, 1);
-		--surface-t: hsla(210, 25%, 7%, 0.6);
-		--surface-variant: hsla(210, 14%, 5%, 1);
-		--overlay: hsla(202, 25%, 5%, 0.8);
-		--primary: hsla(202, 39%, 53%, 1);
-		--primary-variant: hsla(202, 39%, 53%, 0.1);
-		--secondary: hsla(28, 62%, 55%, 1);
-		--secondary-variant: hsla(28, 62%, 60%, 0.1);
 		--on-background: rgba(255, 255, 255, 1);
 		--on-background-variant: rgba(255, 255, 255, 0.3);
 		--on-background-disabled: rgba(255, 255, 255, 0.058);
 		--on-foreground: rgba(0, 0, 0, 0.9);
 		--on-foreground-variant: rgba(0, 0, 0, 0.2);
+
+		--background: hsla(202, 15%, 3%, 1);
+		--surface: hsla(210, 16%, 7%, 1);
+		--surface-variant: hsla(210, 14%, 5%, 1);
+		--overlay: hsla(202, 25%, 5%, 0.8);
+		--highlight: hsla(202, 19%, 40%, 0.1);
+
+		--border-variant: hsla(202, 22%, 15%, 0.4);
+
+		--primary: hsla(202, 39%, 53%, 1);
+		--primary-variant: hsla(202, 35%, 10%, 1);
+		--primary-border: hsla(202, 39%, 13%, 1);
+		--secondary: hsla(28, 62%, 55%, 1);
+		--secondary-variant: hsla(28, 20%, 12%, 1);
+		--secondary-border: hsla(28, 32%, 16%, 1);
+
 		--error: hsla(354, 100%, 62%, 1);
 		--error-variant: hsla(354, 90%, 70%, 0.2);
 
-		--backdrop-filter: blur(0.5rem) contrast(65%) brightness(30%);
+		--shadow: 0 0.5px 0.7px rgba(0, 0, 0, 0.079), 0 1.6px 2.5px rgba(0, 0, 0, 0.059), 5px 7px 11px hsla(202, 0%, 0%, 0.1), -5px -5px 10px hsla(202, 100%, 50%, 0.01);
+		--shadow-variant: 0 0.5px 0.7px rgba(0, 0, 0, 0.079), 0 1.6px 2.5px rgba(0, 0, 0, 0.059), 5px 7px 11px hsla(202, 0%, 0%, 0.03), -5px -5px 10px hsla(202, 100%, 50%, 0.01);
 	}
 }
 
@@ -383,7 +383,7 @@ textarea {
 	border-radius: 4px;
 	background: none;
 	border: none;
-	outline: var(--border-variant);
+	outline: 1px solid var(--border-variant);
 	font: var(--subhead1);
 	color: var(--on-background);
 	transition: 0.1s ease-in;
@@ -391,7 +391,7 @@ textarea {
 	&:is(:-webkit-autofill, :autofill):hover,
 	&:hover {
 		border: none;
-		outline: 1px solid var(--primary-variant);
+		outline: 1px solid var(--primary-border);
 		transition: 0.15s ease-out;
 	}
 
@@ -399,7 +399,7 @@ textarea {
 	&:focus {
 		border: none;
 		outline: 1px solid rgba(0, 0, 0, 0);
-		background: var(--primary-variant);
+		background: var(--highlight);
 		box-shadow: var(--shadow-variant);
 		color: var(--on-background);
 		transition: 0.15s ease-out;
@@ -497,12 +497,12 @@ select {
 
 	&:not(:disabled):hover {
 		cursor: pointer;
-		background: var(--primary-variant);
+		background: var(--highlight);
 	}
 
 	&:focus {
-		background: var(--primary-variant);
-		border: var(--border-primary);
+		background: var(--highlight);
+		border: 1px solid var(--primary-border);
 		box-shadow: var(--shadow-variant);
 	}
 
@@ -524,11 +524,10 @@ select,
 	top: calc(anchor(bottom) + 1px);
 	left: calc(anchor(left) + 1px);
 	border-radius: 4px;
-	background: var(--surface-t);
-	backdrop-filter: var(--backdrop-filter);
+	background: var(--surface);
 	box-shadow: var(--shadow);
 	border: none;
-	outline: var(--border-variant);
+	outline: 1px solid var(--border-variant);
 	opacity: 0;
 	filter: blur(2rem);
 	transition:
@@ -565,7 +564,7 @@ option {
 
 	&:hover {
 		cursor: pointer;
-		background: var(--primary-variant);
+		background: var(--highlight);
 		transition: 0.15s ease-out;
 	}
 
@@ -574,7 +573,7 @@ option {
 	}
 
 	&:not(option:first-of-type) {
-		border-top: var(--border-variant);
+		border-top: 1px solid var(--border-variant);
 
 		&:hover {
 			border-top: 1px solid rgba(0, 0, 0, 0);
@@ -641,21 +640,18 @@ input[type='submit'] {
 	color: var(--primary);
 	transition: 0.1s ease-in;
 
-	&:focus {
-		outline: none;
-		background: var(--on-background-disabled);
+	&:not(.createButton):focus {
+		background: var(--highlight);
 	}
 
 	&:hover {
 		cursor: pointer;
-		background: var(--primary-variant);
+		background: var(--highlight);
 		transition: 0s;
 	}
 
 	&.createButton:hover {
 		background: var(--secondary-variant);
-		border: 1px solid var(--secondary);
-		transition: 0s;
 	}
 
 	&:disabled {
@@ -729,35 +725,63 @@ a {
 
 .panel {
 	position: relative;
-	height: calc(100vh - var(--bar-height) - 3rem);
+	height: calc(100vh - var(--bar-height) - 2rem);
 	border-radius: 4px;
 	display: grid;
+}
+
+.section-card {
+	position: relative;
+	z-index: 1;
+	padding: 1rem 0;
+	background: var(--surface);
+
+	&:not(:last-child)::after {
+		content: '';
+		position: absolute;
+		bottom: 0;
+		z-index: 10;
+		width: 100%;
+		border-bottom: 1px solid var(--border-variant);
+	}
 }
 
 .createButton {
 	height: 3rem;
 	padding: 0 1.5rem;
 	color: var(--secondary);
-	border: 1px solid var(--secondary-variant);
+	outline: 1px solid var(--secondary-border);
 	background: var(--secondary-variant);
-	backdrop-filter: var(--backdrop-filter);
 	box-shadow: var(--shadow-variant);
+	display: flex;
+	gap: 0.5rem;
 	transition: 0.1s ease-in;
 
+	&:hover {
+		outline: 1px solid var(--secondary);
+		transition: 0s;
+	}
+
 	> div {
-		position: absolute;
-		display: flex;
-		gap: 0.5rem;
-	}
+		position: relative;
+		width: 1.5rem;
+		height: 1.5rem;
 
-	span {
-		padding: 0 0.25rem;
-	}
+		.icon {
+			position: absolute;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			left: 0;
 
-	.icon {
-		&::before {
-			background: var(--secondary);
+			&::before {
+				background: var(--secondary);
+			}
 		}
+	}
+
+	> span {
+		padding: 0 0.25rem;
 	}
 }
 
@@ -767,6 +791,7 @@ a {
 	width: 100%;
 	height: 3rem;
 	overflow: hidden;
+	border-radius: 0px 0 4px 4px;
 	background: var(--surface);
 	display: flex;
 	gap: 1px;
@@ -783,7 +808,7 @@ a {
 
 		&:hover {
 			cursor: pointer;
-			background: var(--primary-variant);
+			background: var(--highlight);
 		}
 
 		&:not(:first-child)::after {
@@ -792,7 +817,7 @@ a {
 			top: 0;
 			left: -1px;
 			bottom: 0;
-			border-left: 1px solid var(--primary-variant);
+			border-left: 1px solid var(--primary-border);
 		}
 	}
 }
@@ -805,7 +830,7 @@ a {
 	height: 3rem;
 	border-radius: 0px 0px 4px 4px;
 	overflow: hidden;
-	border-top: 1px solid var(--primary-variant);
+	border-top: 1px solid var(--primary-border);
 	display: flex;
 	gap: 1px;
 
@@ -820,7 +845,7 @@ a {
 
 		&:hover {
 			cursor: pointer;
-			background: var(--primary-variant);
+			background: var(--highlight);
 		}
 
 		&:not(:first-child)::after {
@@ -829,7 +854,7 @@ a {
 			top: 0;
 			left: -1px;
 			bottom: 0;
-			border-left: 1px solid var(--primary-variant);
+			border-left: 1px solid var(--primary-border);
 		}
 	}
 }
@@ -841,7 +866,7 @@ a {
 	width: 100%;
 	height: 3rem;
 	overflow: hidden;
-	border-top: var(--border-variant);
+	border-top: 1px solid var(--border-variant);
 	display: flex;
 	gap: 1px;
 
@@ -864,7 +889,7 @@ a {
 
 		&:hover {
 			cursor: pointer;
-			background: var(--primary-variant);
+			background: var(--highlight);
 		}
 
 		&:not(:first-child)::after {
@@ -873,7 +898,7 @@ a {
 			top: 0;
 			left: -1px;
 			bottom: 0;
-			border-left: var(--border-variant);
+			border-left: 1px solid var(--border-variant);
 		}
 	}
 
@@ -898,6 +923,6 @@ a {
 		left: 0;
 		right: 0;
 		z-index: 0;
-		border-top: var(--border-variant);
+		border-top: 1px solid var(--border-variant);
 	}
 }
