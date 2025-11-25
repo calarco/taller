@@ -38,7 +38,7 @@
 
 <div class="panel">
 	<Section overlay={windowState.form === 'appointment' || windowState.form === 'client'}>
-		{#each calendar as month (month.year + month.month)}
+		{#each calendar as month (`${month.year}${month.month}`)}
 			<div use:loadDays>
 				<div class="month">
 					<h6>{month.year}</h6>

@@ -7,7 +7,7 @@
 	let client = $derived(windowState.id ? page.data.client : {});
 </script>
 
-<Form action="?/upsertClient" --grid-columns="1fr 1fr [end]">
+<Form action="?/upsertClient" isCreate={!windowState.id} --grid-columns="1fr 1fr [end]">
 	<input type="hidden" name="clientId" value={client.clientId || ''} />
 	<Label title="Nombre" error={windowState.error?.nameError}>
 		<input type="text" name="name" placeholder="-" autoComplete="off" value={client.name || ''} />

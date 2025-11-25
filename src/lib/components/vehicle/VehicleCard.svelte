@@ -5,7 +5,6 @@
 	import { windowState } from '$lib/shared.svelte.js';
 	import Card from '$lib/components/Card.svelte';
 	import Dialog from '$lib/components/Dialog.svelte';
-	import VehicleForm from '$lib/components/vehicle/VehicleForm.svelte';
 
 	let { vehicle } = $props();
 
@@ -46,7 +45,7 @@
 	</article>
 {/snippet}
 
-<Card {isActive} isForm={windowState.form === 'vehicle' && windowState.id === vehicle?.vehicleId}>
+<Card {isActive}>
 	<a href={isActive ? `/${page.data.client.clientId}` : `/${page.data.client.clientId}/${vehicle?.vehicleId}`}>
 		{@render vehicleContent()}
 	</a>
@@ -60,15 +59,13 @@
 				onclick={() => {
 					windowState.form = 'vehicle';
 					windowState.id = vehicle?.vehicleId;
+					windowState.data = vehicle;
 				}}
 				aria-label="editar"
 			>
 				<span class="icon edit"></span>
 			</button>
 		</div>
-		{#if windowState.form === 'vehicle' && windowState.id === vehicle?.vehicleId}
-			<VehicleForm {vehicle} />
-		{/if}
 		<Dialog bind:dialog title="¿Borrar vehículo y sus reparaciones?" action="?/deleteVehicle">
 			<input type="hidden" name="vehicleId" value={vehicle?.vehicleId} />
 			{@render vehicleContent()}

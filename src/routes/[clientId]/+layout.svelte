@@ -8,7 +8,7 @@
 	import ClientCard from '$lib/components/client/ClientCard.svelte';
 
 	let { data, children } = $props();
-	let isCreate = $derived(windowState.form === 'vehicle' && windowState.id === '');
+	let isActive = $derived(windowState.form === 'vehicle');
 </script>
 
 <div class="panel" in:fly={{ y: '-1rem', duration: 300, easing: sineOut }} out:blur={{ amount: 32, duration: 250, easing: sineIn }}>
@@ -17,10 +17,10 @@
 			<div class="vehiculos">
 				<div>
 					<Section overlay={windowState.form === 'vehicle' || windowState.form === 'client'} cards>
-						<div class={['section-card', { isCreate }]}>
-							{#if isCreate}
+						<div class={['section-card', { isActive }]}>
+							{#if isActive}
 								<div style="position: relative">
-									<VehicleForm />
+									<VehicleForm vehicle={windowState.data} />
 								</div>
 							{/if}
 							<button
@@ -29,6 +29,7 @@
 								onclick={() => {
 									windowState.form = 'vehicle';
 									windowState.id = '';
+									windowState.data = {};
 								}}
 								aria-label="crear"
 							>
@@ -93,7 +94,7 @@
 		transition: z-index 0.35s step-end;
 		padding: 1rem 0 0.5rem 0;
 
-		&.isCreate {
+		&.isActive {
 			z-index: 1500;
 			transition:
 				z-index 0s,

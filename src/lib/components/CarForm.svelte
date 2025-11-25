@@ -93,6 +93,7 @@
 			e.preventDefault();
 			createModel = !createModel;
 			createMake = false;
+			delete windowState.error?.carMakeError;
 		}}
 		showCreate={carModels.length}
 		error={windowState.error?.carModelError}

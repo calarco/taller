@@ -5,7 +5,6 @@
 	import { windowState } from '$lib/shared.svelte.js';
 	import Card from '$lib/components/Card.svelte';
 	import Dialog from '$lib/components/Dialog.svelte';
-	import RepairForm from '$lib/components/repair/RepairForm.svelte';
 
 	let { repair } = $props();
 
@@ -42,7 +41,7 @@
 	</article>
 {/snippet}
 
-<Card {isActive} isForm={windowState.form === 'repair' && windowState.id === repair?.repairId}>
+<Card {isActive}>
 	<a href={isActive ? `#` : `#${repair.repairId}`}>
 		{@render repairContent()}
 	</a>
@@ -56,15 +55,13 @@
 				onclick={() => {
 					windowState.form = 'repair';
 					windowState.id = repair.repairId;
+					windowState.data = repair;
 				}}
 				aria-label="editar"
 			>
 				<span class="icon edit"></span>
 			</button>
 		</div>
-		{#if windowState.form === 'repair' && windowState.id === repair.repairId}
-			<RepairForm {repair} />
-		{/if}
 		<Dialog bind:dialog title="¿Borrar reparación?" action="?/deleteRepair">
 			<input type="hidden" name="repairId" value={repair?.repairId} />
 			{@render repairContent()}

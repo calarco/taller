@@ -2,12 +2,9 @@
 	import { fade, blur, fly } from 'svelte/transition';
 	import { sineIn, sineOut } from 'svelte/easing';
 	import { page } from '$app/state';
-	import { enhance } from '$app/forms';
 	import { windowState } from '$lib/shared.svelte.js';
 	import Dialog from '$lib/components/Dialog.svelte';
 	import Label from '$lib/components/Label.svelte';
-
-	let { darkTheme, switchTheme } = $props();
 
 	let logoutDialog = $state();
 	let settingsDialog = $state();
@@ -39,22 +36,23 @@
 			<div class="createCont">
 				<button
 					type="button"
-					class="createButton"
+					class={['createButton', { isActive: windowState.form === 'client' }]}
 					onclick={() => {
 						if (windowState.form !== 'client') {
 							windowState.form = 'client';
-						} else {
-							windowState.form = '';
+							windowState.id = '';
+							windowState.data = {};
 						}
-						windowState.id = '';
 					}}
 					aria-label="crear"
 				>
 					<div>
-						{#if windowState.form === 'client'}
-							<span class="icon close" in:blur={{ amount: 16, duration: 200, easing: sineOut }} out:blur={{ amount: 16, duration: 150, easing: sineIn }}> </span>
+						{#if windowState.form === 'client' && !windowState.id}
+							<span class="icon create" in:blur={{ amount: 8, duration: 200, easing: sineOut }} out:blur={{ amount: 8, duration: 150, easing: sineIn }}> </span>
+						{:else if windowState.form === 'client'}
+							<span class="icon edit" in:blur={{ amount: 8, duration: 200, easing: sineOut }} out:blur={{ amount: 8, duration: 150, easing: sineIn }}> </span>
 						{:else}
-							<span class="icon client" in:blur={{ amount: 16, duration: 200, easing: sineOut }} out:blur={{ amount: 16, duration: 150, easing: sineIn }}> </span>
+							<span class="icon client" in:blur={{ amount: 8, duration: 200, easing: sineOut }} out:blur={{ amount: 8, duration: 150, easing: sineIn }}> </span>
 						{/if}
 					</div>
 					<span>Cliente</span>
@@ -85,20 +83,21 @@
 			<div class="createCont">
 				<button
 					type="button"
-					class="createButton"
+					class={['createButton', { isActive: windowState.form === 'estimate' }]}
 					onclick={() => {
 						if (windowState.form !== 'estimate') {
 							windowState.form = 'estimate';
-						} else {
-							windowState.form = '';
+							windowState.id = '';
+							windowState.data = {};
 						}
-						windowState.id = '';
 					}}
 					aria-label="crear"
 				>
 					<div>
-						{#if windowState.form === 'estimate'}
-							<span class="icon close" in:blur={{ amount: 16, duration: 200, easing: sineOut }} out:blur={{ amount: 16, duration: 150, easing: sineIn }}> </span>
+						{#if windowState.form === 'estimate' && !windowState.id}
+							<span class="icon create" in:blur={{ amount: 16, duration: 200, easing: sineOut }} out:blur={{ amount: 16, duration: 150, easing: sineIn }}> </span>
+						{:else if windowState.form === 'estimate'}
+							<span class="icon edit" in:blur={{ amount: 16, duration: 200, easing: sineOut }} out:blur={{ amount: 16, duration: 150, easing: sineIn }}> </span>
 						{:else}
 							<span class="icon estimate" in:blur={{ amount: 16, duration: 200, easing: sineOut }} out:blur={{ amount: 16, duration: 150, easing: sineIn }}> </span>
 						{/if}
@@ -110,28 +109,6 @@
 				<button type="button" onclick={() => settingsDialog.showModal()} aria-label="settings">
 					<span>{user.name || user.userId}</span>
 				</button>
-				<form
-					method="POST"
-					action="?/switchTheme"
-					use:enhance={() => {
-						return async ({ result, update }) => {
-							update({ invalidateAll: false });
-							if (result.type === 'success') {
-								page.data.user.darkTheme = darkTheme;
-							} else {
-								switchTheme();
-							}
-						};
-					}}
-				>
-					<button type="submit" aria-label="borrar" onclick={switchTheme}>
-						{#if darkTheme}
-							<span class="icon lighton"></span>
-						{:else}
-							<span class="icon lightoff"></span>
-						{/if}
-					</button>
-				</form>
 				<button type="button" onclick={() => logoutDialog.showModal()} aria-label="borrar">
 					<span class="icon logout"></span>
 				</button>
@@ -209,7 +186,6 @@
 						justify-content: flex-end;
 						gap: 1px;
 
-						> form > button,
 						> button {
 							height: 100%;
 							padding: 0 1rem;
@@ -272,10 +248,6 @@
 						border-radius: 0 0 var(--border-radius) var(--border-radius);
 						box-shadow: none;
 						border-top: none;
-
-						&:hover {
-							border-top: none;
-						}
 
 						> div {
 							gap: 0.25rem;

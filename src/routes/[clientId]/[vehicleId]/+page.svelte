@@ -8,17 +8,17 @@
 
 	let { data } = $props();
 
-	let isCreate = $derived(windowState.form === 'repair' && windowState.id === '');
+	let isActive = $derived(windowState.form === 'repair');
 </script>
 
 <div class="panel" in:fly={{ x: '-1rem', duration: 300, easing: sineOut }} out:blur={{ amount: 32, duration: 250, easing: sineIn }}>
 	{#key data.vehicle.vehicleId}
 		<div class="container" in:fly={{ x: '-1rem', duration: 300, easing: sineOut }} out:blur={{ amount: 32, duration: 900, easing: sineIn }}>
 			<Section overlay={windowState.form === 'repair' || windowState.form === 'estimate'} cards>
-				<div class={['section-card', { isCreate }]}>
-					{#if isCreate}
+				<div class={['section-card', { isActive }]}>
+					{#if isActive}
 						<div style="position: relative">
-							<RepairForm />
+							<RepairForm repair={windowState.data} />
 						</div>
 					{/if}
 					<button
@@ -27,6 +27,7 @@
 						onclick={() => {
 							windowState.form = 'repair';
 							windowState.id = '';
+							windowState.data = {};
 						}}
 						aria-label="crear"
 					>
@@ -71,7 +72,7 @@
 		transition: z-index 0.35s step-end;
 		padding: 1rem 0 0.5rem 0;
 
-		&.isCreate {
+		&.isActive {
 			z-index: 1500;
 			transition:
 				z-index 0s,

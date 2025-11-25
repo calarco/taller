@@ -113,23 +113,3 @@ export async function editUserAction(event) {
 		throw error(500, err.body || err.toString());
 	}
 }
-
-export async function switchThemeAction(event) {
-	try {
-		const userId = event.cookies.get('userId');
-		if (!userId) {
-			return;
-		}
-
-		const user = await findUser(userId, { userId });
-		if (!user) {
-			throw error(400, 'Usuario no encontrado');
-		}
-
-		const User = getModel(userId, 'User');
-		const data = await User.findOneAndUpdate({ userId }, { darkTheme: !user.darkTheme });
-		return { data: JSON.parse(JSON.stringify(data)) };
-	} catch (err) {
-		throw error(500, err.body || err.toString());
-	}
-}

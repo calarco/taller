@@ -16,7 +16,7 @@
 	let total = $derived(labor + parts.reduce((a, { price }) => a + price, 0));
 </script>
 
-<Form action="?/upsertEstimate" --grid-columns="2fr 5fr 3fr [end]">
+<Form action="?/upsertEstimate" isCreate={!windowState.id} --grid-columns="2fr 5fr 3fr [end]">
 	{#if estimate?.estimateId}
 		<input type="hidden" name="estimateId" value={estimate.estimateId} />
 	{/if}

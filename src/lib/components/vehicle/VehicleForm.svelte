@@ -1,4 +1,5 @@
 <script>
+	import { sineIn, sineOut } from 'svelte/easing';
 	import { page } from '$app/state';
 	import { windowState } from '$lib/shared.svelte.js';
 	import Form from '$lib/components/Form.svelte';
@@ -7,6 +8,7 @@
 
 	let { vehicle } = $props();
 
+	let isCreate = $derived(!vehicle?.vehicleId);
 	let value = $state('');
 	let search = $state(page.data.search);
 	let clientId = $state('');
@@ -33,8 +35,18 @@
 	});
 </script>
 
-<Form action="?/upsertVehicle" --grid-columns="1fr [start] 1fr 1fr [end]">
-	{#if vehicle?.vehicleId}
+<Form action="?/upsertVehicle" isCreate={isCreate} --grid-columns="1fr [start] 1fr 1fr [end]">
+	<div class="formTitle">
+		<div>
+			{#if isCreate}
+				<span class="icon create" in:blur={{ amount: 16, duration: 200, easing: sineOut }} out:blur={{ amount: 16, duration: 150, easing: sineIn }}> </span>
+			{:else}
+				<span class="icon edit" in:blur={{ amount: 16, duration: 200, easing: sineOut }} out:blur={{ amount: 16, duration: 150, easing: sineIn }}> </span>
+			{/if}
+		</div>
+		<span>Vehículo</span>
+	</div>
+	{#if !isCreate}
 		<input type="hidden" name="oldVehicleId" value={vehicle.vehicleId} />
 		<input type="hidden" name="clientId" value={clientId} />
 		<Label title="Cliente" error={windowState.error?.clientIdError} --column-end="span 3">

@@ -1,4 +1,4 @@
-import { switchThemeAction, editUserAction } from '$lib/server/controllers/User.controller.js';
+import { editUserAction } from '$lib/server/controllers/User.controller.js';
 import { upsertClientAction } from '$lib/server/controllers/Client.controller.js';
 import { createCarMakeAction } from '$lib/server/controllers/CarMake.controller.js';
 import { createCarModelAction } from '$lib/server/controllers/CarModel.controller.js';
@@ -6,9 +6,6 @@ import { createAppointmentAction, deleteAppointmentAction } from '$lib/server/co
 import { upsertEstimateAction } from '$lib/server/controllers/Estimate.controller.js';
 
 export const actions = {
-	switchTheme: async (event) => {
-		return await switchThemeAction(event);
-	},
 	editUser: async (event) => {
 		return await editUserAction(event);
 	},

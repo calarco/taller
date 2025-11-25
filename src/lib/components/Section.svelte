@@ -22,6 +22,7 @@
 			onclick={() => {
 				windowState.form = '';
 				windowState.id = '';
+				windowState.data = {};
 			}}
 			in:fade={{ duration: 300, easing: sineOut }}
 			out:fade={{ duration: 250, easing: sineIn }}
@@ -76,7 +77,7 @@
 		right: 0;
 		left: 0;
 		background: var(--overlay);
-		backdrop-filter: blur(0.4rem);
+		backdrop-filter: blur(0.5rem);
 		height: 1000%;
 	}
 </style>

@@ -1,16 +1,28 @@
 <script>
+	import { sineIn, sineOut } from 'svelte/easing';
 	import { windowState } from '$lib/shared.svelte.js';
 	import Form from '$lib/components/Form.svelte';
 	import Label from '$lib/components/Label.svelte';
 
 	let { repair } = $props();
 
+	let isCreate = $derived(!repair?.repairId);
 	let cost = $state(repair?.cost || '');
 	let labor = $state(repair?.labor || '');
 </script>
 
-<Form action="?/upsertRepair" --grid-columns="1fr 1fr 1fr 1fr [end]">
-	{#if repair?.repairId}
+<Form action="?/upsertRepair" isCreate={isCreate} --grid-columns="1fr 1fr 1fr 1fr [end]">
+	<div class="formTitle">
+		<div>
+			{#if isCreate}
+				<span class="icon create" in:blur={{ amount: 16, duration: 200, easing: sineOut }} out:blur={{ amount: 16, duration: 150, easing: sineIn }}> </span>
+			{:else}
+				<span class="icon edit" in:blur={{ amount: 16, duration: 200, easing: sineOut }} out:blur={{ amount: 16, duration: 150, easing: sineIn }}> </span>
+			{/if}
+		</div>
+		<span>Reparación</span>
+	</div>
+	{#if !isCreate}
 		<input type="hidden" name="repairId" value={repair.repairId} />
 	{/if}
 	<Label title="Fecha">

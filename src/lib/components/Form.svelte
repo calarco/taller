@@ -4,7 +4,7 @@
 	import { enhance } from '$app/forms';
 	import { windowState } from '$lib/shared.svelte.js';
 
-	let { action, children } = $props();
+	let { action, isCreate, children } = $props();
 </script>
 
 <form
@@ -35,11 +35,18 @@
 			onclick={() => {
 				windowState.form = '';
 				windowState.id = '';
+				windowState.data = {};
 			}}
 		>
 			Cancelar
 		</button>
-		<button type="submit">Guardar</button>
+		<button type="submit">
+			{#if isCreate}
+				Crear
+			{:else}
+				Guardar
+			{/if}
+		</button>
 	</div>
 </form>
 

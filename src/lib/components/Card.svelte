@@ -38,10 +38,7 @@
 			position: sticky;
 			top: 4.5rem;
 			z-index: 1500;
-			transition:
-				z-index 0s,
-				background 0.4s cubic-bezier(0.895, 0.03, 0.685, 0.22);
-			background: rgba(0, 0, 0, 0);
+			transition: z-index 0s;
 
 			&:not(:first-child)::after {
 				border-bottom: 1px solid rgba(0, 0, 0, 0);

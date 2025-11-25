@@ -10,17 +10,17 @@
 
 	let { children } = $props();
 
-	let darkTheme = $derived(page.data.user?.darkTheme);
 	let url = $derived(page.url.pathname);
 	$effect(() => {
 		if (url) {
 			windowState.form = '';
 			windowState.id = '';
+			windowState.data = {};
 			windowState.loading = false;
 		}
 	});
 	$effect(() => {
-		if (typeof windowState.form === "string") {
+		if (typeof windowState.form === 'string') {
 			windowState.error = {};
 		}
 	});
@@ -38,8 +38,8 @@
 	<meta name="description" content="Gestión de taller mecánico" />
 </svelte:head>
 
-<main class={[{ darkTheme }]}>
-	<Bar {darkTheme} switchTheme={() => (darkTheme = !darkTheme)} />
+<main>
+	<Bar />
 	<div class="panels">
 		<Appointments />
 		<Search />

@@ -130,7 +130,7 @@
 
 	dialog:open::backdrop {
 		background-color: var(--overlay);
-		backdrop-filter: blur(0.4rem);
+		backdrop-filter: blur(0.5rem);
 		transition:
 			display 0.3s ease-out allow-discrete,
 			overlay 0.3s ease-out allow-discrete,

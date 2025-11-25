@@ -7,8 +7,7 @@ const UserSchema = mongoose.Schema({
 	description: String,
 	address: String,
 	phone: String,
-	email: String,
-	darkTheme: { type: Boolean, default: false }
+	email: String
 }, {
 	timestamps: true
 });

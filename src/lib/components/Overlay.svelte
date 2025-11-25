@@ -16,7 +16,7 @@
 		left: 0;
 		border-radius: var(--border-radius);
 		background: var(--overlay);
-		backdrop-filter: blur(0.4rem);
+		backdrop-filter: blur(0.5rem);
 		height: 1000%;
 	}
 </style>
