@@ -3,10 +3,11 @@
 	import Section from '$lib/components/Section.svelte';
 	import Day from './Day.svelte';
 
-	function getCalendarMonth(lastYear, lastMonth) {
-		const year = !lastYear ? new Date().getFullYear() : lastMonth === 11 ? lastYear + 1 : lastYear;
-		const month = !lastMonth ? new Date().getMonth() : lastMonth === 11 ? 0 : lastMonth + 1;
-		const date = lastMonth && lastYear ? 1 : new Date().getDate();
+	function getNextMonth(currentYear, currentMonth) {
+		const now = new Date();
+		const year = !currentYear ? now.getFullYear() : currentMonth === 11 ? currentYear + 1 : currentYear;
+		const month = (!currentMonth && currentMonth !== 0) ? now.getMonth() : currentMonth === 11 ? 0 : currentMonth + 1;
+		const date = (currentMonth || currentMonth === 0) && currentYear ? 1 : now.getDate();
 
 		const days = [];
 		for (var i = date; i <= 32 - new Date(year, month, 32).getDate(); i++) {
@@ -16,7 +17,7 @@
 		return { year: year, month: month, days: days };
 	}
 
-	const calendar = $state([getCalendarMonth(), getCalendarMonth(new Date().getFullYear(), new Date().getMonth())]);
+	const calendar = $state([getNextMonth()]);
 
 	function loadDays(e) {
 		const options = {
@@ -27,7 +28,7 @@
 		const observer = new IntersectionObserver((entries) => {
 			if (entries[0].isIntersecting) {
 				const lastCalendar = calendar[calendar.length - 1];
-				calendar.push(getCalendarMonth(lastCalendar.year, lastCalendar.month));
+				calendar.push(getNextMonth(lastCalendar.year, lastCalendar.month));
 				observer.disconnect();
 			}
 		}, options);
