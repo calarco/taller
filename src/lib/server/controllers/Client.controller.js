@@ -77,7 +77,7 @@ export async function deleteClientAction(event) {
 		const form = await event.request.formData();
 		const clientId = form.get('clientId');
 		if (!clientId) {
-			return fail(400, 'Missing id');
+			return fail(400, { error: 'Missing id' });
 		}
 
 		const vehicles = await findVehicles(userId, { clientId });

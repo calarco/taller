@@ -12,46 +12,103 @@ npm run lint      # Prettier check + ESLint
 npm run format    # Auto-format with Prettier
 ```
 
-No test suite is configured.
+No test suite is configured. Correctness is enforced by ESLint (with `eslint-plugin-svelte`) and by running the app.
 
 ## Architecture
 
-**Stack:** SvelteKit 2 + Svelte 5, MongoDB/Mongoose, Node.js adapter, JWT auth.
+**Stack:** SvelteKit 2 + Svelte 5 (runes), MongoDB/Mongoose, JWT auth, `@sveltejs/adapter-node`. Estimates are rendered with `svelte-email` and mailed with `nodemailer`. (`adapter-auto` is installed but unused — `svelte.config.js` uses the Node adapter.)
 
 ### Multi-tenant database isolation
 
-Every user gets their own MongoDB database. The main `taller` DB holds only the `User` collection. All other data (Client, Vehicle, Repair, Appointment, Estimate, CarMake, CarModel) lives in a per-user DB named after their `userId`. This is handled in `src/lib/server/db.js` via `mongoose.connection.useDb()` with connection caching.
+Every user gets their own MongoDB database. The main `taller` DB holds only the `User` collection. All other data (Client, Vehicle, Repair, Appointment, Estimate, CarMake, CarModel) lives in a per-user DB named after their `userId`.
+
+`src/lib/server/db.js` handles this: `getModel(userId, model)` picks the DB (`taller` for `User`, otherwise `userId`) via `mongoose.connection.useDb(name, { useCache: true })` and registers the schemas on first use. `initDatabase()` runs once from the `init` hook at server start.
+
+Always reach models through `getModel()` — never import a model and call it directly, or you will query the wrong database.
 
 ### Auth flow
 
-`src/hooks.server.js` validates JWT on every request (cookies: `auth-token`, `userId`). Unauthenticated requests redirect to `/login`. The `userId` from the token scopes all DB queries to that user's database.
+`src/hooks.server.js` validates the JWT on every request (cookies: `auth-token`, `userId`) and sets `event.locals.userId`. Unauthenticated requests are redirected to `/login`; authenticated requests to `/login` are redirected to `/`. Every `load` and action reads `event.locals.userId` and returns early without it.
 
 ### Data layer
 
-- **Models:** `src/lib/server/models/` — Mongoose schemas, numeric auto-increment IDs per entity
-- **Controllers:** `src/lib/server/controllers/` — business logic called from SvelteKit form actions
-- **Pattern:** Lean queries, `__v` excluded, collation-aware numeric sorting
+- **Models:** `src/lib/server/models/` — Mongoose schemas, numeric auto-increment IDs per entity, cross-collection links exposed as virtuals (e.g. `Vehicle.carModel`, `Vehicle.client`, `Vehicle.repairs`)
+- **Controllers:** `src/lib/server/controllers/` — business logic; each exports both query helpers (`findVehicle`, `findRepairs`, …) and form-action handlers (`upsertVehicleAction`, …)
+- **Pattern:** lean queries, `_id`/`__v` excluded, `structuredClone` before returning from a `load`, collation-aware numeric sorting for ID generation
 
 ### Routing
 
 ```
 /                        → dashboard (requires auth)
-/login, /register        → public
+/login, /register        → auth pages
 /[clientId]              → client detail
 /[clientId]/[vehicleId]  → vehicle detail
 /estimate/[estimateId]   → estimate (supports print-to-PDF)
 /search?q=&type=         → JSON search endpoint (+server.js, no page)
 ```
 
-Each route has a `+page.server.js` with named form actions (SvelteKit `actions` API) for mutations. Load functions return serialized data for SSR.
+**`src/routes/+page.svelte` and `src/routes/[clientId]/+page.svelte` are empty files.** The UI for those routes lives entirely in the layouts above them. Don't go looking for the dashboard in `+page.svelte`.
+
+### Where data loading lives
+
+Only four files export a `load`:
+
+| File                                     | Returns                                                                      |
+| ---------------------------------------- | ---------------------------------------------------------------------------- |
+| `+layout.server.js` (root)               | `user`, `carMakes`, `carModels`, `appointments`, `search` — on every request |
+| `[clientId]/+layout.server.js`           | `client`, `vehicles`                                                         |
+| `[clientId]/[vehicleId]/+page.server.js` | `vehicle`, `repairs`                                                         |
+| `estimate/[estimateId]/+page.server.js`  | `estimate`, `html`                                                           |
+
+`/` and `/[clientId]` have **no** page load — their data comes from the layouts. Child loads reuse parent data with `await event.parent()` instead of re-querying (the vehicle page takes its `vehicle` from the parent's `vehicles` array; the estimate page takes `user` from the root layout).
+
+### Shared vs route-specific actions
+
+`Bar`, `Appointments`, `ClientForm` and `EstimateForm` live in the **root layout**, so they render on every route, and a `?/name` form posts to whichever route is currently active. Their actions therefore have to exist on every route.
+
+They live once in `src/lib/server/actions.js` as `sharedActions` — `editUser`, `logout`, `createCarMake`, `createCarModel`, `upsertClient`, `upsertEstimate`, `createAppointment`, `deleteAppointment` — and each route spreads them in:
+
+```js
+export const actions = { ...sharedActions, upsertVehicle, deleteVehicle, upsertRepair, deleteRepair };
+```
+
+**A new action reachable from a root-layout component belongs in `sharedActions`, not in one route file.** Putting it in a single `+page.server.js` makes the form 404 on every other route. Route-specific actions (`upsertRepair`, `deleteVehicle`, `sendEstimate`, …) stay in the route that owns them.
+
+### Estimates and email
+
+`src/lib/components/estimate/Estimate.svelte` is built from `svelte-email` primitives, not ordinary markup. It is rendered to an HTML **string** server-side with `render()` from `svelte/server`, and the same component produces both:
+
+- the page body — `load` returns it as `data.html`, injected with `{@html}`
+- the email body — `sendEstimateAction` renders it again and mails it
+
+Changing that component affects both. SMTP host and port are hardcoded in `Estimate.controller.js`; only the credentials come from the environment.
+
+Print-to-PDF: the page copies `#print-content`'s innerHTML into the root layout's `#print-container` and calls `window.print()`; an `@media print` block hides everything else.
 
 ### Client-side state
 
-Svelte 5 `$state`/`$derived`/`$effect` runes throughout. Global UI state (modal open, loading, errors) lives in `src/lib/shared.svelte.js` (`windowState`). The root layout resets form/panel state on navigation via `$effect`.
+Svelte 5 `$state`/`$derived`/`$effect` runes throughout — no stores.
+
+- `src/lib/shared.svelte.js` — `windowState` global UI state (`form`, `id`, `data`, `loading`, `error`). The root layout resets it on navigation via `$effect`.
+- `src/lib/search.svelte.js` — `createSearch({ type })`, a rune-based helper wrapping the `/search` endpoint with a 200 ms debounce, an `AbortController`, and a sequence guard against out-of-order responses. Used by `Search.svelte` and `VehicleForm.svelte`. Use it rather than calling `/search` directly.
+
+Mutations submit through `use:enhance`. By default a successful action re-runs every `load`, including the root layout's five queries — pass `update({ invalidateAll: false })` and patch `page.data` locally when an action only affects one visible thing (see `CarForm.svelte` and `AppointmentCard.svelte`).
 
 ### UI layout
 
-Two-panel grid layout (2fr left, 3fr right). Components in `src/lib/components/` include: `Bar`, `Search`, `Card`, `Dialog`, `Form`, `Label`, `Overlay`, and subfolders per entity (`appointment/`, `client/`, `estimate/`, `repair/`, `vehicle/`).
+Two-panel grid (2fr left, 3fr right) defined in `src/routes/+layout.svelte`. Components in `src/lib/components/`: `Bar`, `Card`, `CarForm`, `Dialog`, `Form`, `Label`, `Search`, `Section`, plus a subfolder per entity (`appointment/`, `client/`, `estimate/`, `repair/`, `vehicle/`).
+
+`Section.svelte` wraps every scrollable panel and renders the dismiss scrim (`<button class="overlay">`) when its `overlay` prop is set.
+
+### Styling
+
+`src/lib/app.css` is a single global stylesheet (~880 lines). There are no CSS frameworks and no utility classes; components add scoped `<style>` blocks on top.
+
+- **Tokens** are oklch inside `light-dark()`, declared on `body`. Typography comes from `font:` shorthand variables (`--body1`, `--subhead1`, `--title`, …). Don't hardcode colours or font stacks.
+- **Icons** are `.icon.<name>` rules using a `mask-image` data-URI. Add a rule rather than an `<img>`.
+- **The global button rule** (`.button, button, input[type='submit']`) gives _every_ button a hover/`:focus-visible` background and a pointer cursor. To exempt one, add it to the `:not(.createButton, .overlay)` list in that rule — don't fight it with per-component overrides, which turns into a specificity war.
+- **Selects** use Chrome's customizable-select (`appearance: base-select`, `::picker(select)`, `::picker-icon`) with an `@supports not (appearance: base-select)` fallback that draws the caret with gradients. Any select styling change needs checking in both branches.
+- **Panel heights come from the grid.** `main` and `.panels` size their rows with `minmax(0, 1fr)` so that a tall panel cannot force the row open — a bare `1fr` is `minmax(auto, 1fr)`, whose content-based minimum is not capped by the container. **Do not give `.panel` an explicit height**; it stretches to its row, and its inner `Section` scrolls.
 
 ## Environment variables
 
@@ -60,8 +117,6 @@ Required in `.env`:
 ```
 JWT_KEY=
 MONGODB_URI=
-MAIL_HOST=
-MAIL_PORT=
 MAIL_USER=
 MAIL_PASS=
 ```

@@ -67,7 +67,7 @@ export async function deleteAppointmentAction(event) {
 		const form = await event.request.formData();
 		const appointmentId = form.get('appointmentId');
 		if (!appointmentId) {
-			return fail(400, 'Missing id');
+			return fail(400, { error: 'Missing id' });
 		}
 
 		const Appointment = getModel(userId, 'Appointment');

@@ -1,4 +1,5 @@
 <script>
+	import { blur } from 'svelte/transition';
 	import { sineIn, sineOut } from 'svelte/easing';
 	import { windowState } from '$lib/shared.svelte.js';
 	import Form from '$lib/components/Form.svelte';

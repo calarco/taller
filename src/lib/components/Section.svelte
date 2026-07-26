@@ -16,6 +16,7 @@
 			type="button"
 			class="overlay"
 			aria-label="cerrar"
+			tabindex="-1"
 			onclick={() => {
 				windowState.form = '';
 				windowState.id = '';
@@ -78,10 +79,5 @@
 		background: var(--overlay);
 		backdrop-filter: blur(0.5rem);
 		height: 1000%;
-
-		&:hover,
-		&:focus {
-			background: var(--overlay);
-		}
 	}
 </style>

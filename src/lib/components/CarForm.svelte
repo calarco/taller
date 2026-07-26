@@ -52,13 +52,9 @@
 						windowState.loading = true;
 						windowState.error = {};
 						return async ({ result, update }) => {
-							update({ invalidateAll: false });
+							await update();
 							windowState.loading = false;
 							if (result.type === 'success' && result.data?.carMake) {
-								const data = [...page.data.carMakes, result.data.carMake];
-								data.sort((a, b) => a.name - b.name);
-								page.data.carMakes = data;
-								carMakes = data;
 								carMakeId = result.data.carMake.carMakeId;
 								createMake = false;
 							}
@@ -108,12 +104,8 @@
 						windowState.loading = true;
 						windowState.error = {};
 						return async ({ result, update }) => {
-							update({ invalidateAll: false });
+							await update();
 							if (result.type === 'success' && result.data?.carModel) {
-								const data = [...page.data.carModels, result.data.carModel];
-								data.sort((a, b) => a.name - b.name);
-								page.data.carModels = data;
-								carModels = data.filter((x) => x.carMakeId === result.data.carModel.carMakeId);
 								carModelId = result.data.carModel.carModelId;
 								createModel = false;
 							}

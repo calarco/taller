@@ -69,7 +69,7 @@
 			> form {
 				display: grid;
 				align-items: stretch;
-				grid-template-columns: var(--grid-columns);
+				grid-template-columns: var(--grid-columns, none);
 			}
 		}
 

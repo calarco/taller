@@ -109,7 +109,6 @@
 				font-size: 0.96em;
 
 				&:hover:not(:has(*:hover)),
-				&:focus,
 				&:hover {
 					background: none;
 				}
@@ -145,7 +144,6 @@
 				}
 
 				&:hover:not(:has(*:hover)),
-				&:focus,
 				&:hover {
 					background: none;
 				}

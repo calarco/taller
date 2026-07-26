@@ -4,55 +4,14 @@
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import { windowState } from '$lib/shared.svelte';
+	import { createSearch } from '$lib/search.svelte.js';
 	import Section from '$lib/components/Section.svelte';
 	import Plate from '$lib/components/vehicle/Plate.svelte';
 
-	let value = $state('');
-	let search = $state(page.data.search);
-	let settled = $state(true);
+	const search = createSearch();
+
 	let activeIndex = $state(-1);
-	let seq = 0;
-	$effect(() => {
-		const query = value.trim();
-		activeIndex = -1;
-		if (!query) {
-			search = page.data.search;
-			settled = true;
-			return;
-		}
-
-		settled = false;
-		const controller = new AbortController();
-		const timer = setTimeout(async () => {
-			const current = ++seq;
-			windowState.loading = true;
-			try {
-				const response = await fetch('/search?q=' + encodeURIComponent(query), { signal: controller.signal });
-				const data = await response.json();
-				if (current !== seq) {
-					return;
-				}
-				search = (data || []).map((x) => ({ ...x, updatedAt: new Date(x.updatedAt) }));
-				settled = true;
-			} catch (err) {
-				if (err.name !== 'AbortError') {
-					search = [];
-					settled = true;
-				}
-			} finally {
-				if (current === seq) {
-					windowState.loading = false;
-				}
-			}
-		}, 200);
-
-		return () => {
-			clearTimeout(timer);
-			controller.abort();
-		};
-	});
-
-	let results = $derived(search ?? []);
+	let results = $derived((search.results ?? page.data.search ?? []).map((x) => ({ ...x, updatedAt: new Date(x.updatedAt) })));
 	const rows = $state([]);
 
 	function select(index) {
@@ -78,7 +37,8 @@
 				goto(`/${resultado.clientId}`);
 			}
 		} else if (e.key === 'Escape') {
-			value = '';
+			search.value = '';
+			activeIndex = -1;
 		}
 	}
 </script>
@@ -87,7 +47,7 @@
 	<Section overlay={windowState.form === 'estimate'}>
 		<label class="buscador">
 			<div>
-				{#if !value}
+				{#if !search.value}
 					<div in:blur={{ amount: 16, duration: 200, easing: sineOut }} out:blur={{ amount: 16, duration: 150, easing: sineIn }}>
 						<span class="icon search"></span>
 					</div>
@@ -97,7 +57,8 @@
 							type="button"
 							onmousedown={(e) => {
 								e.preventDefault();
-								value = '';
+								search.value = '';
+								activeIndex = -1;
 								document.getElementById('searchInput').focus();
 							}}
 							aria-label="borrar"
@@ -107,9 +68,9 @@
 					</div>
 				{/if}
 			</div>
-			<input id="searchInput" type="search" name="search" placeholder="Buscar" autocomplete="off" bind:value {onkeydown} />
+			<input id="searchInput" type="search" name="search" placeholder="Buscar" autocomplete="off" bind:value={search.value} oninput={() => (activeIndex = -1)} {onkeydown} />
 		</label>
-		{#if !results.length && settled}
+		{#if !results.length && search.settled}
 			<h5 class="empty" in:slide={{ axis: 'y', duration: 150, easing: sineIn }} out:slide={{ axis: 'y', duration: 150, easing: sineOut }}>No se encontraron resultados</h5>
 		{/if}
 		{#each results as resultado, i (resultado.id)}

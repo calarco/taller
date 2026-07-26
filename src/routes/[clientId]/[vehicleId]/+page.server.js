@@ -1,11 +1,8 @@
-import { error, redirect } from '@sveltejs/kit';
-import { editUserAction } from '$lib/server/controllers/User.controller.js';
-import { createCarMakeAction } from '$lib/server/controllers/CarMake.controller.js';
-import { createCarModelAction } from '$lib/server/controllers/CarModel.controller.js';
-import { upsertClientAction, deleteClientAction } from '$lib/server/controllers/Client.controller.js';
-import { findVehicle, upsertVehicleAction, deleteVehicleAction } from '$lib/server/controllers/Vehicle.controller.js';
+import { error } from '@sveltejs/kit';
+import { sharedActions } from '$lib/server/actions.js';
+import { deleteClientAction } from '$lib/server/controllers/Client.controller.js';
+import { upsertVehicleAction, deleteVehicleAction } from '$lib/server/controllers/Vehicle.controller.js';
 import { findRepairs, upsertRepairAction, deleteRepairAction } from '$lib/server/controllers/Repair.controller.js';
-import { upsertEstimateAction } from '$lib/server/controllers/Estimate.controller.js';
 
 export const load = async (event) => {
 	const userId = event.locals.userId;
@@ -15,12 +12,12 @@ export const load = async (event) => {
 	}
 
 	try {
-		const vehicle = await findVehicle(userId, { vehicleId });
+		const [{ vehicles }, repairs] = await Promise.all([event.parent(), findRepairs(userId, { vehicleId }).sort({ date: -1, updatedAt: -1 })]);
+		const vehicle = vehicles?.find((x) => x.vehicleId === vehicleId);
 		if (!vehicle) {
 			throw error(500, 'Vehiculo no encontrado');
 		}
 
-		const repairs = await findRepairs(userId, { vehicleId }).sort({ date: -1, updatedAt: -1 });
 		return { vehicle: structuredClone(vehicle), repairs: structuredClone(repairs) };
 	} catch (err) {
 		throw error(500, err.body || err.toString());
@@ -28,23 +25,7 @@ export const load = async (event) => {
 };
 
 export const actions = {
-	editUser: async (event) => {
-		return await editUserAction(event);
-	},
-	logout: async (event) => {
-		event.cookies.delete('auth-token', { path: '/' });
-		event.cookies.delete('userId', { path: '/' });
-		throw redirect(307, '/login');
-	},
-	createCarMake: async (event) => {
-		return await createCarMakeAction(event);
-	},
-	createCarModel: async (event) => {
-		return await createCarModelAction(event);
-	},
-	upsertClient: async (event) => {
-		return await upsertClientAction(event);
-	},
+	...sharedActions,
 	deleteClient: async (event) => {
 		return await deleteClientAction(event);
 	},
@@ -59,8 +40,5 @@ export const actions = {
 	},
 	deleteRepair: async (event) => {
 		return await deleteRepairAction(event);
-	},
-	upsertEstimate: async (event) => {
-		return await upsertEstimateAction(event);
 	},
 };

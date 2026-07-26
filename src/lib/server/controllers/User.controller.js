@@ -106,7 +106,9 @@ export async function editUserAction(event) {
 
 		const User = getModel(userId, 'User');
 		const data = await User.findOneAndUpdate({ userId }, user, { new: true });
-		return { user: JSON.parse(JSON.stringify(data)) };
+		const updated = JSON.parse(JSON.stringify(data));
+		delete updated.password;
+		return { user: updated };
 	} catch (err) {
 		throw error(500, err.body || err.toString());
 	}

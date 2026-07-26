@@ -71,12 +71,12 @@
 <style>
 	main {
 		width: 100vw;
-		height: 100vh;
+		height: 100dvh;
 		overflow: hidden;
 		display: grid;
 		justify-content: center;
 		justify-items: center;
-		grid-template-rows: var(--bar-height) 1fr;
+		grid-template-rows: var(--bar-height) minmax(0, 1fr);
 	}
 
 	.panels {
@@ -86,8 +86,8 @@
 		padding: 1rem;
 		display: grid;
 		gap: 1rem;
-		grid-template-columns: [panel-left] 2fr [panel-right] 3fr;
-		grid-template-rows: [panel-top] 1fr;
+		grid-template-columns: [panel-left] minmax(0, 2fr) [panel-right] minmax(0, 3fr);
+		grid-template-rows: [panel-top] minmax(0, 1fr);
 
 		@media (min-width: 1440px) {
 		}

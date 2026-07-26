@@ -1,38 +1,20 @@
 <script>
+	import { blur } from 'svelte/transition';
 	import { sineIn, sineOut } from 'svelte/easing';
 	import { page } from '$app/state';
 	import { windowState } from '$lib/shared.svelte.js';
+	import { createSearch } from '$lib/search.svelte.js';
 	import Form from '$lib/components/Form.svelte';
 	import Label from '$lib/components/Label.svelte';
 	import CarForm from '$lib/components/CarForm.svelte';
 
 	let { vehicle } = $props();
 
+	const search = createSearch({ type: 'client' });
+
 	let isCreate = $derived(!vehicle?.vehicleId);
-	let value = $state('');
-	let search = $state(page.data.search);
-	let clientId = $state('');
-	$effect(() => {
-		if (value) {
-			(async () => {
-				windowState.loading = true;
-				const response = await fetch('/search?type=client&q=' + encodeURIComponent(value.trim()));
-				const data = await response.json();
-				if (data?.length) {
-					search = data;
-				} else {
-					search = [];
-				}
-				const client = search.find((x) => x.clientName === value);
-				if (client) {
-					clientId = client.clientId;
-				}
-				windowState.loading = false;
-			})();
-		} else {
-			search = page.data.search;
-		}
-	});
+	let clients = $derived((search.results ?? page.data.search ?? []).filter((x) => x.clientId && x.clientName));
+	let clientId = $derived(clients.find((x) => x.clientName === search.value)?.clientId || '');
 </script>
 
 <Form action="?/upsertVehicle" {isCreate} --grid-columns="1fr [start] 1fr 1fr [end]">
@@ -50,9 +32,9 @@
 		<input type="hidden" name="oldVehicleId" value={vehicle.vehicleId} />
 		<input type="hidden" name="clientId" value={clientId} />
 		<Label title="Cliente" error={windowState.error?.clientIdError} --column-end="span 3">
-			<input class="client" list="clients" name="clientName" placeholder={page.data.client.name + ' ' + page.data.client.lastName} autoComplete="off" bind:value />
+			<input class="client" list="clients" name="clientName" placeholder={page.data.client.name + ' ' + page.data.client.lastName} autoComplete="off" bind:value={search.value} />
 			<datalist id="clients">
-				{#each (search ?? []).filter((x) => x.clientId && x.clientName) as client (client.id)}
+				{#each clients as client (client.id)}
 					<option key={client.clientId} value={client.clientName}></option>
 				{/each}
 			</datalist>

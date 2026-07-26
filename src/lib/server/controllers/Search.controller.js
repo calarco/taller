@@ -183,7 +183,20 @@ export async function getSearch(userId, value, type) {
 			return finalize(clients.map((x) => mapClient(x, rank(query, fullName(x), x.name, x.lastName, x.dni, x.phone, x.email))));
 		}
 
-		const [carMakes, carModels] = await Promise.all([findCarMakes(userId), findCarModels(userId)]);
+		const [clients, repairs, estimates, carMakes, carModels] = await Promise.all([
+			findClientHits(userId, query),
+			findRepairs(userId, termFilter(query.terms, ['description', 'detail']))
+				.sort({ updatedAt: -1 })
+				.populate(repairPopulate)
+				.limit(QUERY_LIMIT),
+			findEstimates(userId, { $or: [termFilter(query.terms, ['description', 'email']), ...(query.plateLower ? anyFilter(['vehicleId'], query.plateLower) : []), { estimateId: query.raw }] })
+				.sort({ updatedAt: -1 })
+				.populate(carModelPopulate)
+				.limit(QUERY_LIMIT),
+			findCarMakes(userId),
+			findCarModels(userId),
+		]);
+
 		const makes = new Map(carMakes.map((x) => [x.carMakeId, x.name || '']));
 		const carModelIds = carModels
 			.filter((x) => {
@@ -195,23 +208,12 @@ export async function getSearch(userId, value, type) {
 		const plateFilter = query.plateLower ? anyFilter(['vehicleId', 'vin'], query.plateLower) : [];
 		const vehicleFilter = [...plateFilter, ...(carModelIds.length ? [{ carModelId: { $in: carModelIds } }] : [])];
 
-		const [clients, vehicles, repairs, estimates] = await Promise.all([
-			findClientHits(userId, query),
-			vehicleFilter.length
-				? findVehicles(userId, { $or: vehicleFilter })
-						.sort({ updatedAt: -1 })
-						.populate([carModelPopulate, { path: 'client', select: 'name lastName' }])
-						.limit(QUERY_LIMIT)
-				: [],
-			findRepairs(userId, termFilter(query.terms, ['description', 'detail']))
-				.sort({ updatedAt: -1 })
-				.populate(repairPopulate)
-				.limit(QUERY_LIMIT),
-			findEstimates(userId, { $or: [termFilter(query.terms, ['description', 'email']), ...(query.plateLower ? anyFilter(['vehicleId'], query.plateLower) : []), { estimateId: query.raw }] })
-				.sort({ updatedAt: -1 })
-				.populate(carModelPopulate)
-				.limit(QUERY_LIMIT),
-		]);
+		const vehicles = vehicleFilter.length
+			? await findVehicles(userId, { $or: vehicleFilter })
+					.sort({ updatedAt: -1 })
+					.populate([carModelPopulate, { path: 'client', select: 'name lastName' }])
+					.limit(QUERY_LIMIT)
+			: [];
 
 		const search = [
 			...clients.map((x) => mapClient(x, rank(query, fullName(x), x.name, x.lastName, x.dni, x.phone, x.email))),

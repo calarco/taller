@@ -53,9 +53,6 @@
 						return async ({ result, update }) => {
 							update({ reset: false });
 							windowState.loading = false;
-							if (result.type === 'success') {
-								console.log('email sent');
-							}
 							if (result.type === 'failure' && result.data) {
 								windowState.error = result.data;
 							}

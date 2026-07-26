@@ -87,7 +87,7 @@ export async function deleteRepairAction(event) {
 		const form = await event.request.formData();
 		const repairId = form.get('repairId');
 		if (!repairId) {
-			return fail(400, 'Missing id');
+			return fail(400, { error: 'Missing id' });
 		}
 
 		const Repair = getModel(userId, 'Repair');
