@@ -26,7 +26,7 @@ export function findAppointments(userId, filters, projection = { __v: 0 }) {
 
 export async function createAppointmentAction(event) {
 	try {
-		const userId = event.cookies.get('userId');
+		const userId = event.locals.userId;
 		if (!userId) {
 			return;
 		}
@@ -59,7 +59,7 @@ export async function createAppointmentAction(event) {
 
 export async function deleteAppointmentAction(event) {
 	try {
-		const userId = event.cookies.get('userId');
+		const userId = event.locals.userId;
 		if (!userId) {
 			return;
 		}

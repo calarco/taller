@@ -25,7 +25,7 @@ export function findCarMakes(userId, filters, projection = { __v: 0 }) {
 
 export async function createCarMakeAction(event) {
 	try {
-		const userId = event.cookies.get('userId');
+		const userId = event.locals.userId;
 		if (!userId) {
 			return;
 		}

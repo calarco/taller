@@ -1,3 +1,4 @@
+import { redirect } from '@sveltejs/kit';
 import { editUserAction } from '$lib/server/controllers/User.controller.js';
 import { upsertClientAction } from '$lib/server/controllers/Client.controller.js';
 import { createCarMakeAction } from '$lib/server/controllers/CarMake.controller.js';
@@ -12,7 +13,7 @@ export const actions = {
 	logout: async (event) => {
 		event.cookies.delete('auth-token', { path: '/' });
 		event.cookies.delete('userId', { path: '/' });
-		return;
+		throw redirect(307, '/login');
 	},
 	createCarMake: async (event) => {
 		return await createCarMakeAction(event);

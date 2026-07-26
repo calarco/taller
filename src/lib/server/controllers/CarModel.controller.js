@@ -37,7 +37,7 @@ export async function createCarModel(userId, carModel) {
 
 export async function createCarModelAction(event) {
 	try {
-		const userId = event.cookies.get('userId');
+		const userId = event.locals.userId;
 		if (!userId) {
 			return;
 		}

@@ -6,7 +6,7 @@ import { findAppointments } from '$lib/server/controllers/Appointment.controller
 import { getSearch } from '$lib/server/controllers/Search.controller.js';
 
 export const load = async (event) => {
-	const userId = event.cookies.get('userId');
+	const userId = event.locals.userId;
 	if (!userId) {
 		return;
 	}

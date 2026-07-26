@@ -1,4 +1,4 @@
-import { error } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
 import { editUserAction } from '$lib/server/controllers/User.controller.js';
 import { createCarMakeAction } from '$lib/server/controllers/CarMake.controller.js';
 import { createCarModelAction } from '$lib/server/controllers/CarModel.controller.js';
@@ -8,7 +8,7 @@ import { findRepairs, upsertRepairAction, deleteRepairAction } from '$lib/server
 import { upsertEstimateAction } from '$lib/server/controllers/Estimate.controller.js';
 
 export const load = async (event) => {
-	const userId = event.cookies.get('userId');
+	const userId = event.locals.userId;
 	const vehicleId = event.params.vehicleId;
 	if (!userId || !vehicleId) {
 		return;
@@ -34,7 +34,7 @@ export const actions = {
 	logout: async (event) => {
 		event.cookies.delete('auth-token', { path: '/' });
 		event.cookies.delete('userId', { path: '/' });
-		return;
+		throw redirect(307, '/login');
 	},
 	createCarMake: async (event) => {
 		return await createCarMakeAction(event);

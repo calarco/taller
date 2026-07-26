@@ -31,7 +31,7 @@ export async function upsertVehicle(userId, vehicle) {
 
 export async function upsertVehicleAction(event) {
 	try {
-		const userId = event.cookies.get('userId');
+		const userId = event.locals.userId;
 		if (!userId) {
 			return;
 		}
@@ -100,7 +100,7 @@ export async function upsertVehicleAction(event) {
 
 export async function deleteVehicleAction(event) {
 	try {
-		const userId = event.cookies.get('userId');
+		const userId = event.locals.userId;
 		if (!userId) {
 			return;
 		}

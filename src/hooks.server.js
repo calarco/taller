@@ -7,15 +7,20 @@ export async function init() {
 }
 
 export async function handle({ event, resolve }) {
-	if (!authenticate(event.cookies)) {
+	const auth = authenticate(event.cookies);
+	if (!auth?.userId) {
 		event.cookies.delete('auth-token', { path: '/' });
 		event.cookies.delete('userId', { path: '/' });
 
 		if (event.url.pathname !== '/login') {
 			throw redirect(307, '/login');
 		}
-	} else if (event.url.pathname === '/login') {
-		throw redirect(307, '/');
+	} else {
+		event.locals.userId = auth.userId;
+
+		if (event.url.pathname === '/login') {
+			throw redirect(307, '/');
+		}
 	}
 
 	const response = await resolve(event);

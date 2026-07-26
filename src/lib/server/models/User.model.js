@@ -15,7 +15,7 @@ const UserSchema = mongoose.Schema(
 	}
 );
 
-UserSchema.index({ userId: 1 });
+UserSchema.index({ userId: 1 }, { unique: true });
 
 UserSchema.set('toObject', { virtuals: true });
 UserSchema.set('toJSON', { virtuals: true });

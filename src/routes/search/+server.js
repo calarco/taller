@@ -2,7 +2,7 @@ import { error, json } from '@sveltejs/kit';
 import { getSearch } from '$lib/server/controllers/Search.controller.js';
 
 export const GET = async (event) => {
-	const userId = event.cookies.get('userId');
+	const userId = event.locals.userId;
 	if (!userId) {
 		return json([]);
 	}

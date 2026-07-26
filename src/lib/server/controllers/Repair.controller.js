@@ -43,7 +43,7 @@ export function moveRepairs(userId, oldId, newId) {
 
 export async function upsertRepairAction(event) {
 	try {
-		const userId = event.cookies.get('userId');
+		const userId = event.locals.userId;
 		if (!userId) {
 			return;
 		}
@@ -79,7 +79,7 @@ export async function upsertRepairAction(event) {
 
 export async function deleteRepairAction(event) {
 	try {
-		const userId = event.cookies.get('userId');
+		const userId = event.locals.userId;
 		if (!userId) {
 			return;
 		}

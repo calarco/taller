@@ -36,7 +36,7 @@ export function upsertEstimate(userId, estimate) {
 
 export async function upsertEstimateAction(event) {
 	try {
-		const userId = event.cookies.get('userId');
+		const userId = event.locals.userId;
 		if (!userId) {
 			return;
 		}
@@ -86,7 +86,7 @@ export async function upsertEstimateAction(event) {
 
 export async function deleteEstimateAction(event) {
 	try {
-		const userId = event.cookies.get('userId');
+		const userId = event.locals.userId;
 		if (!userId) {
 			return;
 		}
@@ -110,7 +110,7 @@ export async function deleteEstimateAction(event) {
 
 export async function sendEstimateAction(event) {
 	try {
-		const userId = event.cookies.get('userId');
+		const userId = event.locals.userId;
 		if (!userId) {
 			return;
 		}

@@ -31,7 +31,7 @@ export function upsertClient(userId, client) {
 
 export async function upsertClientAction(event) {
 	try {
-		const userId = event.cookies.get('userId');
+		const userId = event.locals.userId;
 		if (!userId) {
 			return;
 		}
@@ -69,7 +69,7 @@ export async function upsertClientAction(event) {
 
 export async function deleteClientAction(event) {
 	try {
-		const userId = event.cookies.get('userId');
+		const userId = event.locals.userId;
 		if (!userId) {
 			return;
 		}

@@ -3,7 +3,7 @@ import { findClient } from '$lib/server/controllers/Client.controller.js';
 import { findVehicles } from '$lib/server/controllers/Vehicle.controller.js';
 
 export const load = async (event) => {
-	const userId = event.cookies.get('userId');
+	const userId = event.locals.userId;
 	const clientId = event.params.clientId;
 	if (!userId || !clientId) {
 		return;

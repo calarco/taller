@@ -1,4 +1,4 @@
-import { error } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
 import { render } from 'svelte/server';
 import { findUser, editUserAction } from '$lib/server/controllers/User.controller.js';
 import { upsertClientAction } from '$lib/server/controllers/Client.controller.js';
@@ -9,7 +9,7 @@ import { findEstimate, upsertEstimateAction, deleteEstimateAction, sendEstimateA
 import Estimate from '$lib/components/estimate/Estimate.svelte';
 
 export const load = async (event) => {
-	const userId = event.cookies.get('userId');
+	const userId = event.locals.userId;
 	const estimateId = event.params.estimateId;
 	if (!userId || !estimateId) {
 		return;
@@ -41,7 +41,7 @@ export const actions = {
 	logout: async (event) => {
 		event.cookies.delete('auth-token', { path: '/' });
 		event.cookies.delete('userId', { path: '/' });
-		return;
+		throw redirect(307, '/login');
 	},
 	createCarMake: async (event) => {
 		return await createCarMakeAction(event);

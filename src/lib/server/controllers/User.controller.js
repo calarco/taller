@@ -15,7 +15,7 @@ export function authenticate(cookies) {
 		return;
 	}
 	try {
-		return jwt.verify(token, JWT_KEY);
+		return jwt.verify(token, JWT_KEY, { algorithms: ['HS256'] });
 	} catch {
 		return;
 	}
@@ -33,24 +33,19 @@ export async function loginUserAction(event) {
 			return fail(400, { passwordError: 'Ingrese la contraseña' });
 		}
 		const user = await findUser(userId, { userId });
-		if (!user) {
-			return fail(400, { userIdError: 'Usuario no encontrado' });
+		const passwordCorrect = await bcrypt.compare(password, user?.password || '$2b$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy');
+		if (!user || !passwordCorrect) {
+			return fail(400, { passwordError: 'Usuario o contraseña incorrecta' });
 		}
 
-		const passwordCorrect = await bcrypt.compare(password, user.password);
-		if (!passwordCorrect) {
-			return fail(400, { passwordError: 'Contraseña incorrecta' });
-		}
-
-		const token = jwt.sign({ id: user._id.toString() }, JWT_KEY, { expiresIn: '30d' });
-		const options = {
+		const token = jwt.sign({ id: user._id.toString(), userId: user.userId }, JWT_KEY, { expiresIn: '30d' });
+		event.cookies.set('auth-token', token, {
 			httpOnly: true,
 			secure: true,
 			path: '/',
 			maxAge: 60 * 60 * 24 * 30,
-		};
-		event.cookies.set('auth-token', token, options);
-		event.cookies.set('userId', user.userId, options);
+		});
+		event.cookies.delete('userId', { path: '/' });
 
 		const message = 'Usuario ingresado';
 		return { message };
@@ -61,7 +56,7 @@ export async function loginUserAction(event) {
 
 export async function createUserAction(event) {
 	try {
-		if (!event.cookies.get('userId')) {
+		if (!event.locals.userId) {
 			return;
 		}
 
@@ -75,6 +70,10 @@ export async function createUserAction(event) {
 		if (!password) {
 			return fail(400, { passwordError: 'Ingrese la contraseña' });
 		}
+		const existing = await findUser(userId, { userId });
+		if (existing) {
+			return fail(400, { userIdError: 'El usuario ya existe' });
+		}
 
 		const hashedPassword = await bcrypt.hash(password, 10);
 		const User = getModel(userId, 'User');
@@ -87,7 +86,7 @@ export async function createUserAction(event) {
 
 export async function editUserAction(event) {
 	try {
-		const userId = event.cookies.get('userId');
+		const userId = event.locals.userId;
 		if (!userId) {
 			return;
 		}
@@ -106,7 +105,7 @@ export async function editUserAction(event) {
 		}
 
 		const User = getModel(userId, 'User');
-		const data = await User.findOneAndUpdate({ userId }, user);
+		const data = await User.findOneAndUpdate({ userId }, user, { new: true });
 		return { user: JSON.parse(JSON.stringify(data)) };
 	} catch (err) {
 		throw error(500, err.body || err.toString());
