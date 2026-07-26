@@ -3,7 +3,7 @@ import { findUser } from '$lib/server/controllers/User.controller.js';
 import { findCarMakes } from '$lib/server/controllers/CarMake.controller.js';
 import { findCarModels } from '$lib/server/controllers/CarModel.controller.js';
 import { findAppointments } from '$lib/server/controllers/Appointment.controller.js';
-import { getSearch } from '$lib/server/controllers/Util.controller.js';
+import { getSearch } from '$lib/server/controllers/Search.controller.js';
 
 export const load = async (event) => {
 	const userId = event.cookies.get('userId');

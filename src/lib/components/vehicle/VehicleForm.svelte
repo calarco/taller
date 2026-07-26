@@ -16,7 +16,7 @@
 		if (value) {
 			(async () => {
 				windowState.loading = true;
-				const response = await fetch('/search/' + value);
+				const response = await fetch('/search?type=client&q=' + encodeURIComponent(value.trim()));
 				const data = await response.json();
 				if (data?.length) {
 					search = data;
@@ -52,7 +52,7 @@
 		<Label title="Cliente" error={windowState.error?.clientIdError} --column-end="span 3">
 			<input class="client" list="clients" name="clientName" placeholder={page.data.client.name + ' ' + page.data.client.lastName} autoComplete="off" bind:value />
 			<datalist id="clients">
-				{#each search as client (client.id)}
+				{#each (search ?? []).filter((x) => x.clientId && x.clientName) as client (client.id)}
 					<option key={client.clientId} value={client.clientName}></option>
 				{/each}
 			</datalist>

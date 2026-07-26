@@ -14,6 +14,7 @@ const RepairSchema = mongoose.Schema({
 });
 
 RepairSchema.index({ repairId: 1 });
+RepairSchema.index({ vehicleId: 1 });
 
 RepairSchema.set('toObject', { virtuals: true });
 RepairSchema.set('toJSON', { virtuals: true });

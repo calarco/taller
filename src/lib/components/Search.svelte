@@ -2,32 +2,95 @@
 	import { slide, blur } from 'svelte/transition';
 	import { sineIn, sineOut } from 'svelte/easing';
 	import { page } from '$app/state';
+	import { goto } from '$app/navigation';
 	import { windowState } from '$lib/shared.svelte';
 	import Section from '$lib/components/Section.svelte';
 
 	let value = $state('');
 	let search = $state(page.data.search);
+	let settled = $state(true);
+	let activeIndex = $state(-1);
+	let seq = 0;
 	$effect(() => {
-		if (value) {
-			(async () => {
-				windowState.loading = true;
-				const response = await fetch('/search/' + value);
-				const data = await response.json();
-				if (data?.length) {
-					data.forEach((x) => {
-						x.updatedAt = new Date(x.updatedAt);
-					});
-					search = data;
-				} else {
-					search = [];
-				}
-				windowState.loading = false;
-			})();
-		} else {
+		const query = value.trim();
+		activeIndex = -1;
+		if (!query) {
 			search = page.data.search;
+			settled = true;
+			return;
 		}
+
+		settled = false;
+		const controller = new AbortController();
+		const timer = setTimeout(async () => {
+			const current = ++seq;
+			windowState.loading = true;
+			try {
+				const response = await fetch('/search?q=' + encodeURIComponent(query), { signal: controller.signal });
+				const data = await response.json();
+				if (current !== seq) {
+					return;
+				}
+				search = (data || []).map((x) => ({ ...x, updatedAt: new Date(x.updatedAt) }));
+				settled = true;
+			} catch (err) {
+				if (err.name !== 'AbortError') {
+					search = [];
+					settled = true;
+				}
+			} finally {
+				if (current === seq) {
+					windowState.loading = false;
+				}
+			}
+		}, 200);
+
+		return () => {
+			clearTimeout(timer);
+			controller.abort();
+		};
 	});
+
+	let results = $derived(search ?? []);
+	let rows = $state([]);
+
+	function select(index) {
+		activeIndex = index;
+		rows[index]?.scrollIntoView({ block: 'nearest' });
+	}
+
+	function onkeydown(e) {
+		if (e.key === 'ArrowDown') {
+			e.preventDefault();
+			select(results.length ? (activeIndex + 1) % results.length : -1);
+		} else if (e.key === 'ArrowUp') {
+			e.preventDefault();
+			select(results.length ? (activeIndex <= 0 ? results.length - 1 : activeIndex - 1) : -1);
+		} else if (e.key === 'Enter') {
+			e.preventDefault();
+			const resultado = results[activeIndex] || results[0];
+			if (resultado?.estimateId) {
+				goto(`/estimate/${resultado.estimateId}`);
+			} else if (resultado?.vehicleId) {
+				goto(`/${resultado.clientId}/${resultado.vehicleId}${resultado.repairId ? '#' + resultado.repairId : ''}`);
+			} else if (resultado) {
+				goto(`/${resultado.clientId}`);
+			}
+		} else if (e.key === 'Escape') {
+			value = '';
+		}
+	}
 </script>
+
+{#snippet plate(vehicleId)}
+	{#if vehicleId.length === 6}
+		<h4 class="vehicleId">{vehicleId.slice(0, 3)}<span>{vehicleId.slice(-3)}</span></h4>
+	{:else if vehicleId.length === 7}
+		<h4 class="vehicleId">{vehicleId.slice(0, 2)}<span>{vehicleId.slice(2, 5)}</span><span>{vehicleId.slice(-2)}</span></h4>
+	{:else}
+		<h4 class="vehicleId">{vehicleId}</h4>
+	{/if}
+{/snippet}
 
 <div class="panel">
 	<Section overlay={windowState.form === 'estimate'}>
@@ -53,13 +116,13 @@
 					</div>
 				{/if}
 			</div>
-			<input id="searchInput" type="search" name="search" placeholder="Buscar" autocomplete="off" bind:value />
+			<input id="searchInput" type="search" name="search" placeholder="Buscar" autocomplete="off" bind:value {onkeydown} />
 		</label>
-		{#if !search?.length}
+		{#if !results.length && settled}
 			<h5 class="empty" in:slide={{ axis: 'y', duration: 150, easing: sineIn }} out:slide={{ axis: 'y', duration: 150, easing: sineOut }}>No se encontraron resultados</h5>
 		{/if}
-		{#each search as resultado (resultado.id)}
-			<div class="result" in:slide={{ axis: 'y', duration: 150, easing: sineOut }} out:slide={{ axis: 'y', duration: 150, easing: sineIn }}>
+		{#each results as resultado, i (resultado.id)}
+			<div bind:this={rows[i]} class={['result', { isSelected: i === activeIndex }]} in:slide={{ axis: 'y', duration: 150, easing: sineOut }} out:slide={{ axis: 'y', duration: 150, easing: sineIn }}>
 				{#if resultado.clientId}
 					<div class="cliente">
 						<a href={`/${resultado.clientId}`} class={['clienteCont', { isActive: resultado.clientId === page.url.pathname.split('/')[1] }, { isVehicle: resultado.vehicleId }]}>
@@ -73,13 +136,7 @@
 								<div class="vehiculoCont cont">
 									<span class="icon vehicle"></span>
 									<div>
-										{#if resultado.vehicleId.length === 6}
-											<h4 class="vehicleId">{resultado.vehicleId?.slice(0, 3)}<span>{resultado.vehicleId?.slice(-3)}</span></h4>
-										{:else if resultado.vehicleId.length === 7}
-											<h4 class="vehicleId">{resultado.vehicleId?.slice(0, 2)}<span>{resultado.vehicleId?.slice(2, 5)}</span><span>{resultado.vehicleId?.slice(-2)}</span></h4>
-										{:else}
-											<h4 class="vehicleId">{resultado.vehicleId}</h4>
-										{/if}
+										{@render plate(resultado.vehicleId)}
 										{#if resultado.carModel}
 											<small>{resultado.carModel.carMake?.name} {resultado.carModel.name}</small>
 										{/if}
@@ -110,7 +167,7 @@
 					</a>
 				{/if}
 				{#if resultado.estimateId}
-					<a class="estimate" href={`estimate/${resultado.estimateId}`}>
+					<a class="estimate" href={`/estimate/${resultado.estimateId}`}>
 						<div class="estimateCont cont">
 							<span class="icon estimate"></span>
 							<p>{resultado.description}</p>
@@ -120,13 +177,7 @@
 								<div class="vehiculoCont cont">
 									<span class="icon vehicle"></span>
 									<div>
-										{#if resultado.vehicleId.length === 6}
-											<h4 class="vehicleId">{resultado.vehicleId?.slice(0, 3)}<span>{resultado.vehicleId?.slice(-3)}</span></h4>
-										{:else if resultado.vehicleId.length === 7}
-											<h4 class="vehicleId">{resultado.vehicleId?.slice(0, 2)}<span>{resultado.vehicleId?.slice(2, 5)}</span><span>{resultado.vehicleId?.slice(-2)}</span></h4>
-										{:else}
-											<h4 class="vehicleId">{resultado.vehicleId}</h4>
-										{/if}
+										{@render plate(resultado.vehicleId)}
 										{#if resultado.carModel}
 											<small>{resultado.carModel.carMake?.name} {resultado.carModel.name}</small>
 										{/if}
@@ -256,7 +307,8 @@
 		align-items: center;
 		transition: 0.1s ease-in;
 
-		&:hover {
+		&:hover,
+		&.isSelected {
 			cursor: pointer;
 			background: var(--highlight);
 			transition: 0.15s ease-out;

@@ -14,6 +14,8 @@ const EstimateSchema = mongoose.Schema({
 });
 
 EstimateSchema.index({ estimateId: 1 });
+EstimateSchema.index({ vehicleId: 1 });
+EstimateSchema.index({ updatedAt: -1 });
 
 EstimateSchema.set('toObject', { virtuals: true });
 EstimateSchema.set('toJSON', { virtuals: true });

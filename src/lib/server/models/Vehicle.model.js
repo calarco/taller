@@ -13,6 +13,8 @@ const VehicleSchema = mongoose.Schema({
 });
 
 VehicleSchema.index({ vehicleId: 1 });
+VehicleSchema.index({ clientId: 1 });
+VehicleSchema.index({ carModelId: 1 });
 
 VehicleSchema.set('toObject', { virtuals: true });
 VehicleSchema.set('toJSON', { virtuals: true });

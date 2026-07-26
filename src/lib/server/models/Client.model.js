@@ -13,6 +13,7 @@ const ClientSchema = mongoose.Schema({
 });
 
 ClientSchema.index({ clientId: 1 });
+ClientSchema.index({ updatedAt: -1 });
 
 ClientSchema.set('toObject', { virtuals: true });
 ClientSchema.set('toJSON', { virtuals: true });
