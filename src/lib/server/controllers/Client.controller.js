@@ -14,14 +14,14 @@ async function getNewId(userId) {
 	return String(max);
 }
 
-export function findClient(userId, filters) {
+export function findClient(userId, filters, projection = { __v: 0 }) {
 	const Client = getModel(userId, 'Client');
-	return Client.findOne(filters, { __v: 0, _id: 0 }).lean();
+	return Client.findOne(filters, { ...projection, _id: 0 }).lean();
 }
 
-export function findClients(userId, filters) {
+export function findClients(userId, filters, projection = { __v: 0 }) {
 	const Client = getModel(userId, 'Client');
-	return Client.find(filters, { __v: 0, _id: 0 }).lean();
+	return Client.find(filters, { ...projection, _id: 0 }).lean();
 }
 
 export function upsertClient(userId, client) {

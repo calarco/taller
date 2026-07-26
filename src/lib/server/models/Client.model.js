@@ -1,16 +1,19 @@
 import mongoose from 'mongoose';
 
-const ClientSchema = mongoose.Schema({
-	clientId: String,
-	name: String,
-	lastName: String,
-	dni: String,
-	work: String,
-	phone: String,
-	email: String
-}, {
-	timestamps: true
-});
+const ClientSchema = mongoose.Schema(
+	{
+		clientId: String,
+		name: String,
+		lastName: String,
+		dni: String,
+		work: String,
+		phone: String,
+		email: String,
+	},
+	{
+		timestamps: true,
+	}
+);
 
 ClientSchema.index({ clientId: 1 });
 ClientSchema.index({ updatedAt: -1 });
@@ -22,7 +25,7 @@ ClientSchema.virtual('vehicles', {
 	ref: 'Vehicle',
 	localField: 'clientId',
 	foreignField: 'clientId',
-	justOne: true
+	justOne: true,
 });
 
 export default ClientSchema;

@@ -12,13 +12,10 @@
 		<div class="padding"></div>
 	{/if}
 	{#if overlay}
-		<div
+		<button
+			type="button"
 			class="overlay"
-			role="button"
-			tabindex="0"
-			aria-pressed="false"
-			onkeyup={() => {}}
-			onkeydown={() => {}}
+			aria-label="cerrar"
 			onclick={() => {
 				windowState.form = '';
 				windowState.id = '';
@@ -26,7 +23,7 @@
 			}}
 			in:fade={{ duration: 300, easing: sineOut }}
 			out:fade={{ duration: 250, easing: sineIn }}
-		></div>
+		></button>
 	{/if}
 </section>
 
@@ -76,8 +73,15 @@
 		top: 0;
 		right: 0;
 		left: 0;
+		padding: 0;
+		border-radius: 0;
 		background: var(--overlay);
 		backdrop-filter: blur(0.5rem);
 		height: 1000%;
+
+		&:hover,
+		&:focus {
+			background: var(--overlay);
+		}
 	}
 </style>

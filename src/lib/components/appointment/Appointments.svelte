@@ -6,7 +6,7 @@
 	function getNextMonth(currentYear, currentMonth) {
 		const now = new Date();
 		const year = !currentYear ? now.getFullYear() : currentMonth === 11 ? currentYear + 1 : currentYear;
-		const month = (!currentMonth && currentMonth !== 0) ? now.getMonth() : currentMonth === 11 ? 0 : currentMonth + 1;
+		const month = !currentMonth && currentMonth !== 0 ? now.getMonth() : currentMonth === 11 ? 0 : currentMonth + 1;
 		const date = (currentMonth || currentMonth === 0) && currentYear ? 1 : now.getDate();
 
 		const days = [];

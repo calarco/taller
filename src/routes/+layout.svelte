@@ -31,7 +31,17 @@
 			windowState.loading = false;
 		}
 	});
+
+	function onkeydown(e) {
+		if (e.key === 'Escape' && windowState.form) {
+			windowState.form = '';
+			windowState.id = '';
+			windowState.data = {};
+		}
+	}
 </script>
+
+<svelte:window {onkeydown} />
 
 <svelte:head>
 	<title>Sistema Taller</title>

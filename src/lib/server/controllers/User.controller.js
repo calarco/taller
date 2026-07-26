@@ -10,15 +10,14 @@ export function findUser(userId, filters) {
 }
 
 export function authenticate(cookies) {
+	const token = cookies.get('auth-token');
+	if (!token) {
+		return;
+	}
 	try {
-		let token = cookies.get('auth-token');
-		if (!token) {
-			return;
-		}
-		const auth = jwt.verify(token, JWT_KEY);
-		return auth;
-	} catch (err) {
-		throw error(500, err.body || err.toString());
+		return jwt.verify(token, JWT_KEY);
+	} catch {
+		return;
 	}
 }
 

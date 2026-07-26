@@ -16,11 +16,21 @@ export default [
 	...svelte.configs.prettier,
 	{
 		languageOptions: {
-			globals: { ...globals.browser, ...globals.node }
-		}
+			globals: { ...globals.browser, ...globals.node },
+		},
+	},
+	{
+		files: ['**/*.js'],
+		ignores: ['**/*.svelte.js'],
+		rules: {
+			'prefer-const': 'error',
+		},
 	},
 	{
 		files: ['**/*.svelte', '**/*.svelte.js'],
-		languageOptions: { parserOptions: { svelteConfig } }
-	}
+		languageOptions: { parserOptions: { svelteConfig } },
+		rules: {
+			'svelte/prefer-const': 'error',
+		},
+	},
 ];

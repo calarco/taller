@@ -66,7 +66,7 @@
 			</ul>
 		</div>
 		<Label title="Cantidad">
-			<input type="number" min="0" name="amount" placeholder="1" bind:value={amount}/>
+			<input type="number" min="0" name="amount" placeholder="1" bind:value={amount} />
 		</Label>
 		<Label title="Repuesto" error={windowState.error?.nameError}>
 			<input type="text" name="name" placeholder="-" autoComplete="off" bind:value={name} />

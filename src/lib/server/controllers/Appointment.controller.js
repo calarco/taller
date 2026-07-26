@@ -14,14 +14,14 @@ async function getNewId(userId) {
 	return String(max);
 }
 
-export function findAppointment(userId, filters) {
+export function findAppointment(userId, filters, projection = { __v: 0 }) {
 	const Appointment = getModel(userId, 'Appointment');
-	return Appointment.findOne(filters, { __v: 0, _id: 0 }).lean();
+	return Appointment.findOne(filters, { ...projection, _id: 0 }).lean();
 }
 
-export function findAppointments(userId, filters) {
+export function findAppointments(userId, filters, projection = { __v: 0 }) {
 	const Appointment = getModel(userId, 'Appointment');
-	return Appointment.find(filters, { __v: 0, _id: 0 }).lean();
+	return Appointment.find(filters, { ...projection, _id: 0 }).lean();
 }
 
 export async function createAppointmentAction(event) {

@@ -1,13 +1,16 @@
 import mongoose from 'mongoose';
 
-const AppointmentSchema = mongoose.Schema({
-	appointmentId: String,
-	date: Date,
-	description: String,
-	carModelId: String
-}, {
-	timestamps: true
-});
+const AppointmentSchema = mongoose.Schema(
+	{
+		appointmentId: String,
+		date: Date,
+		description: String,
+		carModelId: String,
+	},
+	{
+		timestamps: true,
+	}
+);
 
 AppointmentSchema.index({ appointmentId: 1 });
 
@@ -18,7 +21,7 @@ AppointmentSchema.virtual('carModel', {
 	ref: 'CarModel',
 	localField: 'carModelId',
 	foreignField: 'carModelId',
-	justOne: true
+	justOne: true,
 });
 
 export default AppointmentSchema;

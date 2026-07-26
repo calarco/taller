@@ -14,14 +14,14 @@ async function getNewId(userId) {
 	return String(max);
 }
 
-export function findRepair(userId, filters) {
+export function findRepair(userId, filters, projection = { __v: 0 }) {
 	const Repair = getModel(userId, 'Repair');
-	return Repair.findOne(filters, { __v: 0, _id: 0 }).lean();
+	return Repair.findOne(filters, { ...projection, _id: 0 }).lean();
 }
 
-export function findRepairs(userId, filters) {
+export function findRepairs(userId, filters, projection = { __v: 0 }) {
 	const Repair = getModel(userId, 'Repair');
-	return Repair.find(filters, { __v: 0, _id: 0 }).lean();
+	return Repair.find(filters, { ...projection, _id: 0 }).lean();
 }
 
 export function deleteRepairs(userId, filters) {

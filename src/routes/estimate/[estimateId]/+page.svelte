@@ -5,6 +5,7 @@
 	import { windowState } from '$lib/shared.svelte.js';
 	import Section from '$lib/components/Section.svelte';
 	import Dialog from '$lib/components/Dialog.svelte';
+	import Plate from '$lib/components/vehicle/Plate.svelte';
 
 	let { data } = $props();
 
@@ -75,6 +76,7 @@
 			<div class="estimate">
 				<Section overlay={windowState.form === 'estimate'} cards>
 					<div id="print-content">
+						<!-- eslint-disable-next-line svelte/no-at-html-tags -- rendered by svelte/server, already escaped -->
 						{@html data.html}
 					</div>
 				</Section>
@@ -83,13 +85,7 @@
 				<input type="hidden" name="estimateId" value={estimate.estimateId} />
 				<article>
 					<div>
-						{#if estimate.vehicleId.length === 6}
-							<h4 class="vehicleId">{estimate.vehicleId?.slice(0, 3)}<span>{estimate.vehicleId?.slice(-3)}</span></h4>
-						{:else if estimate.vehicleId.length === 7}
-							<h4 class="vehicleId">{estimate.vehicleId?.slice(0, 2)}<span>{estimate.vehicleId?.slice(2, 5)}</span><span>{estimate.vehicleId?.slice(-2)}</span></h4>
-						{:else}
-							<h4 class="vehicleId">{estimate.vehicleId}</h4>
-						{/if}
+						<Plate vehicleId={estimate.vehicleId} />
 						{#if estimate.carModel}
 							<small>{estimate.carModel?.carMake?.name} {estimate.carModel?.name}</small>
 						{/if}
@@ -222,14 +218,6 @@
 			max-width: 8rem;
 			display: grid;
 			align-items: center;
-
-			.vehicleId {
-				font-size: 0.9em;
-
-				span {
-					margin-left: 0.25rem;
-				}
-			}
 
 			small {
 				overflow: hidden;

@@ -4,14 +4,14 @@ import { createCarModel } from '$lib/server/controllers/CarModel.controller.js';
 import { upsertClient } from '$lib/server/controllers/Client.controller';
 import { deleteRepairs, moveRepairs } from '$lib/server/controllers/Repair.controller';
 
-export function findVehicle(userId, filters) {
+export function findVehicle(userId, filters, projection = { __v: 0 }) {
 	const Vehicle = getModel(userId, 'Vehicle');
-	return Vehicle.findOne(filters, { __v: 0, _id: 0 }).lean();
+	return Vehicle.findOne(filters, { ...projection, _id: 0 }).lean();
 }
 
-export function findVehicles(userId, filters) {
+export function findVehicles(userId, filters, projection = { __v: 0 }) {
 	const Vehicle = getModel(userId, 'Vehicle');
-	return Vehicle.find(filters, { __v: 0, _id: 0 }).lean();
+	return Vehicle.find(filters, { ...projection, _id: 0 }).lean();
 }
 
 export function deleteByVehicleId(userId, vehicleId) {

@@ -11,7 +11,7 @@
 	let labor = $state(repair?.labor || '');
 </script>
 
-<Form action="?/upsertRepair" isCreate={isCreate} --grid-columns="1fr 1fr 1fr 1fr [end]">
+<Form action="?/upsertRepair" {isCreate} --grid-columns="1fr 1fr 1fr 1fr [end]">
 	<div class="formTitle">
 		<div>
 			{#if isCreate}

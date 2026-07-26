@@ -1,11 +1,14 @@
 import mongoose from 'mongoose';
 
-const CarMakeSchema = mongoose.Schema({
-	carMakeId: String,
-	name: String
-}, {
-	timestamps: true
-});
+const CarMakeSchema = mongoose.Schema(
+	{
+		carMakeId: String,
+		name: String,
+	},
+	{
+		timestamps: true,
+	}
+);
 
 CarMakeSchema.index({ carMakeId: 1 });
 

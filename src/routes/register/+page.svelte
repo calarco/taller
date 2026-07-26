@@ -13,27 +13,14 @@
 	<form method="POST" autocomplete="off" use:enhance>
 		<label>
 			Usuario
-			<input
-				type="text"
-				name="userId"
-				autoComplete="username"
-				value={form?.user?.userId ?? ""}
-			/>
+			<input type="text" name="userId" autoComplete="username" value={form?.user?.userId ?? ''} />
 		</label>
 		<label>
 			Contraseña
-			<input
-				type="password"
-				name="password"
-				autoComplete="current-password"
-			/>
+			<input type="password" name="password" autoComplete="current-password" />
 		</label>
 		<div class="buttons">
-			<button
-				type="submit"
-			>
-				Ingresar
-			</button>
+			<button type="submit"> Ingresar </button>
 		</div>
 	</form>
 </div>

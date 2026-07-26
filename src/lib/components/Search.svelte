@@ -5,6 +5,7 @@
 	import { goto } from '$app/navigation';
 	import { windowState } from '$lib/shared.svelte';
 	import Section from '$lib/components/Section.svelte';
+	import Plate from '$lib/components/vehicle/Plate.svelte';
 
 	let value = $state('');
 	let search = $state(page.data.search);
@@ -52,7 +53,7 @@
 	});
 
 	let results = $derived(search ?? []);
-	let rows = $state([]);
+	const rows = $state([]);
 
 	function select(index) {
 		activeIndex = index;
@@ -81,16 +82,6 @@
 		}
 	}
 </script>
-
-{#snippet plate(vehicleId)}
-	{#if vehicleId.length === 6}
-		<h4 class="vehicleId">{vehicleId.slice(0, 3)}<span>{vehicleId.slice(-3)}</span></h4>
-	{:else if vehicleId.length === 7}
-		<h4 class="vehicleId">{vehicleId.slice(0, 2)}<span>{vehicleId.slice(2, 5)}</span><span>{vehicleId.slice(-2)}</span></h4>
-	{:else}
-		<h4 class="vehicleId">{vehicleId}</h4>
-	{/if}
-{/snippet}
 
 <div class="panel">
 	<Section overlay={windowState.form === 'estimate'}>
@@ -136,7 +127,7 @@
 								<div class="vehiculoCont cont">
 									<span class="icon vehicle"></span>
 									<div>
-										{@render plate(resultado.vehicleId)}
+										<Plate vehicleId={resultado.vehicleId} />
 										{#if resultado.carModel}
 											<small>{resultado.carModel.carMake?.name} {resultado.carModel.name}</small>
 										{/if}
@@ -177,7 +168,7 @@
 								<div class="vehiculoCont cont">
 									<span class="icon vehicle"></span>
 									<div>
-										{@render plate(resultado.vehicleId)}
+										<Plate vehicleId={resultado.vehicleId} />
 										{#if resultado.carModel}
 											<small>{resultado.carModel.carMake?.name} {resultado.carModel.name}</small>
 										{/if}
@@ -344,14 +335,6 @@
 				min-width: 7.5rem;
 				max-width: 7.5rem;
 				flex-grow: 1;
-
-				.vehicleId {
-					font-size: 0.9em;
-
-					span {
-						margin-left: 0.25rem;
-					}
-				}
 
 				> div {
 					display: grid;

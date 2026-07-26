@@ -14,7 +14,9 @@ export const load = async (event) => {
 		if (!client) {
 			throw error(500, 'Cliente no encontrado');
 		}
-		const vehicles = await findVehicles(userId, { clientId }).sort({ updatedAt: -1 }).populate({ path: 'carModel', populate: { path: 'carMake', select: 'name' }, select: 'name carMakeId' });
+		const vehicles = await findVehicles(userId, { clientId })
+			.sort({ updatedAt: -1 })
+			.populate({ path: 'carModel', populate: { path: 'carMake', select: 'name' }, select: 'name carMakeId' });
 		return { client: structuredClone(client), vehicles: structuredClone(vehicles) };
 	} catch (err) {
 		throw error(500, err.body || err.toString());

@@ -35,7 +35,7 @@
 	});
 </script>
 
-<Form action="?/upsertVehicle" isCreate={isCreate} --grid-columns="1fr [start] 1fr 1fr [end]">
+<Form action="?/upsertVehicle" {isCreate} --grid-columns="1fr [start] 1fr 1fr [end]">
 	<div class="formTitle">
 		<div>
 			{#if isCreate}

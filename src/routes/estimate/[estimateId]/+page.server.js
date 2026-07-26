@@ -16,10 +16,7 @@ export const load = async (event) => {
 	}
 
 	try {
-		const [estimate, user] = await Promise.all([
-			findEstimate(userId, { estimateId }).populate({ path: 'carModel', populate: { path: 'carMake' } }),
-			findUser(userId, { userId }),
-		]);
+		const [estimate, user] = await Promise.all([findEstimate(userId, { estimateId }).populate({ path: 'carModel', populate: { path: 'carMake' } }), findUser(userId, { userId })]);
 		if (!estimate) {
 			throw error(500, 'Presupuesto no encontrado');
 		}

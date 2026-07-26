@@ -5,6 +5,7 @@
 	import { windowState } from '$lib/shared.svelte.js';
 	import Card from '$lib/components/Card.svelte';
 	import Dialog from '$lib/components/Dialog.svelte';
+	import Plate from '$lib/components/vehicle/Plate.svelte';
 
 	let { vehicle } = $props();
 
@@ -14,13 +15,7 @@
 
 {#snippet vehicleContent()}
 	<article>
-		{#if vehicle?.vehicleId?.length === 6}
-			<h4 class="vehicleId">{vehicle.vehicleId.slice(0, 3)}<span>{vehicle.vehicleId.slice(3)}</span></h4>
-		{:else if vehicle?.vehicleId?.length === 7}
-			<h4 class="vehicleId">{vehicle.vehicleId.slice(0, 2)}<span>{vehicle.vehicleId.slice(2, 5)}</span><span>{vehicle.vehicleId.slice(-2)}</span></h4>
-		{:else}
-			<h4 class="vehicleId">{vehicle?.vehicleId}</h4>
-		{/if}
+		<Plate vehicleId={vehicle?.vehicleId} --font-size="1.1em" --text-align="center" />
 		<div class="subtitle">
 			{#if vehicle?.carModel}
 				<h6>{vehicle.carModel.carMake?.name} {vehicle.carModel.name}</h6>
@@ -82,15 +77,6 @@
 		grid-template-columns: 5.75rem 1fr auto;
 		gap: 1rem;
 		align-items: center;
-
-		.vehicleId {
-			text-align: center;
-			font-size: 1.1em;
-
-			span {
-				margin-left: 0.25rem;
-			}
-		}
 
 		.subtitle {
 			display: grid;

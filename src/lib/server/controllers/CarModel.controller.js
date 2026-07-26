@@ -13,14 +13,14 @@ async function getNewId(userId) {
 	return String(max);
 }
 
-export function findCarModel(userId, filters) {
+export function findCarModel(userId, filters, projection = { __v: 0 }) {
 	const CarModel = getModel(userId, 'CarModel');
-	return CarModel.findOne(filters, { __v: 0, _id: 0 }).lean();
+	return CarModel.findOne(filters, { ...projection, _id: 0 }).lean();
 }
 
-export function findCarModels(userId, filters) {
+export function findCarModels(userId, filters, projection = { __v: 0 }) {
 	const CarModel = getModel(userId, 'CarModel');
-	return CarModel.find(filters, { __v: 0, _id: 0 }).lean();
+	return CarModel.find(filters, { ...projection, _id: 0 }).lean();
 }
 
 export async function createCarModel(userId, carModel) {

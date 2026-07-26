@@ -1,17 +1,20 @@
 import mongoose from 'mongoose';
 
-const EstimateSchema = mongoose.Schema({
-	estimateId: String,
-	vehicleId: String,
-	carModelId: String,
-	km: Number,
-	description: String,
-	labor: Number,
-	parts: { type: Array, default: [] },
-	email: String
-}, {
-	timestamps: true
-});
+const EstimateSchema = mongoose.Schema(
+	{
+		estimateId: String,
+		vehicleId: String,
+		carModelId: String,
+		km: Number,
+		description: String,
+		labor: Number,
+		parts: { type: Array, default: [] },
+		email: String,
+	},
+	{
+		timestamps: true,
+	}
+);
 
 EstimateSchema.index({ estimateId: 1 });
 EstimateSchema.index({ vehicleId: 1 });
@@ -24,7 +27,7 @@ EstimateSchema.virtual('carModel', {
 	ref: 'CarModel',
 	localField: 'carModelId',
 	foreignField: 'carModelId',
-	justOne: true
+	justOne: true,
 });
 
 export default EstimateSchema;

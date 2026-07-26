@@ -19,14 +19,14 @@ async function getNewId(userId) {
 	return String(max);
 }
 
-export function findEstimate(userId, filters) {
+export function findEstimate(userId, filters, projection = { __v: 0 }) {
 	const Estimate = getModel(userId, 'Estimate');
-	return Estimate.findOne(filters, { __v: 0, _id: 0 }).lean();
+	return Estimate.findOne(filters, { ...projection, _id: 0 }).lean();
 }
 
-export function findEstimates(userId, filters) {
+export function findEstimates(userId, filters, projection = { __v: 0 }) {
 	const Estimate = getModel(userId, 'Estimate');
-	return Estimate.find(filters, { __v: 0, _id: 0 }).lean();
+	return Estimate.find(filters, { ...projection, _id: 0 }).lean();
 }
 
 export function upsertEstimate(userId, estimate) {

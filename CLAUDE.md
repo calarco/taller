@@ -56,6 +56,7 @@ Two-panel grid layout (2fr left, 3fr right). Components in `src/lib/components/`
 ## Environment variables
 
 Required in `.env`:
+
 ```
 JWT_KEY=
 MONGODB_URI=
