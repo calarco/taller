@@ -65,6 +65,7 @@
 		outline: 1px solid var(--primary);
 		background: var(--primary);
 		box-shadow: var(--shadow);
+		overflow: clip;
 		display: grid;
 		gap: 1px;
 		align-items: stretch;

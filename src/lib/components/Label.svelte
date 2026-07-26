@@ -83,6 +83,8 @@
 			top: 0;
 			bottom: 0;
 			left: -1px;
+			max-width: calc(100% + 1px);
+			overflow: clip;
 			border-radius: var(--border-radius);
 			background: var(--error);
 			display: grid;

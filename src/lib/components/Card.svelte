@@ -1,15 +1,8 @@
 <script>
-	let { isActive, isForm, children } = $props();
-
-	let element;
-	$effect(() => {
-		if (isForm && element?.getBoundingClientRect().y > 500) {
-			element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-		}
-	});
+	let { isActive, children } = $props();
 </script>
 
-<div bind:this={element} class={['section-card', { isActive, isForm }]}>
+<div class={['section-card', { isActive }]}>
 	<div>
 		{@render children()}
 	</div>
@@ -31,17 +24,6 @@
 
 			&:hover {
 				cursor: default;
-			}
-		}
-
-		&.isForm {
-			position: sticky;
-			top: 4.5rem;
-			z-index: 1500;
-			transition: z-index 0s;
-
-			&:not(:first-child)::after {
-				border-bottom: 1px solid rgba(0, 0, 0, 0);
 			}
 		}
 

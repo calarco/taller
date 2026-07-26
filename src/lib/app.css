@@ -80,7 +80,8 @@ body {
 	}
 
 	--bar-height: 3rem;
-	--scrollbar-width: 12px;
+	--scrollbar-width: 11px;
+	--scrollbar-track: light-dark(rgba(0, 0, 0, 0.08), hsla(202, 15%, 20%, 0.08));
 	--border-radius: 0.75rem;
 
 	@supports (corner-shape: superellipse(2)) {
@@ -99,16 +100,18 @@ body {
 	}
 	::-webkit-scrollbar-track {
 		border-radius: 0 var(--border-radius) var(--border-radius) 0;
-		background: light-dark(rgba(0, 0, 0, 0.08), hsla(202, 15%, 20%, 0.08));
+		background: var(--scrollbar-track);
 	}
 	::-webkit-scrollbar-thumb {
 		border-radius: 0 var(--border-radius) var(--border-radius) 0;
 		background: var(--on-background-disabled);
 	}
 
-	@supports not selector(::-webkit-scrollbar) {
-		scrollbar-width: thin;
-		scrollbar-color: var(--on-background-disabled) rgba(0, 0, 0, 0);
+	@supports (-moz-orient: inline) or (not selector(::-webkit-scrollbar)) {
+		&,
+		* {
+			scrollbar-color: var(--on-background-disabled) var(--scrollbar-track);
+		}
 	}
 
 	-webkit-font-smoothing: antialiased;

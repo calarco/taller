@@ -6,11 +6,13 @@
 	let { overlay, children, cards } = $props();
 </script>
 
-<section class={[{ notOverlay: !overlay, cards }]}>
-	{@render children()}
-	{#if cards}
-		<div class="padding"></div>
-	{/if}
+<section class={[{ cards }]}>
+	<div class={['scroller', { notOverlay: !overlay }]}>
+		{@render children()}
+		{#if cards}
+			<div class="padding"></div>
+		{/if}
+	</div>
 	{#if overlay}
 		<button
 			type="button"
@@ -37,47 +39,43 @@
 		min-height: 25rem;
 		max-height: 100%;
 		border-radius: var(--border-radius);
-		display: flex;
-		flex-direction: column;
-		gap: 1px;
-		border-right: var(--scrollbar-width) solid rgba(0, 0, 0, 0.08);
-		overflow-y: hidden;
 
 		&.cards {
 			background: var(--surface);
 			box-shadow: var(--shadow);
-			padding: 0 1rem;
-			gap: 0;
+
+			.scroller {
+				padding: 0 1rem;
+				gap: 0;
+			}
 
 			.padding {
 				min-height: 15rem;
 			}
 		}
-
-		&.notOverlay {
-			border-right: 0px solid rgba(0, 0, 0, 0.08);
-			overflow-y: scroll;
-			animation: 0.25s delay-overflow step-end;
-		}
 	}
 
-	@keyframes delay-overflow {
-		from {
-			border-right: var(--scrollbar-width) solid rgba(0, 0, 0, 0.08);
-			overflow-y: hidden;
+	.scroller {
+		height: 100%;
+		display: flex;
+		flex-direction: column;
+		gap: 1px;
+		border-radius: var(--border-radius);
+		scrollbar-gutter: stable;
+		overflow-y: hidden;
+
+		&.notOverlay {
+			overflow-y: scroll;
 		}
 	}
 
 	.overlay {
 		position: absolute;
 		z-index: 1001;
-		top: 0;
-		right: 0;
-		left: 0;
+		inset: 0;
 		padding: 0;
 		border-radius: 0;
 		background: var(--overlay);
 		backdrop-filter: blur(0.5rem);
-		height: 1000%;
 	}
 </style>
