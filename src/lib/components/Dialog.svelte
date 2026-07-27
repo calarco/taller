@@ -1,5 +1,6 @@
 <script>
 	import { enhance } from '$app/forms';
+	import { invalidateAll } from '$app/navigation';
 	import { windowState } from '$lib/shared.svelte.js';
 
 	let { dialog = $bindable(), title, actionText, action, children } = $props();
@@ -48,14 +49,17 @@
 				windowState.loading = true;
 				windowState.error = {};
 				return async ({ result, update }) => {
-					update({ reset: false });
-					windowState.loading = false;
 					if (result.type === 'success' || result.type === 'redirect') {
 						requestClose();
 					}
 					if (result.type === 'failure' && result.data) {
 						windowState.error = result.data;
 					}
+					await update({ reset: false });
+					if (result.type === 'redirect') {
+						await invalidateAll();
+					}
+					windowState.loading = false;
 				};
 			}}
 		>
