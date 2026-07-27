@@ -1,6 +1,6 @@
 <script>
 	import { fly, blur } from 'svelte/transition';
-	import { blurEnter, blurExit, panelBlurExit, panelFlyEnter, panelFlyExit } from '$lib/motion.js';
+	import { blurEnter, blurExit, panelBlurExit, panelFlyEnterX, panelFlyExitX } from '$lib/motion.js';
 	import { enhance } from '$app/forms';
 	import { windowState } from '$lib/shared.svelte.js';
 	import Section from '$lib/components/Section.svelte';
@@ -13,9 +13,9 @@
 	let dialog = $state();
 </script>
 
-<div class="panel" in:fly={panelFlyEnter} out:blur={panelBlurExit}>
+<div class="panel" in:fly={panelFlyEnterX} out:blur={panelBlurExit}>
 	{#key estimate.estimateId}
-		<div class="container" in:fly={panelFlyEnter} out:fly={panelFlyExit}>
+		<div class="container" in:fly={panelFlyEnterX} out:fly={panelFlyExitX}>
 			<div class="buttons">
 				<button type="button" onclick={() => dialog.showModal()} aria-label="borrar">
 					<span class="icon delete"></span>

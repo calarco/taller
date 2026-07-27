@@ -1,6 +1,6 @@
 <script>
 	import { fade } from 'svelte/transition';
-	import { panelEnter, panelExit } from '$lib/motion.js';
+	import { enter, exit } from '$lib/motion.js';
 	import { windowState } from '$lib/shared.svelte.js';
 
 	let { overlay, children, cards } = $props();
@@ -24,8 +24,8 @@
 				windowState.id = '';
 				windowState.data = {};
 			}}
-			in:fade={panelEnter}
-			out:fade={panelExit}
+			in:fade={enter}
+			out:fade={exit}
 		></button>
 	{/if}
 </section>

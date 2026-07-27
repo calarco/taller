@@ -1,6 +1,6 @@
 <script>
 	import { fly, blur } from 'svelte/transition';
-	import { panelBlurExit, panelFlyEnter, panelFlyExit } from '$lib/motion.js';
+	import { panelBlurExit, panelFlyEnterX, panelFlyExitX } from '$lib/motion.js';
 	import { windowState } from '$lib/shared.svelte.js';
 	import Section from '$lib/components/Section.svelte';
 	import VehicleForm from '$lib/components/vehicle/VehicleForm.svelte';
@@ -11,9 +11,9 @@
 	let isActive = $derived(windowState.form === 'vehicle');
 </script>
 
-<div class="panel" in:fly={panelFlyEnter} out:blur={panelBlurExit}>
+<div class="panel" in:fly={panelFlyEnterX} out:blur={panelBlurExit}>
 	{#key data.client.clientId}
-		<div in:fly={panelFlyEnter} out:fly={panelFlyExit}>
+		<div in:fly={panelFlyEnterX} out:fly={panelFlyExitX}>
 			<div class="vehiculos">
 				<div>
 					<Section overlay={windowState.form === 'vehicle' || windowState.form === 'client'} cards>

@@ -6,9 +6,7 @@ export const panelEnter = { duration: 300, easing: sineOut };
 export const panelExit = { duration: 250, easing: sineIn };
 
 export const flyEnter = { y: '-1rem', ...enter };
-export const panelFlyEnter = { y: '-1rem', ...panelEnter };
 export const panelFlyEnterX = { x: '-1rem', ...panelEnter };
-export const panelFlyExit = { y: '1rem', ...panelExit };
 export const panelFlyExitX = { x: '1rem', ...panelExit };
 
 export const blurEnter = { amount: 16, ...enter };

@@ -19,7 +19,7 @@
 		if (!dialog?.open || closing) return;
 		closing = true;
 		clearTimeout(closeTimer);
-		closeTimer = setTimeout(finishClose, 400);
+		closeTimer = setTimeout(finishClose, 300);
 	}
 
 	function onanimationend(event) {
@@ -134,9 +134,9 @@
 		filter: blur(0rem);
 		transform: none;
 		transition:
-			opacity var(--duration-panel-in) var(--ease-out),
-			filter var(--duration-panel-in) var(--ease-out),
-			transform var(--duration-panel-in) var(--ease-out);
+			opacity var(--duration-in) var(--ease-out),
+			filter var(--duration-in) var(--ease-out),
+			transform var(--duration-in) var(--ease-out);
 	}
 
 	@starting-style {
@@ -148,11 +148,11 @@
 	}
 
 	dialog.closing {
-		animation: dialog-out var(--duration-panel-out) var(--ease-in) forwards;
+		animation: dialog-out var(--duration-out) var(--ease-in) forwards;
 	}
 
 	dialog.closing::backdrop {
-		animation: backdrop-out var(--duration-panel-out) var(--ease-in) forwards;
+		animation: backdrop-out var(--duration-out) var(--ease-in) forwards;
 	}
 
 	@keyframes dialog-out {
@@ -177,7 +177,7 @@
 
 	dialog[open]::backdrop {
 		opacity: 1;
-		transition: opacity var(--duration-panel-in) var(--ease-out);
+		transition: opacity var(--duration-in) var(--ease-out);
 	}
 
 	@starting-style {

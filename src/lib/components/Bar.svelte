@@ -1,7 +1,7 @@
 <script>
 	import { fade, blur, fly } from 'svelte/transition';
 	import { sineIn } from 'svelte/easing';
-	import { blurEnter, blurExit, enter, exit, panelBlurExit, panelExit, panelFlyEnter, panelFlyEnterX } from '$lib/motion.js';
+	import { blurEnter, blurExit, enter, exit, panelBlurExit, panelExit, panelFlyEnterX } from '$lib/motion.js';
 	import { page } from '$app/state';
 	import { windowState } from '$lib/shared.svelte.js';
 	import Dialog from '$lib/components/Dialog.svelte';
@@ -27,7 +27,7 @@
 						<p>Turnos</p>
 					</div>
 				{:else}
-					<div in:fly={panelFlyEnter} out:blur={panelBlurExit}>
+					<div in:fly={panelFlyEnterX} out:blur={panelBlurExit}>
 						<a class="button" href="/" aria-label="cerrar">
 							<span class="icon back"></span>Cliente
 						</a>
@@ -64,7 +64,7 @@
 		<div>
 			<div class="titleCont">
 				{#if url[1] === 'estimate'}
-					<div in:fly={panelFlyEnter} out:blur={panelBlurExit}>
+					<div in:fly={panelFlyEnterX} out:blur={panelBlurExit}>
 						<a class="button" href="/" aria-label="cerrar">
 							<span class="icon back"></span>Presupuesto
 						</a>
