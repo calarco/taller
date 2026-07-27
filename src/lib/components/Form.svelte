@@ -1,6 +1,6 @@
 <script>
 	import { fly, blur } from 'svelte/transition';
-	import { sineIn, sineOut } from 'svelte/easing';
+	import { blurExit, flyEnter } from '$lib/motion.js';
 	import { enhance } from '$app/forms';
 	import { windowState } from '$lib/shared.svelte.js';
 
@@ -25,8 +25,8 @@
 			}
 		};
 	}}
-	in:fly={{ y: '-1rem', duration: 200, easing: sineOut }}
-	out:blur={{ amount: 32, duration: 150, easing: sineIn }}
+	in:fly={flyEnter}
+	out:blur={blurExit}
 >
 	{@render children()}
 	<div class="formButtons">
@@ -54,7 +54,7 @@
 	form {
 		pointer-events: auto;
 		position: absolute;
-		z-index: 1500;
+		z-index: var(--layer-form);
 		top: 0;
 		left: 0;
 		right: 0;

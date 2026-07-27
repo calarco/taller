@@ -1,6 +1,6 @@
 <script>
 	import { fade, fly, blur } from 'svelte/transition';
-	import { sineIn, sineOut } from 'svelte/easing';
+	import { blurExit, flyEnter, panelEnter, panelExit } from '$lib/motion.js';
 	import { enhance } from '$app/forms';
 	import Label from '$lib/components/Label.svelte';
 	import { windowState } from '$lib/shared.svelte';
@@ -8,7 +8,7 @@
 	let hide = $state(false);
 </script>
 
-<div class="container" in:fade={{ duration: 300, easing: sineOut }} out:fade={{ duration: 250, easing: sineIn }}>
+<div class="container" in:fade={panelEnter} out:fade={panelExit}>
 	{#if !hide}
 		<form
 			method="POST"
@@ -26,8 +26,8 @@
 					}
 				};
 			}}
-			in:fly={{ y: '-1rem', duration: 200, easing: sineOut }}
-			out:blur={{ amount: 32, duration: 150, easing: sineIn }}
+			in:fly={flyEnter}
+			out:blur={blurExit}
 		>
 			<Label title="Usuario" error={windowState.error?.userIdError}>
 				<input type="text" name="userId" autoComplete="username" />
@@ -49,7 +49,7 @@
 		left: 0;
 		right: 0;
 		bottom: 0;
-		z-index: 2000;
+		z-index: var(--layer-cover);
 		display: grid;
 		justify-items: center;
 		align-items: center;

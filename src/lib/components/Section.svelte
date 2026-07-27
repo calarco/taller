@@ -1,6 +1,6 @@
 <script>
 	import { fade } from 'svelte/transition';
-	import { sineIn, sineOut } from 'svelte/easing';
+	import { panelEnter, panelExit } from '$lib/motion.js';
 	import { windowState } from '$lib/shared.svelte.js';
 
 	let { overlay, children, cards } = $props();
@@ -24,15 +24,14 @@
 				windowState.id = '';
 				windowState.data = {};
 			}}
-			in:fade={{ duration: 300, easing: sineOut }}
-			out:fade={{ duration: 250, easing: sineIn }}
+			in:fade={panelEnter}
+			out:fade={panelExit}
 		></button>
 	{/if}
 </section>
 
 <style>
 	section {
-		content-visibility: auto;
 		position: relative;
 		width: 100%;
 		height: 100%;
@@ -71,10 +70,10 @@
 
 	.overlay {
 		position: absolute;
-		z-index: 1001;
+		z-index: var(--layer-scrim);
 		inset: 0;
 		padding: 0;
-		border-radius: 0;
+		border-radius: var(--border-radius);
 		background: var(--overlay);
 		backdrop-filter: blur(0.5rem);
 	}

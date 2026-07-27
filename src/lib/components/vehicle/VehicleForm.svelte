@@ -1,6 +1,4 @@
 <script>
-	import { blur } from 'svelte/transition';
-	import { sineIn, sineOut } from 'svelte/easing';
 	import { page } from '$app/state';
 	import { windowState } from '$lib/shared.svelte.js';
 	import { createSearch } from '$lib/search.svelte.js';
@@ -21,9 +19,9 @@
 	<div class="formTitle">
 		<div>
 			{#if isCreate}
-				<span class="icon create" in:blur={{ amount: 16, duration: 200, easing: sineOut }} out:blur={{ amount: 16, duration: 150, easing: sineIn }}> </span>
+				<span class="icon create"> </span>
 			{:else}
-				<span class="icon edit" in:blur={{ amount: 16, duration: 200, easing: sineOut }} out:blur={{ amount: 16, duration: 150, easing: sineIn }}> </span>
+				<span class="icon edit"> </span>
 			{/if}
 		</div>
 		<span>Vehículo</span>

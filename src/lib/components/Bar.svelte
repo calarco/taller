@@ -1,6 +1,7 @@
 <script>
 	import { fade, blur, fly } from 'svelte/transition';
-	import { sineIn, sineOut } from 'svelte/easing';
+	import { sineIn } from 'svelte/easing';
+	import { blurEnter, blurExit, enter, exit, panelBlurExit, panelExit, panelFlyEnter, panelFlyEnterX } from '$lib/motion.js';
 	import { page } from '$app/state';
 	import { windowState } from '$lib/shared.svelte.js';
 	import Dialog from '$lib/components/Dialog.svelte';
@@ -22,11 +23,11 @@
 		<div>
 			<div class="titleCont">
 				{#if !url[1] || url[1] === 'estimate'}
-					<div in:blur={{ amount: 16, duration: 200, easing: sineOut }} out:blur={{ amount: 16, duration: 150, easing: sineIn }}>
+					<div in:blur={blurEnter} out:blur={blurExit}>
 						<p>Turnos</p>
 					</div>
 				{:else}
-					<div in:fly={{ y: '-1rem', duration: 300, easing: sineOut }} out:blur={{ amount: 32, duration: 250, easing: sineIn }}>
+					<div in:fly={panelFlyEnter} out:blur={panelBlurExit}>
 						<a class="button" href="/" aria-label="cerrar">
 							<span class="icon back"></span>Cliente
 						</a>
@@ -48,11 +49,11 @@
 				>
 					<div>
 						{#if windowState.form === 'client' && !windowState.id}
-							<span class="icon create" in:blur={{ amount: 8, duration: 200, easing: sineOut }} out:blur={{ amount: 8, duration: 150, easing: sineIn }}> </span>
+							<span class="icon create" in:blur={{ amount: 8, ...enter }} out:blur={{ amount: 8, ...exit }}> </span>
 						{:else if windowState.form === 'client'}
-							<span class="icon edit" in:blur={{ amount: 8, duration: 200, easing: sineOut }} out:blur={{ amount: 8, duration: 150, easing: sineIn }}> </span>
+							<span class="icon edit" in:blur={{ amount: 8, ...enter }} out:blur={{ amount: 8, ...exit }}> </span>
 						{:else}
-							<span class="icon client" in:blur={{ amount: 8, duration: 200, easing: sineOut }} out:blur={{ amount: 8, duration: 150, easing: sineIn }}> </span>
+							<span class="icon client" in:blur={{ amount: 8, ...enter }} out:blur={{ amount: 8, ...exit }}> </span>
 						{/if}
 					</div>
 					<span>Cliente</span>
@@ -63,19 +64,19 @@
 		<div>
 			<div class="titleCont">
 				{#if url[1] === 'estimate'}
-					<div in:fly={{ y: '-1rem', duration: 300, easing: sineOut }} out:blur={{ amount: 32, duration: 250, easing: sineIn }}>
+					<div in:fly={panelFlyEnter} out:blur={panelBlurExit}>
 						<a class="button" href="/" aria-label="cerrar">
 							<span class="icon back"></span>Presupuesto
 						</a>
 					</div>
 				{:else if url[2]}
-					<div in:fly={{ x: '-1rem', duration: 300, easing: sineOut }} out:blur={{ amount: 32, duration: 900, easing: sineIn }}>
+					<div in:fly={panelFlyEnterX} out:blur={panelBlurExit}>
 						<a class="button" href={`/${url[1]}`} aria-label="cerrar">
 							<span class="icon back"></span>Reparaciones
 						</a>
 					</div>
 				{:else}
-					<div in:blur={{ amount: 16, duration: 200, easing: sineOut }} out:blur={{ amount: 16, duration: 150, easing: sineIn }}>
+					<div in:blur={blurEnter} out:blur={blurExit}>
 						<p>Recientes</p>
 					</div>
 				{/if}
@@ -95,11 +96,11 @@
 				>
 					<div>
 						{#if windowState.form === 'estimate' && !windowState.id}
-							<span class="icon create" in:blur={{ amount: 16, duration: 200, easing: sineOut }} out:blur={{ amount: 16, duration: 150, easing: sineIn }}> </span>
+							<span class="icon create" in:blur={blurEnter} out:blur={blurExit}> </span>
 						{:else if windowState.form === 'estimate'}
-							<span class="icon edit" in:blur={{ amount: 16, duration: 200, easing: sineOut }} out:blur={{ amount: 16, duration: 150, easing: sineIn }}> </span>
+							<span class="icon edit" in:blur={blurEnter} out:blur={blurExit}> </span>
 						{:else}
-							<span class="icon estimate" in:blur={{ amount: 16, duration: 200, easing: sineOut }} out:blur={{ amount: 16, duration: 150, easing: sineIn }}> </span>
+							<span class="icon estimate" in:blur={blurEnter} out:blur={blurExit}> </span>
 						{/if}
 					</div>
 					<span>Presupuesto</span>
@@ -135,7 +136,7 @@
 </Dialog>
 <Dialog bind:dialog={logoutDialog} title={`¿Cerrar la sesión de ${user.name || user.userId}?`} action="?/logout" actionText="Cerrar sesión" />
 {#if windowState.loading}
-	<div class="loading" in:fade={{ duration: 1800, easing: sineIn }} out:fade={{ duration: 250, easing: sineIn }}>
+	<div class="loading" in:fade={{ duration: 1800, easing: sineIn }} out:fade={panelExit}>
 		<div></div>
 		<div></div>
 	</div>
@@ -143,7 +144,7 @@
 
 <style>
 	.bar {
-		z-index: 10;
+		z-index: var(--layer-bar);
 		width: 100vw;
 		display: grid;
 		justify-items: center;
@@ -258,39 +259,33 @@
 		}
 	}
 
-	@keyframes loading {
+	@keyframes sweep-a {
 		0% {
-			opacity: 0.2;
+			transform: translateX(-100%);
 		}
-		50% {
-			opacity: 0.7;
+		66% {
+			transform: translateX(166.667%);
 		}
 		100% {
-			opacity: 0.2;
+			transform: translateX(166.667%);
 		}
 	}
 
-	@keyframes l16 {
+	@keyframes sweep-b {
 		0% {
-			background-position:
-				-150% 0,
-				-150% 0;
+			transform: translateX(-100%);
 		}
 		66% {
-			background-position:
-				250% 0,
-				-150% 0;
+			transform: translateX(-100%);
 		}
 		100% {
-			background-position:
-				250% 0,
-				250% 0;
+			transform: translateX(166.667%);
 		}
 	}
 
 	.loading {
 		position: absolute;
-		z-index: 2100;
+		z-index: var(--layer-loading);
 		top: 0;
 		bottom: 0;
 		left: 0;
@@ -302,17 +297,36 @@
 		> div {
 			position: absolute;
 			width: 100%;
-			--c: no-repeat linear-gradient(var(--secondary) 0 0);
-			background: var(--c), var(--c);
-			background-size: 60% 100%;
-			animation: l16 3s ease-in-out infinite;
+			overflow: clip;
+
+			&::before,
+			&::after {
+				content: '';
+				position: absolute;
+				top: 0;
+				bottom: 0;
+				left: 0;
+				width: 60%;
+				background: var(--secondary);
+				will-change: transform;
+				animation: sweep-a 3s ease-in-out infinite;
+			}
+
+			&::after {
+				animation-name: sweep-b;
+			}
 		}
 
 		> div:first-child {
 			top: -5rem;
 			height: 6rem;
-			filter: blur(1rem);
-			--c: no-repeat linear-gradient(var(--secondary-variant) 0 0);
+			overflow-clip-margin: 1rem;
+
+			&::before,
+			&::after {
+				background: var(--secondary-variant);
+				filter: blur(1rem);
+			}
 		}
 
 		> div:last-child {

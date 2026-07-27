@@ -67,7 +67,7 @@
 
 	.month {
 		position: sticky;
-		z-index: 900;
+		z-index: var(--layer-sticky);
 		top: -1px;
 		margin-top: -1px;
 		width: 100%;

@@ -14,7 +14,7 @@
 			position: sticky;
 			top: 4.5rem;
 			bottom: 0;
-			z-index: 1000;
+			z-index: var(--layer-card);
 
 			> div {
 				background: var(--primary-variant);
@@ -32,13 +32,13 @@
 			border-radius: var(--border-radius);
 			outline: 1px solid rgba(0, 0, 0, 0);
 			transition:
-				outline 0.2s ease-in,
-				background 0.15s ease-in,
-				z-index 0.25s step-end;
+				outline-color var(--duration-in) var(--ease-out),
+				background-color var(--duration-out) var(--ease-out),
+				z-index var(--duration-panel-out) step-end;
 		}
 
 		&:not(.isActive) > div:hover {
-			transition: background 0s;
+			transition: none;
 			cursor: pointer;
 			background: var(--highlight);
 		}

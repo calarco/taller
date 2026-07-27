@@ -15,6 +15,17 @@ html {
 	scroll-behavior: smooth;
 }
 
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+		scroll-behavior: auto !important;
+	}
+}
+
 html,
 body {
 	height: 100dvh;
@@ -78,6 +89,26 @@ body {
 		--shadow: 0 0.5px 0.7px rgba(0, 0, 0, 0.079), 0 1.6px 2.5px rgba(0, 0, 0, 0.059), 5px 7px 11px hsla(202, 0%, 0%, 0.1), -5px -5px 10px hsla(202, 100%, 50%, 0.01);
 		--shadow-variant: 0 0.5px 0.7px rgba(0, 0, 0, 0.079), 0 1.6px 2.5px rgba(0, 0, 0, 0.059), 5px 7px 11px hsla(202, 0%, 0%, 0.03), -5px -5px 10px hsla(202, 100%, 50%, 0.01);
 	}
+
+	--ease-in: cubic-bezier(0.47, 0, 0.745, 0.715);
+	--ease-out: cubic-bezier(0.39, 0.575, 0.565, 1);
+
+	--duration-fast: 0.1s;
+	--duration-in: 0.2s;
+	--duration-out: 0.15s;
+	--duration-panel-in: 0.3s;
+	--duration-panel-out: 0.25s;
+
+	--layer-sticky: 10;
+	--layer-card: 20;
+	--layer-scrim: 30;
+	--layer-form: 40;
+	--layer-error: 50;
+
+	--layer-bar: 100;
+	--layer-cover: 200;
+	--layer-loading: 300;
+	--layer-print: 400;
 
 	--bar-height: 3rem;
 	--scrollbar-width: 11px;
@@ -259,13 +290,17 @@ textarea {
 	outline: 1px solid var(--border-variant);
 	font: var(--subhead1);
 	color: var(--on-background);
-	transition: 0.1s ease-in;
+	transition:
+		background-color var(--duration-fast) var(--ease-out),
+		outline-color var(--duration-fast) var(--ease-out),
+		box-shadow var(--duration-fast) var(--ease-out),
+		color var(--duration-fast) var(--ease-out);
 
 	&:is(:-webkit-autofill, :autofill):hover,
 	&:hover {
 		border: none;
 		background: var(--highlight);
-		transition: 0s;
+		transition: none;
 	}
 
 	&:is(:-webkit-autofill, :autofill):focus,
@@ -275,7 +310,11 @@ textarea {
 		background: var(--primary-variant);
 		box-shadow: var(--shadow-variant);
 		color: var(--on-background);
-		transition: 0.15s ease-out;
+		transition:
+			background-color var(--duration-out) var(--ease-out),
+			outline-color var(--duration-out) var(--ease-out),
+			box-shadow var(--duration-out) var(--ease-out),
+			color var(--duration-out) var(--ease-out);
 	}
 
 	&:is(:-webkit-autofill, :autofill) {
@@ -314,11 +353,6 @@ input[type='number'] {
 		top: 0;
 		bottom: 0;
 		right: 0;
-		transition: 0.1s ease-in;
-	}
-
-	&:hover::-webkit-inner-spin-button {
-		transition: 0.15s ease-in;
 	}
 }
 
@@ -350,23 +384,26 @@ select {
 	outline: 1px solid var(--border-variant);
 	font: var(--subhead1);
 	color: var(--on-background);
-	transition: 0.15s ease-in;
+	transition:
+		background-color var(--duration-fast) var(--ease-out),
+		outline-color var(--duration-fast) var(--ease-out),
+		box-shadow var(--duration-fast) var(--ease-out);
 
 	&::picker-icon {
 		padding: 0 6px;
 		transform: scale(0.8);
 		color: var(--on-background-disabled);
-		transition: 0.15s ease-in;
+		transition: rotate var(--duration-out) var(--ease-in);
 	}
 
 	&:open::picker-icon {
 		rotate: 180deg;
-		transition: 0.2s ease-out;
+		transition: rotate var(--duration-in) var(--ease-out);
 	}
 
 	&:not(:disabled):hover {
 		cursor: pointer;
-		transition: 0s;
+		transition: none;
 	}
 
 	&:not(:disabled):not(:focus):hover {
@@ -422,21 +459,22 @@ select,
 	border: none;
 	outline: 1px solid var(--border-variant);
 	opacity: 0;
+	transform: translateY(-1rem);
 	transition:
-		opacity 0.2s ease-out,
-		transform 0.2s ease-out,
-		overlay 0.2s ease-out allow-discrete,
-		display 0.2s ease-out allow-discrete;
+		opacity var(--duration-out) var(--ease-in),
+		transform var(--duration-out) var(--ease-in),
+		overlay var(--duration-out) var(--ease-in) allow-discrete,
+		display var(--duration-out) var(--ease-in) allow-discrete;
 }
 
 ::picker(select):popover-open {
 	opacity: 1;
-	transform: initial;
+	transform: none;
 	transition:
-		opacity 0.15s ease-in,
-		transform 0.15s ease-in,
-		overlay 0.15s ease-in allow-discrete,
-		display 0.15s ease-in allow-discrete;
+		opacity var(--duration-in) var(--ease-out),
+		transform var(--duration-in) var(--ease-out),
+		overlay var(--duration-in) var(--ease-out) allow-discrete,
+		display var(--duration-in) var(--ease-out) allow-discrete;
 }
 
 @starting-style {
@@ -449,12 +487,14 @@ select,
 option {
 	color: var(--on-background);
 	padding: 0.25rem 0.5rem;
-	transition: 0.1s ease-in;
+	transition:
+		background-color var(--duration-fast) var(--ease-out),
+		border-top-color var(--duration-fast) var(--ease-out);
 
 	&:hover {
 		cursor: pointer;
 		background: var(--highlight);
-		transition: 0.15s ease-out;
+		transition: none;
 	}
 
 	&:checked {
@@ -522,7 +562,9 @@ input[type='submit'] {
 	justify-content: center;
 	font: var(--body2);
 	color: var(--primary);
-	transition: 0.1s ease-in;
+	transition:
+		background-color var(--duration-fast) var(--ease-out),
+		color var(--duration-fast) var(--ease-out);
 
 	&:not(.createButton, .overlay):focus-visible {
 		background: var(--highlight);
@@ -531,7 +573,7 @@ input[type='submit'] {
 	&:not(.overlay):hover {
 		cursor: pointer;
 		background: var(--highlight);
-		transition: 0s;
+		transition: none;
 	}
 
 	&.createButton:not(.isActive):hover {
@@ -658,6 +700,7 @@ a {
 
 .panel {
 	position: relative;
+	isolation: isolate;
 	border-radius: var(--border-radius);
 	display: grid;
 }
@@ -686,7 +729,10 @@ a {
 	box-shadow: var(--shadow-variant);
 	display: flex;
 	gap: 0.5rem;
-	transition: 0.1s ease-in;
+	transition:
+		outline-color var(--duration-fast) var(--ease-out),
+		background-color var(--duration-fast) var(--ease-out),
+		color var(--duration-fast) var(--ease-out);
 
 	&.isActive {
 		outline: 1px solid var(--primary);
@@ -700,7 +746,7 @@ a {
 
 	&:not(.isActive):hover {
 		outline: 1px solid var(--secondary);
-		transition: 0s;
+		transition: none;
 	}
 
 	&.isActive:hover {

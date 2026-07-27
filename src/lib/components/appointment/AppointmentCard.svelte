@@ -1,6 +1,6 @@
 <script>
 	import { slide } from 'svelte/transition';
-	import { sineIn, sineOut } from 'svelte/easing';
+	import { slideEnter, slideExit } from '$lib/motion.js';
 	import Dialog from '$lib/components/Dialog.svelte';
 
 	let { appointment } = $props();
@@ -18,7 +18,7 @@
 	</article>
 {/snippet}
 
-<div class="container" in:slide={{ axis: 'y', duration: 200, easing: sineOut }} out:slide={{ axis: 'y', duration: 150, easing: sineIn }}>
+<div class="container" in:slide={slideEnter} out:slide={slideExit}>
 	{@render appointmentContent()}
 	<button type="button" onclick={() => dialog.showModal()} aria-label="borrar">
 		<span class="icon delete"></span>

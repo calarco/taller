@@ -1,6 +1,6 @@
 <script>
 	import { slide } from 'svelte/transition';
-	import { sineIn, sineOut } from 'svelte/easing';
+	import { slideEnter, slideExit } from '$lib/motion.js';
 	import { page } from '$app/state';
 	import { windowState } from '$lib/shared.svelte.js';
 	import Form from '$lib/components/Form.svelte';
@@ -42,7 +42,7 @@
 		<div class="parts">
 			<ul>
 				{#each parts as part (part.name)}
-					<li in:slide={{ axis: 'y', duration: 150, easing: sineOut }} out:slide={{ axis: 'y', duration: 150, easing: sineIn }}>
+					<li in:slide={slideEnter} out:slide={slideExit}>
 						<div>
 							<p>{part.amount}</p>
 						</div>
@@ -59,7 +59,7 @@
 					</li>
 				{/each}
 				{#if !parts.length}
-					<li in:slide={{ axis: 'y', duration: 150, easing: sineIn }} out:slide={{ axis: 'y', duration: 150, easing: sineOut }}>
+					<li in:slide={slideEnter} out:slide={slideExit}>
 						<h5 class="empty">Sin repuestos</h5>
 					</li>
 				{/if}

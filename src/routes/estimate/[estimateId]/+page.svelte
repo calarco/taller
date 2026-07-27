@@ -1,6 +1,6 @@
 <script>
 	import { fly, blur } from 'svelte/transition';
-	import { sineIn, sineOut } from 'svelte/easing';
+	import { blurEnter, blurExit, panelBlurExit, panelFlyEnter, panelFlyExit } from '$lib/motion.js';
 	import { enhance } from '$app/forms';
 	import { windowState } from '$lib/shared.svelte.js';
 	import Section from '$lib/components/Section.svelte';
@@ -13,9 +13,9 @@
 	let dialog = $state();
 </script>
 
-<div class="panel" in:fly={{ y: '-1rem', duration: 300, easing: sineOut }} out:blur={{ amount: 32, duration: 250, easing: sineIn }}>
+<div class="panel" in:fly={panelFlyEnter} out:blur={panelBlurExit}>
 	{#key estimate.estimateId}
-		<div class="container" in:fly={{ y: '-1rem', duration: 300, easing: sineOut }} out:blur={{ amount: 32, duration: 900, easing: sineIn }}>
+		<div class="container" in:fly={panelFlyEnter} out:fly={panelFlyExit}>
 			<div class="buttons">
 				<button type="button" onclick={() => dialog.showModal()} aria-label="borrar">
 					<span class="icon delete"></span>
@@ -63,9 +63,9 @@
 					<input type="email" name="email" placeholder="Dirección de correo" value={estimate.email || ''} />
 					<button type="submit" aria-label="editar">
 						{#if estimate.email}
-							<span class="icon mailok" in:blur={{ amount: 16, duration: 200, easing: sineOut }} out:blur={{ amount: 16, duration: 150, easing: sineIn }}></span>
+							<span class="icon mailok" in:blur={blurEnter} out:blur={blurExit}></span>
 						{:else}
-							<span class="icon mailsend" in:blur={{ amount: 16, duration: 200, easing: sineOut }} out:blur={{ amount: 16, duration: 150, easing: sineIn }}></span>
+							<span class="icon mailsend" in:blur={blurEnter} out:blur={blurExit}></span>
 						{/if}
 					</button>
 				</form>
@@ -104,7 +104,6 @@
 	.container {
 		pointer-events: auto;
 		position: absolute;
-		z-index: 600;
 		top: 0;
 		right: 0;
 		bottom: 0;

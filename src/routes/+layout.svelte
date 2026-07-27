@@ -109,7 +109,7 @@
 		display: none;
 		pointer-events: none;
 		position: absolute;
-		z-index: 9000;
+		z-index: var(--layer-print);
 		left: 0;
 		right: 0;
 		top: 0;

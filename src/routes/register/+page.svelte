@@ -82,7 +82,6 @@
 		overflow: hidden;
 		background: var(--surface);
 		display: flex;
-		transition: 0.25s ease-out;
 
 		button {
 			width: 100%;

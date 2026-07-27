@@ -1,6 +1,6 @@
 <script>
 	import { slide } from 'svelte/transition';
-	import { sineIn, sineOut } from 'svelte/easing';
+	import { slideEnter, slideExit } from '$lib/motion.js';
 	import { page } from '$app/state';
 	import { windowState } from '$lib/shared.svelte.js';
 	import Card from '$lib/components/Card.svelte';
@@ -45,7 +45,7 @@
 		{@render vehicleContent()}
 	</a>
 	{#if isActive}
-		<div class="cardButtons" in:slide={{ axis: 'y', duration: 200, easing: sineOut }} out:slide={{ axis: 'y', duration: 150, easing: sineIn }}>
+		<div class="cardButtons" in:slide={slideEnter} out:slide={slideExit}>
 			<button type="button" onclick={() => dialog.showModal()} aria-label="borrar">
 				<span class="icon delete"></span>
 			</button>

@@ -1,6 +1,6 @@
 <script>
 	import { fade, fly } from 'svelte/transition';
-	import { sineIn, sineOut } from 'svelte/easing';
+	import { enter, exit, flyEnter } from '$lib/motion.js';
 	import { enhance } from '$app/forms';
 	import { page } from '$app/state';
 	import { windowState } from '$lib/shared.svelte.js';
@@ -63,8 +63,8 @@
 							}
 						};
 					}}
-					in:fly={{ y: '-1rem', duration: 200, easing: sineIn }}
-					out:fly={{ y: '-1rem', duration: 150, easing: sineOut }}
+					in:fly={flyEnter}
+					out:fly={{ y: '-1rem', ...exit }}
 				>
 					<input type="text" name="name" placeholder="-" autoComplete="off" use:focus />
 					<button type="submit" aria-label="crear">
@@ -72,7 +72,7 @@
 					</button>
 				</form>
 			{:else}
-				<select name="carMakeId" placeholder="-" autoComplete="off" bind:value={carMakeId} in:fade={{ duration: 200, easing: sineIn }} out:fade={{ duration: 150, easing: sineOut }}>
+				<select name="carMakeId" placeholder="-" autoComplete="off" bind:value={carMakeId} in:fade={enter} out:fade={exit}>
 					{#each carMakes as carMake (carMake.carMakeId)}
 						<option value={carMake.carMakeId}>
 							{carMake.name}
@@ -115,8 +115,8 @@
 							windowState.loading = false;
 						};
 					}}
-					in:fly={{ y: '-1rem', duration: 200, easing: sineOut }}
-					out:fly={{ y: '-1rem', duration: 150, easing: sineIn }}
+					in:fly={flyEnter}
+					out:fly={{ y: '-1rem', ...exit }}
 				>
 					<input type="hidden" name="carMakeId" value={carMakeId} />
 					<input type="text" name="name" placeholder="-" autoComplete="off" disabled={createMake} bind:value={carModelName} use:focus />
@@ -125,15 +125,7 @@
 					</button>
 				</form>
 			{:else}
-				<select
-					name="carModelId"
-					placeholder="-"
-					autoComplete="off"
-					disabled={!carMakeId}
-					bind:value={carModelId}
-					in:fade={{ duration: 200, easing: sineOut }}
-					out:fade={{ duration: 150, easing: sineIn }}
-				>
+				<select name="carModelId" placeholder="-" autoComplete="off" disabled={!carMakeId} bind:value={carModelId} in:fade={enter} out:fade={exit}>
 					{#each carModels as carModel (carModel.carModelId)}
 						<option value={carModel.carModelId}>
 							{carModel.name}

@@ -3,9 +3,42 @@
 	import { windowState } from '$lib/shared.svelte.js';
 
 	let { dialog = $bindable(), title, actionText, action, children } = $props();
+
+	let closing = $state(false);
+	let closeTimer;
+
+	function finishClose() {
+		clearTimeout(closeTimer);
+		if (dialog?.open) {
+			dialog.close();
+		}
+		closing = false;
+	}
+
+	function requestClose() {
+		if (!dialog?.open || closing) return;
+		closing = true;
+		clearTimeout(closeTimer);
+		closeTimer = setTimeout(finishClose, 400);
+	}
+
+	function onanimationend(event) {
+		if (event.target === dialog && closing) {
+			finishClose();
+		}
+	}
 </script>
 
-<dialog bind:this={dialog} closedby="any" class={[{ save: actionText === 'Guardar' }]}>
+<dialog
+	bind:this={dialog}
+	closedby="any"
+	class={[{ save: actionText === 'Guardar' }, { closing }]}
+	oncancel={(e) => {
+		e.preventDefault();
+		requestClose();
+	}}
+	{onanimationend}
+>
 	<div>
 		<h4>{title}</h4>
 		<form
@@ -18,7 +51,7 @@
 					update({ reset: false });
 					windowState.loading = false;
 					if (result.type === 'success' || result.type === 'redirect') {
-						dialog.close();
+						requestClose();
 					}
 					if (result.type === 'failure' && result.data) {
 						windowState.error = result.data;
@@ -30,7 +63,7 @@
 				{@render children()}
 			{/if}
 			<div class="dialogButtons">
-				<button type="button" onclick={() => dialog.close()}>Cancelar</button>
+				<button type="button" onclick={requestClose}>Cancelar</button>
 				<button type="submit">{actionText || 'Borrar'}</button>
 			</div>
 		</form>
@@ -48,13 +81,8 @@
 		background: var(--surface);
 		box-shadow: var(--shadow);
 		opacity: 0;
-		filter: blur(2rem);
-		transition:
-			opacity 0.2s ease-in,
-			filter 0.2s ease-in,
-			transform 0.2s ease-in,
-			overlay 0.2s ease-in allow-discrete,
-			display 0.2s ease-in allow-discrete;
+		filter: blur(1rem);
+		transform: translateY(-1rem);
 
 		> div {
 			display: grid;
@@ -101,45 +129,60 @@
 		}
 	}
 
-	dialog:open {
+	dialog[open] {
 		opacity: 1;
 		filter: blur(0rem);
-		transform: initial;
+		transform: none;
 		transition:
-			opacity 0.3s ease-out,
-			filter 0.3s ease-out,
-			transform 0.3s ease-out,
-			overlay 0.3s ease-out allow-discrete,
-			display 0.3s ease-out allow-discrete;
+			opacity var(--duration-panel-in) var(--ease-out),
+			filter var(--duration-panel-in) var(--ease-out),
+			transform var(--duration-panel-in) var(--ease-out);
 	}
 
 	@starting-style {
-		dialog:open {
+		dialog[open] {
 			opacity: 0;
+			filter: blur(1rem);
 			transform: translateY(-1rem);
 		}
 	}
 
-	dialog::backdrop {
-		background-color: rgb(0 0 0 / 0%);
-		transition:
-			display 0.2s ease-in allow-discrete,
-			overlay 0.2s ease-in allow-discrete,
-			background-color 0.2s;
+	dialog.closing {
+		animation: dialog-out var(--duration-panel-out) var(--ease-in) forwards;
 	}
 
-	dialog:open::backdrop {
+	dialog.closing::backdrop {
+		animation: backdrop-out var(--duration-panel-out) var(--ease-in) forwards;
+	}
+
+	@keyframes dialog-out {
+		to {
+			opacity: 0;
+			filter: blur(1rem);
+			transform: translateY(-1rem);
+		}
+	}
+
+	@keyframes backdrop-out {
+		to {
+			opacity: 0;
+		}
+	}
+
+	dialog::backdrop {
 		background-color: var(--overlay);
 		backdrop-filter: blur(0.5rem);
-		transition:
-			display 0.3s ease-out allow-discrete,
-			overlay 0.3s ease-out allow-discrete,
-			background-color 0.3s;
+		opacity: 0;
+	}
+
+	dialog[open]::backdrop {
+		opacity: 1;
+		transition: opacity var(--duration-panel-in) var(--ease-out);
 	}
 
 	@starting-style {
-		dialog:open::backdrop {
-			background-color: rgb(0 0 0 / 0%);
+		dialog[open]::backdrop {
+			opacity: 0;
 		}
 	}
 </style>

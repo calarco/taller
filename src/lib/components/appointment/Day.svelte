@@ -18,7 +18,8 @@
 	let element;
 	$effect(() => {
 		if (isCreate && element?.getBoundingClientRect().y > 550) {
-			element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+			const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+			element.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' });
 		}
 	});
 </script>
@@ -58,8 +59,8 @@
 		align-items: start;
 		grid-template-columns: 2.5rem 1fr;
 		gap: 1.5rem;
-		z-index: 10;
-		transition: z-index 0.35s step-end;
+		z-index: 1;
+		transition: z-index var(--duration-panel-out) step-end;
 
 		&:nth-child(2) {
 			margin-top: 0.75rem;
@@ -72,8 +73,8 @@
 		&.isCreate {
 			position: sticky;
 			top: 0;
-			z-index: 1500;
-			transition: z-index 0s;
+			z-index: var(--layer-form);
+			transition: none;
 		}
 	}
 
@@ -133,7 +134,7 @@
 		}
 
 		&.isCreate {
-			z-index: 1500;
+			z-index: var(--layer-form);
 			box-shadow: none;
 		}
 

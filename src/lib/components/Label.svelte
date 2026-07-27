@@ -1,6 +1,6 @@
 <script>
 	import { fly, fade } from 'svelte/transition';
-	import { sineIn, sineOut } from 'svelte/easing';
+	import { enter, exit, flyEnter } from '$lib/motion.js';
 
 	let { title, error, isCreate, onCreate, showCreate, children } = $props();
 
@@ -16,7 +16,7 @@
 	<span class="label">
 		{title}
 		{#if error && !hideError}
-			<div class="error" in:fly={{ y: '-1rem', duration: 200, easing: sineOut }} out:fly={{ y: '-1rem', duration: 150, easing: sineIn }}>
+			<div class="error" in:fly={flyEnter} out:fly={{ y: '-1rem', ...exit }}>
 				<button
 					tabindex="-1"
 					type="button"
@@ -31,7 +31,7 @@
 			</div>
 		{/if}
 		{#if showCreate}
-			<div class="create" in:fade={{ duration: 200 }} out:fade={{ duration: 150 }}>
+			<div class="create" in:fade={enter} out:fade={exit}>
 				<button type="button" onmousedown={onCreate} aria-label="crear">
 					<span class={['icon', 'create', { isCreate }]}></span>
 				</button>
@@ -79,7 +79,7 @@
 
 		> .error {
 			position: absolute;
-			z-index: 2000;
+			z-index: var(--layer-error);
 			top: 0;
 			bottom: 0;
 			left: -1px;
@@ -89,11 +89,10 @@
 			background: var(--error);
 			display: grid;
 			cursor: pointer;
-			transition: transform 0.1s ease-out;
+			transition: transform var(--duration-fast) var(--ease-out);
 
 			&:hover {
 				transform: translateY(-2px);
-				transition: transform 0.15s ease-in;
 			}
 
 			> button {
@@ -131,11 +130,11 @@
 			border-radius: var(--border-radius);
 			display: grid;
 			cursor: pointer;
-			transition: 0.1s ease-in;
+			transition: background-color var(--duration-fast) var(--ease-out);
 
 			&:hover {
 				background: var(--highlight);
-				transition: 0.15s ease-out;
+				transition: none;
 			}
 
 			> button {
@@ -151,10 +150,9 @@
 				}
 
 				.icon.create {
-					transition: transform 0.1s ease-in;
+					transition: transform var(--duration-fast) var(--ease-out);
 
 					&.isCreate {
-						transition: transform 0.15s ease-out;
 						transform: rotate(45deg);
 					}
 				}

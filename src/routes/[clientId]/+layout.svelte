@@ -1,6 +1,6 @@
 <script>
 	import { fly, blur } from 'svelte/transition';
-	import { sineIn, sineOut } from 'svelte/easing';
+	import { panelBlurExit, panelFlyEnter, panelFlyExit } from '$lib/motion.js';
 	import { windowState } from '$lib/shared.svelte.js';
 	import Section from '$lib/components/Section.svelte';
 	import VehicleForm from '$lib/components/vehicle/VehicleForm.svelte';
@@ -11,9 +11,9 @@
 	let isActive = $derived(windowState.form === 'vehicle');
 </script>
 
-<div class="panel" in:fly={{ y: '-1rem', duration: 300, easing: sineOut }} out:blur={{ amount: 32, duration: 250, easing: sineIn }}>
+<div class="panel" in:fly={panelFlyEnter} out:blur={panelBlurExit}>
 	{#key data.client.clientId}
-		<div in:fly={{ y: '-1rem', duration: 300, easing: sineOut }} out:blur={{ amount: 32, duration: 900, easing: sineIn }}>
+		<div in:fly={panelFlyEnter} out:fly={panelFlyExit}>
 			<div class="vehiculos">
 				<div>
 					<Section overlay={windowState.form === 'vehicle' || windowState.form === 'client'} cards>
@@ -56,7 +56,6 @@
 
 <style>
 	.panel {
-		z-index: 1000;
 		grid-column-start: panel-left;
 		grid-row-start: panel-top;
 
@@ -90,13 +89,13 @@
 	.section-card {
 		position: sticky;
 		top: 0;
-		z-index: 100;
-		transition: z-index 0.35s step-end;
+		z-index: var(--layer-sticky);
+		transition: z-index var(--duration-panel-out) step-end;
 		padding: 1rem 0 0.5rem 0;
 
 		&.isActive {
-			z-index: 1500;
-			transition: z-index 0s;
+			z-index: var(--layer-form);
+			transition: none;
 		}
 
 		> button {

@@ -1,12 +1,12 @@
 <script>
 	import { fade, fly, blur } from 'svelte/transition';
-	import { sineIn, sineOut } from 'svelte/easing';
+	import { blurExit, flyEnter, panelEnter, panelExit } from '$lib/motion.js';
 	import { page } from '$app/state';
 	import { windowState } from '$lib/shared.svelte.js';
 </script>
 
-<div class="container" in:fade={{ duration: 300, easing: sineOut }} out:fade={{ duration: 250, easing: sineIn }}>
-	<div in:fly={{ y: '-1rem', duration: 200, easing: sineOut }} out:blur={{ amount: 32, duration: 150, easing: sineIn }}>
+<div class="container" in:fade={panelEnter} out:fade={panelExit}>
+	<div in:fly={flyEnter} out:blur={blurExit}>
 		<div>
 			<a
 				class="button"
@@ -34,7 +34,7 @@
 		right: 0;
 		bottom: 0;
 		min-height: 3rem;
-		z-index: 2000;
+		z-index: var(--layer-cover);
 		display: grid;
 		justify-items: center;
 		align-items: center;

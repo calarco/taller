@@ -91,6 +91,7 @@ Svelte 5 `$state`/`$derived`/`$effect` runes throughout — no stores.
 
 - `src/lib/shared.svelte.js` — `windowState` global UI state (`form`, `id`, `data`, `loading`, `error`). The root layout resets it on navigation via `$effect`.
 - `src/lib/search.svelte.js` — `createSearch({ type })`, a rune-based helper wrapping the `/search` endpoint with a 200 ms debounce, an `AbortController`, and a sequence guard against out-of-order responses. Used by `Search.svelte` and `VehicleForm.svelte`. Use it rather than calling `/search` directly.
+- `src/lib/motion.js` — the `in:`/`out:` presets every Svelte transition imports (`flyEnter`, `blurExit`, `slideEnter`, `panelFlyExit`, …). See [Motion](#motion).
 
 Mutations submit through `use:enhance`. By default a successful action re-runs every `load`, including the root layout's five queries — pass `update({ invalidateAll: false })` and patch `page.data` locally when an action only affects one visible thing (see `CarForm.svelte` and `AppointmentCard.svelte`).
 
@@ -109,6 +110,28 @@ Two-panel grid (2fr left, 3fr right) defined in `src/routes/+layout.svelte`. Com
 - **The global button rule** (`.button, button, input[type='submit']`) gives _every_ button a hover/`:focus-visible` background and a pointer cursor. To exempt one, add it to the `:not(.createButton, .overlay)` list in that rule — don't fight it with per-component overrides, which turns into a specificity war.
 - **Selects** use Chrome's customizable-select (`appearance: base-select`, `::picker(select)`, `::picker-icon`) with an `@supports not (appearance: base-select)` fallback that draws the caret with gradients. Any select styling change needs checking in both branches.
 - **Panel heights come from the grid.** `main` and `.panels` size their rows with `minmax(0, 1fr)` so that a tall panel cannot force the row open — a bare `1fr` is `minmax(auto, 1fr)`, whose content-based minimum is not capped by the container. **Do not give `.panel` an explicit height**; it stretches to its row, and its inner `Section` scrolls.
+
+### Motion
+
+Two layers drive animation and they share one set of values. CSS uses `--duration-*` and `--ease-in`/`--ease-out` on `body`; Svelte transitions use the presets in `src/lib/motion.js`. The `--ease-*` beziers are the CSS equivalents of `sineIn`/`sineOut`, so both layers curve identically. **Import a preset rather than writing `{ duration, easing }` inline, and use the tokens rather than raw seconds.**
+
+- **Convention:** enter with `sineOut` / `--ease-out`, exit with `sineIn` / `--ease-in`; elements (`--duration-in` / `--duration-out`) move faster than the panels containing them (`--duration-panel-*`).
+- **Hover is instant in, eased out** — the base rule carries the transition and the `:hover` rule sets `transition: none`. Don't invert this.
+- **Never `transition: <time> <easing>` with no property** — that is `transition: all`, which watches every animatable property. List the properties that actually change. Watch for layout-triggering ones sneaking in (`font-weight` on a search row was reflowing text every frame).
+- `filter: blur()` and `background-position` are not composited. Prefer `transform`/`opacity`; never nest two blur transitions, and never animate `background-position` in a loop (see the transform-driven loading bar in `Bar.svelte`).
+- `prefers-reduced-motion` is handled by one global block in `app.css`. Because Svelte compiles `fade`/`fly`/`slide`/`blur` to CSS animations, that block covers both layers. It sets `animation-duration: 0.01ms`, not `none`, because `Dialog.svelte` closes on `animationend`.
+
+### Stacking
+
+`.panel` sets `isolation: isolate`, so every panel is its own stacking context and **panels order purely by DOM position in `+layout.svelte`** — appointments/search, then route panels, then the client/estimate form panels. No panel needs a `z-index`; adding one is usually a sign something else is wrong.
+
+Inside a panel use `--layer-sticky` → `--layer-card` → `--layer-scrim` → `--layer-form` → `--layer-error`. At the root use `--layer-bar` → `--layer-cover` → `--layer-loading` → `--layer-print`. The two scales never meet, which is the point of isolating. A sticky header whose `z-index` leaks out of its panel will be painted under an incoming panel, because the `fly` transform makes that panel a stacking context for the duration of the transition.
+
+### Dialog
+
+`Dialog.svelte` does **not** close via `dialog.close()`. Firefox has no `overlay` property, so it drops the dialog out of the top layer the instant `close()` runs and the exit never renders. Every close path — Cancelar, `oncancel` (Esc and `closedby="any"` light dismiss), and `use:enhance` success — goes through `requestClose()`, which adds `.closing`, plays a keyframe exit while the dialog is still open, and only then calls `close()` on `animationend`, with a `setTimeout` backstop so a skipped animation can't leave it stuck open. **Add new close paths to `requestClose()`, not `close()`.**
+
+The backdrop animates `opacity`, not `background-color`: `backdrop-filter` is not in any transition list, so fading the tint alone makes the blur snap on at full strength.
 
 ## Environment variables
 

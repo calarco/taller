@@ -1,6 +1,6 @@
 <script>
 	import { slide, blur } from 'svelte/transition';
-	import { sineIn, sineOut } from 'svelte/easing';
+	import { blurEnter, blurExit, slideEnter, slideExit } from '$lib/motion.js';
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import { windowState } from '$lib/shared.svelte';
@@ -48,11 +48,11 @@
 		<label class="buscador">
 			<div>
 				{#if !search.value}
-					<div in:blur={{ amount: 16, duration: 200, easing: sineOut }} out:blur={{ amount: 16, duration: 150, easing: sineIn }}>
+					<div in:blur={blurEnter} out:blur={blurExit}>
 						<span class="icon search"></span>
 					</div>
 				{:else}
-					<div class="close" in:blur={{ amount: 16, duration: 200, easing: sineOut }} out:blur={{ amount: 16, duration: 150, easing: sineIn }}>
+					<div class="close" in:blur={blurEnter} out:blur={blurExit}>
 						<button
 							type="button"
 							onmousedown={(e) => {
@@ -71,10 +71,10 @@
 			<input id="searchInput" type="search" name="search" placeholder="Buscar" autocomplete="off" bind:value={search.value} oninput={() => (activeIndex = -1)} {onkeydown} />
 		</label>
 		{#if !results.length && search.settled}
-			<h5 class="empty" in:slide={{ axis: 'y', duration: 150, easing: sineIn }} out:slide={{ axis: 'y', duration: 150, easing: sineOut }}>No se encontraron resultados</h5>
+			<h5 class="empty" in:slide={slideEnter} out:slide={slideExit}>No se encontraron resultados</h5>
 		{/if}
 		{#each results as resultado, i (resultado.id)}
-			<div bind:this={rows[i]} class={['result', { isSelected: i === activeIndex }]} in:slide={{ axis: 'y', duration: 150, easing: sineOut }} out:slide={{ axis: 'y', duration: 150, easing: sineIn }}>
+			<div bind:this={rows[i]} class={['result', { isSelected: i === activeIndex }]} in:slide={slideEnter} out:slide={slideExit}>
 				{#if resultado.clientId}
 					<div class="cliente">
 						<a href={`/${resultado.clientId}`} class={['clienteCont', { isActive: resultado.clientId === page.url.pathname.split('/')[1] }, { isVehicle: resultado.vehicleId }]}>
@@ -175,7 +175,7 @@
 
 	.buscador {
 		position: sticky;
-		z-index: 100;
+		z-index: var(--layer-sticky);
 		top: 0;
 		right: 0;
 		left: 0;
@@ -257,13 +257,13 @@
 		display: grid;
 		grid-template-columns: 1fr auto;
 		align-items: center;
-		transition: 0.1s ease-in;
+		transition: background-color var(--duration-fast) var(--ease-out);
 
 		&:hover,
 		&.isSelected {
 			cursor: pointer;
 			background: var(--highlight);
-			transition: 0.15s ease-out;
+			transition: none;
 		}
 
 		&::after {
@@ -338,20 +338,20 @@
 				&.isVehicle:hover {
 					div {
 						outline: 1px solid var(--border-variant);
-						transition: 0.15s ease-out;
+						transition: none;
 					}
 				}
 
 				.cont {
 					padding: 0.5rem 0.5rem;
 					border-radius: var(--border-radius);
-					transition: 0.1s ease-in;
+					transition: outline-color var(--duration-fast) var(--ease-out);
 					outline: 1px solid rgba(0, 0, 0, 0);
 					text-transform: capitalize;
 				}
 
 				.icon::before {
-					transition: 0.1s ease-in;
+					transition: background-color var(--duration-fast) var(--ease-out);
 				}
 
 				h5 {
@@ -359,19 +359,17 @@
 					text-overflow: ellipsis;
 					white-space: pre;
 					font-size: 0.9em;
-					transition: 0.1s ease-in;
+					transition: color var(--duration-fast) var(--ease-out);
 				}
 
 				&.isActive {
 					.icon::before {
 						background: var(--secondary);
-						transition: 0.15s ease-out;
 					}
 
 					h5 {
 						font-weight: bold;
 						color: var(--secondary);
-						transition: 0.15s ease-out;
 					}
 				}
 			}
