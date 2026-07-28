@@ -36,17 +36,61 @@ body {
 
 @font-face {
 	font-family: 'Supreme-Variable';
-	src: url('/Supreme-Variable.woff2');
+	src: url('/Supreme-Variable.woff2') format('woff2');
+	font-weight: 100 800;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'Supreme-Fallback';
+	src: local('HelveticaNeue-Light'), local('Helvetica Neue Light');
+	font-weight: 100 349;
+	size-adjust: 97.39%;
+	ascent-override: 100.63%;
+	descent-override: 28.75%;
+	line-gap-override: 9.24%;
+}
+
+@font-face {
+	font-family: 'Supreme-Fallback';
+	src: local('Helvetica Neue');
+	font-weight: 350 449;
+	size-adjust: 95.73%;
+	ascent-override: 102.37%;
+	descent-override: 29.25%;
+	line-gap-override: 9.4%;
+}
+
+@font-face {
+	font-family: 'Supreme-Fallback';
+	src: local('HelveticaNeue-Medium'), local('Helvetica Neue Medium');
+	font-weight: 450 599;
+	size-adjust: 95.21%;
+	ascent-override: 102.93%;
+	descent-override: 29.41%;
+	line-gap-override: 9.45%;
+}
+
+@font-face {
+	font-family: 'Supreme-Fallback';
+	src: local('HelveticaNeue-Bold'), local('Helvetica Neue Bold');
+	font-weight: 600 800;
+	size-adjust: 98.74%;
+	ascent-override: 99.25%;
+	descent-override: 28.36%;
+	line-gap-override: 9.11%;
 }
 
 @font-face {
 	font-family: 'SpaceMono-Regular';
-	src: url('/SpaceMono-Regular.ttf');
+	src: url('/SpaceMono-Regular.woff2') format('woff2');
+	font-weight: 400;
+	font-display: swap;
 }
 
 body {
-	--font-family: 'Supreme-Variable';
-	--font-family-alt: 'SpaceMono-Regular';
+	--font-family: 'Supreme-Variable', 'Supreme-Fallback', system-ui, -apple-system, 'Segoe UI', sans-serif;
+	--font-family-alt: 'SpaceMono-Regular', ui-monospace, 'SF Mono', monospace;
 
 	--label: 300 0.75rem/1.25rem var(--font-family);
 	--body1: 300 0.9rem/1.25rem var(--font-family);
@@ -147,10 +191,7 @@ body {
 
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
-	text-rendering: optimizeLegibility;
-	font-feature-settings: 'kern' 1;
-	font-kerning: normal;
-	font-family: var(--font-family), var(--font-family-alt), sans-serif;
+	font-family: var(--font-family);
 	color: var(--on-background);
 	background: var(--background);
 	user-select: none;
