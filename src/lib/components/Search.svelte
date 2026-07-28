@@ -28,13 +28,13 @@
 			select(results.length ? (activeIndex <= 0 ? results.length - 1 : activeIndex - 1) : -1);
 		} else if (e.key === 'Enter') {
 			e.preventDefault();
-			const resultado = results[activeIndex] || results[0];
-			if (resultado?.estimateId) {
-				goto(`/estimate/${resultado.estimateId}`);
-			} else if (resultado?.vehicleId) {
-				goto(`/${resultado.clientId}/${resultado.vehicleId}${resultado.repairId ? '#' + resultado.repairId : ''}`);
-			} else if (resultado) {
-				goto(`/${resultado.clientId}`);
+			const result = results[activeIndex] || results[0];
+			if (result?.estimateId) {
+				goto(`/estimate/${result.estimateId}`);
+			} else if (result?.vehicleId) {
+				goto(`/${result.clientId}/${result.vehicleId}${result.repairId ? '#' + result.repairId : ''}`);
+			} else if (result) {
+				goto(`/${result.clientId}`);
 			}
 		} else if (e.key === 'Escape') {
 			search.value = '';
@@ -45,7 +45,7 @@
 
 <div class="panel">
 	<Section overlay={windowState.form === 'estimate'}>
-		<label class="buscador">
+		<label class="searchBar">
 			<div>
 				{#if !search.value}
 					<div in:blur={blurEnter} out:blur={blurExit}>
@@ -68,49 +68,49 @@
 					</div>
 				{/if}
 			</div>
-			<input id="searchInput" type="search" name="search" placeholder="Buscar" autocomplete="off" bind:value={search.value} oninput={() => (activeIndex = -1)} {onkeydown} />
+			<input id="searchInput" type="search" name="search" placeholder="BUSCAR" autocomplete="off" bind:value={search.value} oninput={() => (activeIndex = -1)} {onkeydown} />
 		</label>
 		{#if !results.length && search.settled}
 			<h5 class="empty" in:slide={slideEnter} out:slide={slideExit}>No se encontraron resultados</h5>
 		{/if}
-		{#each results as resultado, i (resultado.id)}
+		{#each results as result, i (result.id)}
 			<div bind:this={rows[i]} class={['result', { isSelected: i === activeIndex }]} in:slide={slideEnter} out:slide={slideExit}>
-				{#if resultado.clientId}
-					<div class="cliente">
-						<a href={`/${resultado.clientId}`} class={['clienteCont', { isActive: resultado.clientId === page.url.pathname.split('/')[1] }, { isVehicle: resultado.vehicleId }]}>
-							<div class="cont">
+				{#if result.clientId}
+					<div class="clientResult">
+						<a href={`/${result.clientId}`} class={['clientLink', { isActive: result.clientId === page.url.pathname.split('/')[1] }, { isVehicle: result.vehicleId }]}>
+							<div class="iconRow">
 								<span class="icon client"></span>
-								<h5>{resultado.clientName}</h5>
+								<h5>{result.clientName}</h5>
 							</div>
 						</a>
-						{#if resultado.vehicleId}
-							<a href={`/${resultado.clientId}/${resultado.vehicleId || ''}${resultado.repairId ? '#' + resultado.repairId : ''}`} class="vehiculo">
-								<div class="vehiculoCont cont">
+						{#if result.vehicleId}
+							<a href={`/${result.clientId}/${result.vehicleId || ''}${result.repairId ? '#' + result.repairId : ''}`} class="vehicleLink">
+								<div class="vehicleInfo iconRow">
 									<span class="icon vehicle"></span>
 									<div>
-										<Plate vehicleId={resultado.vehicleId} />
-										{#if resultado.carModel}
-											<small>{resultado.carModel.carMake?.name} {resultado.carModel.name}</small>
+										<Plate vehicleId={result.vehicleId} />
+										{#if result.carModel}
+											<small>{result.carModel.carMake?.name} {result.carModel.name}</small>
 										{/if}
 									</div>
 								</div>
-								{#if resultado.repairId}
-									<div class="reparacionCont cont">
+								{#if result.repairId}
+									<div class="repairInfo iconRow">
 										<span class="icon repair"></span>
-										<p>{resultado.description}</p>
+										<p>{result.description}</p>
 									</div>
 								{/if}
 							</a>
 						{/if}
 					</div>
-					<a href={`/${resultado.clientId}/${resultado.vehicleId || ''}${resultado.repairId ? '#' + resultado.repairId : ''}`} class="updated-at">
+					<a href={`/${result.clientId}/${result.vehicleId || ''}${result.repairId ? '#' + result.repairId : ''}`} class="updatedAt">
 						<div>
-							{resultado.updatedAt.getDate()}/{resultado.updatedAt.toLocaleDateString('default', { month: 'short' }).substring(0, 3)}/{resultado.updatedAt
+							{result.updatedAt.getDate()}/{result.updatedAt.toLocaleDateString('default', { month: 'short' }).substring(0, 3)}/{result.updatedAt
 								.toLocaleDateString('default', { year: 'numeric' })
 								.substring(2, 4)}
 						</div>
 						<div>
-							{resultado.updatedAt.toLocaleTimeString([], {
+							{result.updatedAt.toLocaleTimeString([], {
 								hour: '2-digit',
 								minute: '2-digit',
 								hour12: false,
@@ -118,40 +118,40 @@
 						</div>
 					</a>
 				{/if}
-				{#if resultado.estimateId}
-					<a class="estimate" href={`/estimate/${resultado.estimateId}`}>
-						<div class="estimateCont cont">
+				{#if result.estimateId}
+					<a class="estimateResult" href={`/estimate/${result.estimateId}`}>
+						<div class="estimateInfo iconRow">
 							<span class="icon estimate"></span>
-							<p>{resultado.description}</p>
+							<p>{result.description}</p>
 						</div>
-						{#if resultado.vehicleId}
-							<div class="vehiculo">
-								<div class="vehiculoCont cont">
+						{#if result.vehicleId}
+							<div class="vehicleLink">
+								<div class="vehicleInfo iconRow">
 									<span class="icon vehicle"></span>
 									<div>
-										<Plate vehicleId={resultado.vehicleId} />
-										{#if resultado.carModel}
-											<small>{resultado.carModel.carMake?.name} {resultado.carModel.name}</small>
+										<Plate vehicleId={result.vehicleId} />
+										{#if result.carModel}
+											<small>{result.carModel.carMake?.name} {result.carModel.name}</small>
 										{/if}
 									</div>
 								</div>
-								{#if resultado.email}
-									<div class="reparacionCont cont">
+								{#if result.email}
+									<div class="repairInfo iconRow">
 										<span class="icon mail"></span>
-										<p>{resultado.email}</p>
+										<p>{result.email}</p>
 									</div>
 								{/if}
 							</div>
 						{/if}
 					</a>
-					<a href={`/estimate/${resultado.estimateId}`} class="updated-at">
+					<a href={`/estimate/${result.estimateId}`} class="updatedAt">
 						<div>
-							{resultado.updatedAt.getDate()}/{resultado.updatedAt.toLocaleDateString('default', { month: 'short' }).substring(0, 3)}/{resultado.updatedAt
+							{result.updatedAt.getDate()}/{result.updatedAt.toLocaleDateString('default', { month: 'short' }).substring(0, 3)}/{result.updatedAt
 								.toLocaleDateString('default', { year: 'numeric' })
 								.substring(2, 4)}
 						</div>
 						<div>
-							{resultado.updatedAt.toLocaleTimeString([], {
+							{result.updatedAt.toLocaleTimeString([], {
 								hour: '2-digit',
 								minute: '2-digit',
 								hour12: false,
@@ -173,7 +173,7 @@
 		box-shadow: var(--shadow-variant);
 	}
 
-	.buscador {
+	.searchBar {
 		position: sticky;
 		z-index: var(--layer-sticky);
 		top: 0;
@@ -278,21 +278,21 @@
 			background: var(--on-background-variant);
 		}
 
-		.cont {
+		.iconRow {
 			display: grid;
 			grid-template-columns: auto 1fr;
 			gap: 1rem;
 			align-items: center;
 		}
 
-		.vehiculo {
+		.vehicleLink {
 			position: relative;
 			flex-grow: 1000;
 			padding: 0.5rem 0 0.5rem 1rem;
 			display: flex;
 			gap: 1rem;
 
-			.vehiculoCont {
+			.vehicleInfo {
 				min-width: 7.5rem;
 				max-width: 7.5rem;
 				flex-grow: 1;
@@ -311,7 +311,7 @@
 				}
 			}
 
-			.reparacionCont {
+			.repairInfo {
 				position: relative;
 				flex-grow: 1000;
 
@@ -324,12 +324,12 @@
 			}
 		}
 
-		> .cliente {
+		> .clientResult {
 			height: 100%;
 			display: flex;
 			gap: 1px;
 
-			.clienteCont {
+			.clientLink {
 				min-width: 40%;
 				flex-grow: 1;
 				padding: 0.5rem 0.5rem;
@@ -342,7 +342,7 @@
 					}
 				}
 
-				.cont {
+				.iconRow {
 					padding: 0.5rem 0.5rem;
 					border-radius: var(--border-radius);
 					transition: outline-color var(--duration-fast) var(--ease-out);
@@ -374,7 +374,7 @@
 				}
 			}
 
-			.vehiculo {
+			.vehicleLink {
 				&::after {
 					content: '';
 					position: absolute;
@@ -386,19 +386,19 @@
 			}
 		}
 
-		> .estimate {
+		> .estimateResult {
 			height: 100%;
 			display: flex;
 			gap: 1px;
 
-			.estimateCont {
+			.estimateInfo {
 				flex-grow: 1;
 				min-width: 40%;
 				padding: 0 1rem;
 			}
 		}
 
-		> .updated-at {
+		> .updatedAt {
 			height: 100%;
 			position: relative;
 			padding: 0 1rem;

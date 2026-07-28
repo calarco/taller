@@ -38,7 +38,7 @@
 	</article>
 {/snippet}
 
-<div class="container">
+<div class="card">
 	{@render clientContent()}
 	<div class="cardButtons">
 		<button type="button" onclick={() => dialog.showModal()} aria-label="borrar">
@@ -62,7 +62,7 @@
 </div>
 
 <style>
-	.container {
+	.card {
 		position: relative;
 		top: 0;
 		grid-column-start: 1;

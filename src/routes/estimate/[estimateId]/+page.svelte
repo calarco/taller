@@ -15,7 +15,7 @@
 
 <div class="panel" in:fly={panelFlyEnterX} out:blur={panelBlurExit}>
 	{#key estimate.estimateId}
-		<div class="container" in:fly={panelFlyEnterX} out:fly={panelFlyExitX}>
+		<div class="panelFill" in:fly={panelFlyEnterX} out:fly={panelFlyExitX}>
 			<div class="buttons">
 				<button type="button" onclick={() => dialog.showModal()} aria-label="borrar">
 					<span class="icon delete"></span>
@@ -101,7 +101,7 @@
 		pointer-events: none;
 	}
 
-	.container {
+	.panelFill {
 		pointer-events: auto;
 		position: absolute;
 		top: 0;

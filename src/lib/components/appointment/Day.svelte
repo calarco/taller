@@ -24,13 +24,13 @@
 	});
 </script>
 
-<div bind:this={element} class={['container', { isCreate }]}>
+<div bind:this={element} class={['dayRow', { isCreate }]}>
 	<div class={['day', { isCurrent, isWeekend }]}>
 		<h3>{date.getDate()}</h3>
 		<p>{date.toLocaleDateString('default', { weekday: 'short' }).substring(0, 3)}</p>
 	</div>
 	<div class="list">
-		<div class={['createCont', { isCreate }]}>
+		<div class={['createSlot', { isCreate }]}>
 			{#if isCreate}
 				<AppointmentForm {date} />
 			{/if}
@@ -52,7 +52,7 @@
 </div>
 
 <style>
-	.container {
+	.dayRow {
 		position: relative;
 		padding: 0.75rem 1.5rem;
 		display: grid;
@@ -117,7 +117,7 @@
 		outline: 1px solid var(--border-variant);
 	}
 
-	.createCont {
+	.createSlot {
 		position: relative;
 		height: 3rem;
 		padding: 0 0 3rem 0;

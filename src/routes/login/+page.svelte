@@ -8,7 +8,7 @@
 	let hide = $state(false);
 </script>
 
-<div class="container" in:fade={panelEnter} out:fade={panelExit}>
+<div class="cover" in:fade={panelEnter} out:fade={panelExit}>
 	{#if !hide}
 		<form
 			method="POST"
@@ -43,7 +43,7 @@
 </div>
 
 <style>
-	.container {
+	.cover {
 		position: absolute;
 		top: 0;
 		left: 0;

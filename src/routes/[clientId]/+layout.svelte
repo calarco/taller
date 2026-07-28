@@ -14,10 +14,10 @@
 <div class="panel" in:fly={panelFlyEnterX} out:blur={panelBlurExit}>
 	{#key data.client.clientId}
 		<div in:fly={panelFlyEnterX} out:fly={panelFlyExitX}>
-			<div class="vehiculos">
+			<div class="vehicles">
 				<div>
 					<Section overlay={windowState.form === 'vehicle' || windowState.form === 'client'} cards>
-						<div class={['section-card', { isActive }]}>
+						<div class={['sectionCard', { isActive }]}>
 							{#if isActive}
 								<div style="position: relative">
 									<VehicleForm vehicle={windowState.data} />
@@ -72,7 +72,7 @@
 		}
 	}
 
-	.vehiculos {
+	.vehicles {
 		position: relative;
 		border-radius: var(--border-radius);
 		border-top: 1px solid var(--border-variant);
@@ -86,7 +86,7 @@
 		}
 	}
 
-	.section-card {
+	.sectionCard {
 		position: sticky;
 		top: 0;
 		z-index: var(--layer-sticky);

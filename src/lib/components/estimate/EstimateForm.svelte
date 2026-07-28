@@ -21,12 +21,12 @@
 		<input type="hidden" name="estimateId" value={estimate.estimateId} />
 	{/if}
 	<Label title="Patente" error={windowState.error?.vehicleIdError}>
-		<input class="patente" type="text" name="vehicleId" placeholder="-" autoComplete="off" value={estimate.vehicleId || ''} />
+		<input class="plate" type="text" name="vehicleId" placeholder="-" autoComplete="off" value={estimate.vehicleId || ''} />
 	</Label>
 	<CarForm carModelProp={estimate?.carModelId} --flow="row" --row-end="span 1" />
 	<Label title="Total" --template-columns="max-content 1fr">
 		<h6 class="unit">$</h6>
-		<h5 class="precio">{new Intl.NumberFormat('es-AR').format(total)}</h5>
+		<h5 class="price">{new Intl.NumberFormat('es-AR').format(total)}</h5>
 	</Label>
 	<Label title="KM">
 		<input type="number" min="0" name="km" placeholder="-" autoComplete="off" value={estimate.km || ''} />
@@ -36,7 +36,7 @@
 	</Label>
 	<Label title="Mano de obra" --template-columns="max-content 1fr">
 		<h6 class="unit">$</h6>
-		<input type="number" min="1" name="labor" placeholder="0" autoComplete="off" bind:value={labor} class="precio" />
+		<input type="number" min="1" name="labor" placeholder="0" autoComplete="off" bind:value={labor} class="price" />
 	</Label>
 	<fieldset>
 		<div class="parts">
@@ -51,7 +51,7 @@
 						</div>
 						<input type="hidden" name="part" value={JSON.stringify(part)} />
 						<div>
-							<p class="precio"><span>$</span>{new Intl.NumberFormat('es-AR').format(part.price)}</p>
+							<p class="price"><span>$</span>{new Intl.NumberFormat('es-AR').format(part.price)}</p>
 							<button type="button" onclick={() => (parts = parts.filter((x) => x.name !== part.name))} aria-label="borrar">
 								<span class="icon delete"></span>
 							</button>
@@ -73,7 +73,7 @@
 		</Label>
 		<Label title="Precio" --template-columns="max-content 1fr auto">
 			<h6 class="unit">$</h6>
-			<input type="number" min="0" name="price" placeholder="0" bind:value={price} class="precio" />
+			<input type="number" min="0" name="price" placeholder="0" bind:value={price} class="price" />
 			<button
 				type="button"
 				onclick={() => {
@@ -96,12 +96,12 @@
 </Form>
 
 <style>
-	.patente {
+	.plate {
 		text-transform: uppercase;
 		font-family: var(--font-family-alt);
 	}
 
-	.precio {
+	.price {
 		font-family: var(--font-family-alt);
 
 		> span {

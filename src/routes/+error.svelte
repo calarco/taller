@@ -5,7 +5,7 @@
 	import { windowState } from '$lib/shared.svelte.js';
 </script>
 
-<div class="container" in:fade={panelEnter} out:fade={panelExit}>
+<div class="cover" in:fade={panelEnter} out:fade={panelExit}>
 	<div in:fly={flyEnter} out:blur={blurExit}>
 		<div>
 			<a
@@ -26,7 +26,7 @@
 </div>
 
 <style>
-	.container {
+	.cover {
 		position: absolute;
 		top: 0;
 		bottom: 0;

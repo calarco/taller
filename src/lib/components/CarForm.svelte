@@ -43,7 +43,7 @@
 		showCreate={carMakes.length}
 		error={windowState.error?.carMakeError}
 	>
-		<div class="container">
+		<div class="formSlot">
 			{#if createMake}
 				<form
 					action="?/createCarMake"
@@ -94,7 +94,7 @@
 		showCreate={carModels.length}
 		error={windowState.error?.carModelError}
 	>
-		<div class="container">
+		<div class="formSlot">
 			{#if carMakeId && (createModel || !carModels.length)}
 				<input type="hidden" name="carModelName" value={carModelName} />
 				<form
@@ -147,7 +147,7 @@
 		flex-direction: var(--flow, column);
 	}
 
-	.container {
+	.formSlot {
 		position: relative;
 		height: 2rem;
 

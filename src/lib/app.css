@@ -368,7 +368,6 @@ input[type='search'] {
 	padding: 0 1.5rem;
 	border-radius: var(--border-radius) var(--border-radius) 0 0;
 	outline: none;
-	text-transform: uppercase;
 
 	&::-webkit-search-cancel-button {
 		appearance: none;
@@ -731,14 +730,6 @@ a {
 	color: var(--on-background-variant);
 }
 
-.vehicleId {
-	font-family: var(--font-family-alt);
-
-	span {
-		color: inherit;
-	}
-}
-
 .panel {
 	position: relative;
 	isolation: isolate;
@@ -746,7 +737,7 @@ a {
 	display: grid;
 }
 
-.section-card {
+.sectionCard {
 	position: relative;
 	z-index: 1;
 	padding: 0.5rem 0;

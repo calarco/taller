@@ -18,7 +18,7 @@
 	</article>
 {/snippet}
 
-<div class="container" in:slide={slideEnter} out:slide={slideExit}>
+<div class="card" in:slide={slideEnter} out:slide={slideExit}>
 	{@render appointmentContent()}
 	<button type="button" onclick={() => dialog.showModal()} aria-label="borrar">
 		<span class="icon delete"></span>
@@ -30,7 +30,7 @@
 </div>
 
 <style>
-	.container {
+	.card {
 		position: relative;
 		display: grid;
 		grid-template-columns: 1fr auto;

@@ -2,14 +2,14 @@
 	let { isActive, children } = $props();
 </script>
 
-<div class={['section-card', { isActive }]}>
+<div class={['sectionCard', { isActive }]}>
 	<div>
 		{@render children()}
 	</div>
 </div>
 
 <style>
-	.section-card {
+	.sectionCard {
 		&.isActive {
 			position: sticky;
 			top: 4.5rem;

@@ -9,7 +9,7 @@
 
 <h1>Register</h1>
 
-<div class="container">
+<div class="cover">
 	<form method="POST" autocomplete="off" use:enhance>
 		<label>
 			Usuario
@@ -38,7 +38,7 @@
 {/if}
 
 <style>
-	.container {
+	.cover {
 		position: absolute;
 		top: 0;
 		left: 0;

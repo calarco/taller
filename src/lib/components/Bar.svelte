@@ -21,7 +21,7 @@
 <div class="bar">
 	<div>
 		<div>
-			<div class="titleCont">
+			<div class="title">
 				{#if !url[1] || url[1] === 'estimate'}
 					<div in:blur={blurEnter} out:blur={blurExit}>
 						<p>Turnos</p>
@@ -34,7 +34,7 @@
 					</div>
 				{/if}
 			</div>
-			<div class="createCont">
+			<div class="createSlot">
 				<button
 					type="button"
 					class={['createButton', { isActive: windowState.form === 'client' }]}
@@ -62,7 +62,7 @@
 			<p class="label">© Calarco WEB</p>
 		</div>
 		<div>
-			<div class="titleCont">
+			<div class="title">
 				{#if url[1] === 'estimate'}
 					<div in:fly={panelFlyEnterX} out:blur={panelBlurExit}>
 						<a class="button" href="/" aria-label="cerrar">
@@ -81,7 +81,7 @@
 					</div>
 				{/if}
 			</div>
-			<div class="createCont">
+			<div class="createSlot">
 				<button
 					type="button"
 					class={['createButton', { isActive: windowState.form === 'estimate' }]}
@@ -106,7 +106,7 @@
 					<span>Presupuesto</span>
 				</button>
 			</div>
-			<div class="buttonsCont">
+			<div class="buttons">
 				<button type="button" onclick={() => settingsDialog.showModal()} aria-label="settings">
 					<span>{user.name || user.userId}</span>
 				</button>
@@ -182,7 +182,7 @@
 				&:last-child {
 					grid-template-columns: 1fr auto 1fr;
 
-					.buttonsCont {
+					.buttons {
 						display: flex;
 						justify-content: flex-end;
 						gap: 1px;
@@ -215,7 +215,7 @@
 					}
 				}
 
-				.titleCont {
+				.title {
 					height: 100%;
 					display: grid;
 
@@ -242,7 +242,7 @@
 					}
 				}
 
-				.createCont {
+				.createSlot {
 					position: relative;
 
 					.createButton {

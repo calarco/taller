@@ -10,7 +10,7 @@
 	<div class={['scroller', { notOverlay: !overlay }]}>
 		{@render children()}
 		{#if cards}
-			<div class="padding"></div>
+			<div class="scrollSpacer"></div>
 		{/if}
 	</div>
 	{#if overlay}
@@ -48,7 +48,7 @@
 				gap: 0;
 			}
 
-			.padding {
+			.scrollSpacer {
 				min-height: 15rem;
 			}
 		}

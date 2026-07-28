@@ -29,15 +29,15 @@
 	</Label>
 	<Label title="Mano de obra" --template-columns="max-content 1fr">
 		<h6 class="unit">$</h6>
-		<input class="precio" type="number" min="0" name="labor" placeholder="0" autoComplete="off" bind:value={labor} />
+		<input class="price" type="number" min="0" name="labor" placeholder="0" autoComplete="off" bind:value={labor} />
 	</Label>
 	<Label title="Repuestos" --template-columns="max-content 1fr">
 		<h6 class="unit">$</h6>
-		<input class="precio" type="number" min="0" name="cost" placeholder="0" autoComplete="off" bind:value={cost} />
+		<input class="price" type="number" min="0" name="cost" placeholder="0" autoComplete="off" bind:value={cost} />
 	</Label>
 	<Label title="Total" --template-columns="max-content 1fr">
 		<h6 class="unit">$</h6>
-		<h5 class="precio">{new Intl.NumberFormat('es-AR').format(cost + labor)}</h5>
+		<h5 class="price">{new Intl.NumberFormat('es-AR').format(cost + labor)}</h5>
 	</Label>
 	<Label title="Descripción" error={windowState.error?.descriptionError} --column-end="span 3">
 		<input type="text" name="description" placeholder="-" autoComplete="off" value={repair?.description || ''} />
@@ -51,7 +51,7 @@
 </Form>
 
 <style>
-	.precio {
+	.price {
 		font-family: var(--font-family-alt);
 	}
 </style>

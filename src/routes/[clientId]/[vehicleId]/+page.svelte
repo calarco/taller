@@ -13,9 +13,9 @@
 
 <div class="panel" in:fly={panelFlyEnterX} out:blur={panelBlurExit}>
 	{#key data.vehicle.vehicleId}
-		<div class="container" in:fly={panelFlyEnterX} out:fly={panelFlyExitX}>
+		<div class="panelFill" in:fly={panelFlyEnterX} out:fly={panelFlyExitX}>
 			<Section overlay={windowState.form === 'repair' || windowState.form === 'estimate'} cards>
-				<div class={['section-card', { isActive }]}>
+				<div class={['sectionCard', { isActive }]}>
 					{#if isActive}
 						<div style="position: relative">
 							<RepairForm repair={windowState.data} />
@@ -55,7 +55,7 @@
 		pointer-events: none;
 	}
 
-	.container {
+	.panelFill {
 		pointer-events: auto;
 		position: absolute;
 		top: 0;
@@ -64,7 +64,7 @@
 		left: 0;
 	}
 
-	.section-card {
+	.sectionCard {
 		position: sticky;
 		top: 0;
 		z-index: var(--layer-sticky);
