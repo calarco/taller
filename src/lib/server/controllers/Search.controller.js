@@ -15,13 +15,6 @@ const carModelPopulate = {
 	select: 'name carMakeId',
 };
 
-const clientPopulate = {
-	path: 'vehicles',
-	perDocumentLimit: 1,
-	options: { sort: { updatedAt: -1 } },
-	populate: [carModelPopulate, { path: 'repairs', perDocumentLimit: 1, options: { sort: { updatedAt: -1 } } }],
-};
-
 const repairPopulate = {
 	path: 'vehicle',
 	populate: [carModelPopulate, { path: 'client', select: 'name lastName' }],
@@ -151,11 +144,43 @@ function finalize(rows) {
 	return structuredClone(search);
 }
 
+function newestBy(rows, key) {
+	const newest = new Map();
+	for (const row of rows) {
+		if (!newest.has(row[key])) {
+			newest.set(row[key], row);
+		}
+	}
+	return newest;
+}
+
+async function findClientRows(userId, filters, sort, limit) {
+	const clients = await findClients(userId, filters).sort(sort).limit(limit);
+	if (!clients.length) {
+		return clients;
+	}
+
+	const vehicles = await findVehicles(userId, { clientId: { $in: clients.map((x) => x.clientId) } })
+		.sort({ updatedAt: -1 })
+		.populate(carModelPopulate);
+	const vehicleByClient = newestBy(vehicles, 'clientId');
+
+	const vehicleIds = [...vehicleByClient.values()].map((x) => x.vehicleId);
+	const repairs = vehicleIds.length ? await findRepairs(userId, { vehicleId: { $in: vehicleIds } }).sort({ updatedAt: -1, repairId: -1 }) : [];
+	const repairByVehicle = newestBy(repairs, 'vehicleId');
+
+	for (const client of clients) {
+		const vehicle = vehicleByClient.get(client.clientId);
+		if (vehicle) {
+			const repair = repairByVehicle.get(vehicle.vehicleId);
+			client.vehicles = { ...vehicle, repairs: repair ? [repair] : [] };
+		}
+	}
+	return clients;
+}
+
 function findClientHits(userId, query) {
-	return findClients(userId, termFilter(query.terms, ['name', 'lastName', 'dni', 'work', 'phone', 'email']))
-		.sort({ name: 1, lastName: 1 })
-		.populate(clientPopulate)
-		.limit(QUERY_LIMIT);
+	return findClientRows(userId, termFilter(query.terms, ['name', 'lastName', 'dni', 'work', 'phone', 'email']), { name: 1, lastName: 1 }, QUERY_LIMIT);
 }
 
 export async function getSearch(userId, value, type) {
@@ -165,7 +190,7 @@ export async function getSearch(userId, value, type) {
 			.replace(/\s+/g, ' ');
 		if (!raw) {
 			const [clients, estimates] = await Promise.all([
-				findClients(userId).sort({ updatedAt: -1 }).populate(clientPopulate).limit(LIMIT),
+				findClientRows(userId, undefined, { updatedAt: -1 }, LIMIT),
 				findEstimates(userId).sort({ updatedAt: -1 }).populate(carModelPopulate).limit(LIMIT),
 			]);
 			return finalize([...clients.map((x) => mapClient(x, 0)), ...estimates.map((x) => mapEstimate(x, 0))]);

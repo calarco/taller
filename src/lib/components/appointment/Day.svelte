@@ -13,7 +13,7 @@
 	const isCurrent = id === today.toISOString().substring(0, 10);
 	const isWeekend = [0, 6].indexOf(date.getDay()) !== -1;
 	let isCreate = $derived(windowState.form === 'appointment' && windowState.id === id);
-	let appointments = $derived(page.data.appointments?.filter((x) => new Date(x.date).toISOString().substring(0, 10) === id));
+	let appointments = $derived((page.data.appointments ?? []).filter((x) => new Date(x.date).toISOString().substring(0, 10) === id));
 
 	let element;
 	$effect(() => {

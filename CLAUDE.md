@@ -22,7 +22,7 @@ No test suite is configured. Correctness is enforced by ESLint (with `eslint-plu
 
 Every user gets their own MongoDB database. The main `taller` DB holds only the `User` collection. All other data (Client, Vehicle, Repair, Appointment, Estimate, CarMake, CarModel) lives in a per-user DB named after their `userId`.
 
-`src/lib/server/db.js` handles this: `getModel(userId, model)` picks the DB (`taller` for `User`, otherwise `userId`) via `mongoose.connection.useDb(name, { useCache: true })` and registers the schemas on first use. `initDatabase()` runs once from the `init` hook at server start.
+`getModel(userId, model)` in `src/lib/server/db.js` picks the right DB and registers schemas on first use; `initDatabase()` runs once from the `init` hook.
 
 Always reach models through `getModel()` — never import a model and call it directly, or you will query the wrong database.
 
@@ -45,28 +45,61 @@ Always reach models through `getModel()` — never import a model and call it di
 /[clientId]/[vehicleId]  → vehicle detail
 /estimate/[estimateId]   → estimate (supports print-to-PDF)
 /search?q=&type=         → JSON search endpoint (+server.js, no page)
+/cars                    → JSON car makes + models (+server.js, no page)
 ```
 
 **`src/routes/+page.svelte` and `src/routes/[clientId]/+page.svelte` are empty files.** The UI for those routes lives entirely in the layouts above them. Don't go looking for the dashboard in `+page.svelte`.
 
 ### Where data loading lives
 
-Only four files export a `load`:
+Five files export a `load`:
 
-| File                                     | Returns                                                                      |
-| ---------------------------------------- | ---------------------------------------------------------------------------- |
-| `+layout.server.js` (root)               | `user`, `carMakes`, `carModels`, `appointments`, `search` — on every request |
-| `[clientId]/+layout.server.js`           | `client`, `vehicles`                                                         |
-| `[clientId]/[vehicleId]/+page.server.js` | `vehicle`, `repairs`                                                         |
-| `estimate/[estimateId]/+page.server.js`  | `estimate`, `html`                                                           |
+| File                                     | Returns                                             |
+| ---------------------------------------- | --------------------------------------------------- |
+| `+layout.server.js` (root)               | `user`, `appointments`, `search` — on every request |
+| `+layout.js` (root, **universal**)       | `carMakes`, `carModels` — fetched from `/cars`      |
+| `[clientId]/+layout.server.js`           | `client`, `vehicles`                                |
+| `[clientId]/[vehicleId]/+page.server.js` | `repairs`                                           |
+| `estimate/[estimateId]/+page.server.js`  | `estimate`, `html`                                  |
 
-`/` and `/[clientId]` have **no** page load — their data comes from the layouts. Child loads reuse parent data with `await event.parent()` instead of re-querying (the vehicle page takes its `vehicle` from the parent's `vehicles` array; the estimate page takes `user` from the root layout).
+**`appointments` and `search` must stay in the root layout**, not move to the routes whose panels show
+them. Both panels are mounted once by the root layout in the `panel-left` / `panel-right` cells, and
+route panels later in the DOM cover them. Loading each dataset only where its panel is visible looks
+tighter, but re-queries on every hop between two routes that both show it — `/` ↔ `/estimate/…` for the
+calendar, `/` ↔ `/[clientId]` for search.
+
+The root layout reads no `params` and no `url`; that is what makes it run once per full page load and
+never on client-side navigation. Keep it that way. The cost is that a hard load of
+`/[clientId]/[vehicleId]` fetches `appointments` and `search` it cannot show.
+
+**Never call `event.parent()` in a server load.** Server loads keep no state between requests, so
+`parent()` re-executes the parent server loads in that request. Query directly instead — the estimate
+page calls its own `findUser` rather than reaching for the root layout's `user`.
+
+**`getSearch` batches its client hydration; never `populate` with `perDocumentLimit`,** which issues
+one query per parent document. Fetch all vehicles for the matched clients in one sorted query and pick
+the newest per client in JS.
+
+**`carMakes`/`carModels` sit in the root universal `+layout.js`, which fetches `/cars`.** `invalidate()`
+re-runs a whole load function, so sharing the server load would mean re-running all of it; this way
+`CarForm`'s `invalidate('/cars')` re-runs only the two car queries. Two traps:
+
+- Return `{ ...data, ...cars }`. With both `+layout.server.js` and `+layout.js` on a route, the
+  universal load's return value **replaces** the server load's data for that level — returning only the
+  cars drops `user`/`appointments`/`search` and every panel renders empty.
+- Don't read `event.url` to skip the fetch on `/login`, or it re-runs on every navigation. `/login` is
+  covered by `response.ok` plus a `try`/`catch` around `.json()`: hooks redirects unauthenticated
+  requests, so the body is HTML. Reading response headers instead would need
+  `filterSerializedResponseHeaders` in hooks.
+
+`Day.svelte`, `Search.svelte` and `VehicleForm.svelte` guard with `?? []` because the root load returns
+nothing without a `userId`.
 
 ### Shared vs route-specific actions
 
 `Bar`, `Appointments`, `ClientForm` and `EstimateForm` live in the **root layout**, so they render on every route, and a `?/name` form posts to whichever route is currently active. Their actions therefore have to exist on every route.
 
-They live once in `src/lib/server/actions.js` as `sharedActions` — `editUser`, `logout`, `createCarMake`, `createCarModel`, `upsertClient`, `upsertEstimate`, `createAppointment`, `deleteAppointment` — and each route spreads them in:
+They live once in `src/lib/server/actions.js` as `sharedActions`, and each route spreads them in:
 
 ```js
 export const actions = { ...sharedActions, upsertVehicle, deleteVehicle, upsertRepair, deleteRepair };
@@ -93,23 +126,25 @@ Svelte 5 `$state`/`$derived`/`$effect` runes throughout — no stores.
 - `src/lib/search.svelte.js` — `createSearch({ type })`, a rune-based helper wrapping the `/search` endpoint with a 200 ms debounce, an `AbortController`, and a sequence guard against out-of-order responses. Used by `Search.svelte` and `VehicleForm.svelte`. Use it rather than calling `/search` directly.
 - `src/lib/motion.js` — the `in:`/`out:` presets every Svelte transition imports (`flyEnter`, `blurExit`, `slideEnter`, `panelFlyExit`, …). See [Motion](#motion).
 
-Mutations submit through `use:enhance`. By default a successful action re-runs every `load`, including the root layout's five queries — pass `update({ invalidateAll: false })` and patch `page.data` locally when an action only affects one visible thing (see `CarForm.svelte` and `AppointmentCard.svelte`).
+Mutations submit through `use:enhance`, which re-runs every `load` on the route by default. To scope that, pass `update({ invalidateAll: false })` and invalidate one load — see `CarForm.svelte`'s `invalidate('/cars')`. `page.data` is not writable, so patching it in place is not an option.
+
+`Dialog.svelte` must **not** call `invalidateAll()` itself. Every delete/upsert controller throws `redirect(307, …)`, and for a redirect result `update()` already routes through `applyAction()` → `_goto(location, { invalidateAll: true })`. Adding an explicit call on top runs every load twice.
 
 ### UI layout
 
-Two-panel grid (2fr left, 3fr right) defined in `src/routes/+layout.svelte`. Components in `src/lib/components/`: `Bar`, `Card`, `CarForm`, `Dialog`, `Form`, `Label`, `Search`, `Section`, plus a subfolder per entity (`appointment/`, `client/`, `estimate/`, `repair/`, `vehicle/`).
+Two-panel grid (2fr left, 3fr right) defined in `src/routes/+layout.svelte`. Shared components live in `src/lib/components/`, with a subfolder per entity.
 
 `Section.svelte` wraps every scrollable panel and renders the dismiss scrim (`<button class="overlay">`) when its `overlay` prop is set.
 
 ### Styling
 
-`src/lib/app.css` is a single global stylesheet (~880 lines). There are no CSS frameworks and no utility classes; components add scoped `<style>` blocks on top.
+`src/lib/app.css` is a single global stylesheet. There are no CSS frameworks and no utility classes; components add scoped `<style>` blocks on top.
 
 - **Tokens** are oklch inside `light-dark()`, declared on `body`. Typography comes from `font:` shorthand variables (`--body1`, `--subhead1`, `--title`, …). Don't hardcode colours or font stacks.
 - **Icons** are `.icon.<name>` rules using a `mask-image` data-URI. Add a rule rather than an `<img>`.
 - **The global button rule** (`.button, button, input[type='submit']`) gives _every_ button a hover/`:focus-visible` background and a pointer cursor. To exempt one, add it to the `:not(.createButton, .overlay)` list in that rule — don't fight it with per-component overrides, which turns into a specificity war.
 - **Selects** use Chrome's customizable-select (`appearance: base-select`, `::picker(select)`, `::picker-icon`) with an `@supports not (appearance: base-select)` fallback that draws the caret with gradients. Any select styling change needs checking in both branches.
-- **Panel heights come from the grid.** `main` and `.panels` size their rows with `minmax(0, 1fr)` so that a tall panel cannot force the row open — a bare `1fr` is `minmax(auto, 1fr)`, whose content-based minimum is not capped by the container. **Do not give `.panel` an explicit height**; it stretches to its row, and its inner `Section` scrolls.
+- **Panel heights come from the grid.** `main` and `.panels` size their rows `minmax(0, 1fr)`, not `1fr`, so a tall panel cannot force the row open. **Do not give `.panel` an explicit height**; it stretches to its row, and its inner `Section` scrolls.
 
 ### Motion
 
@@ -117,7 +152,7 @@ Two layers drive animation and they share one set of values. CSS uses `--duratio
 
 - **Convention:** enter with `sineOut` / `--ease-out`, exit with `sineIn` / `--ease-in`; elements (`--duration-in` / `--duration-out`) move faster than the panels containing them (`--duration-panel-*`).
 - **Hover is instant in, eased out** — the base rule carries the transition and the `:hover` rule sets `transition: none`. Don't invert this.
-- **Never `transition: <time> <easing>` with no property** — that is `transition: all`, which watches every animatable property. List the properties that actually change. Watch for layout-triggering ones sneaking in (`font-weight` on a search row was reflowing text every frame).
+- **Never `transition: <time> <easing>` with no property** — that is `transition: all`. List the properties that actually change, and keep layout-triggering ones (like `font-weight`) out.
 - `filter: blur()` and `background-position` are not composited. Prefer `transform`/`opacity`; never nest two blur transitions, and never animate `background-position` in a loop (see the transform-driven loading bar in `Bar.svelte`).
 - `prefers-reduced-motion` is handled by one global block in `app.css`. Because Svelte compiles `fade`/`fly`/`slide`/`blur` to CSS animations, that block covers both layers. It sets `animation-duration: 0.01ms`, not `none`, because `Dialog.svelte` closes on `animationend`.
 
@@ -125,11 +160,11 @@ Two layers drive animation and they share one set of values. CSS uses `--duratio
 
 `.panel` sets `isolation: isolate`, so every panel is its own stacking context and **panels order purely by DOM position in `+layout.svelte`** — appointments/search, then route panels, then the client/estimate form panels. No panel needs a `z-index`; adding one is usually a sign something else is wrong.
 
-Inside a panel use `--layer-sticky` → `--layer-card` → `--layer-scrim` → `--layer-form` → `--layer-error`. At the root use `--layer-bar` → `--layer-cover` → `--layer-loading` → `--layer-print`. The two scales never meet, which is the point of isolating. A sticky header whose `z-index` leaks out of its panel will be painted under an incoming panel, because the `fly` transform makes that panel a stacking context for the duration of the transition.
+Inside a panel use `--layer-sticky` → `--layer-card` → `--layer-scrim` → `--layer-form` → `--layer-error`. At the root use `--layer-bar` → `--layer-cover` → `--layer-loading` → `--layer-print`. The two scales never meet. A sticky header whose `z-index` leaks out of its panel gets painted under an incoming panel, because the `fly` transform makes that panel a stacking context for the duration of the transition.
 
 ### Dialog
 
-`Dialog.svelte` does **not** close via `dialog.close()`. Firefox has no `overlay` property, so it drops the dialog out of the top layer the instant `close()` runs and the exit never renders. Every close path — Cancelar, `oncancel` (Esc and `closedby="any"` light dismiss), and `use:enhance` success — goes through `requestClose()`, which adds `.closing`, plays a keyframe exit while the dialog is still open, and only then calls `close()` on `animationend`, with a `setTimeout` backstop so a skipped animation can't leave it stuck open. **Add new close paths to `requestClose()`, not `close()`.**
+`Dialog.svelte` does **not** close via `dialog.close()`. Firefox has no `overlay` property, so it drops the dialog out of the top layer the instant `close()` runs and the exit never renders. Instead `requestClose()` adds `.closing`, plays a keyframe exit while the dialog is still open, and calls `close()` on `animationend`, with a `setTimeout` backstop. **Add new close paths to `requestClose()`, not `close()`.**
 
 The backdrop animates `opacity`, not `background-color`: `backdrop-filter` is not in any transition list, so fading the tint alone makes the blur snap on at full strength.
 

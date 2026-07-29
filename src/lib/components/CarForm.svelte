@@ -2,6 +2,7 @@
 	import { fade, fly } from 'svelte/transition';
 	import { enter, exit, flyEnter } from '$lib/motion.js';
 	import { enhance } from '$app/forms';
+	import { invalidate } from '$app/navigation';
 	import { page } from '$app/state';
 	import { windowState } from '$lib/shared.svelte.js';
 	import Label from '$lib/components/Label.svelte';
@@ -52,7 +53,8 @@
 						windowState.loading = true;
 						windowState.error = {};
 						return async ({ result, update }) => {
-							await update();
+							await update({ invalidateAll: false });
+							await invalidate('/cars');
 							windowState.loading = false;
 							if (result.type === 'success' && result.data?.carMake) {
 								carMakeId = result.data.carMake.carMakeId;
@@ -104,7 +106,8 @@
 						windowState.loading = true;
 						windowState.error = {};
 						return async ({ result, update }) => {
-							await update();
+							await update({ invalidateAll: false });
+							await invalidate('/cars');
 							if (result.type === 'success' && result.data?.carModel) {
 								carModelId = result.data.carModel.carModelId;
 								createModel = false;

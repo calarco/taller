@@ -12,13 +12,9 @@ export const load = async (event) => {
 	}
 
 	try {
-		const [{ vehicles }, repairs] = await Promise.all([event.parent(), findRepairs(userId, { vehicleId }).sort({ date: -1, updatedAt: -1 })]);
-		const vehicle = vehicles?.find((x) => x.vehicleId === vehicleId);
-		if (!vehicle) {
-			throw error(500, 'Vehiculo no encontrado');
-		}
+		const repairs = await findRepairs(userId, { vehicleId }).sort({ date: -1, updatedAt: -1 });
 
-		return { vehicle: structuredClone(vehicle), repairs: structuredClone(repairs) };
+		return { repairs: structuredClone(repairs) };
 	} catch (err) {
 		throw error(500, err.body || err.toString());
 	}

@@ -1,7 +1,5 @@
 import { error, redirect } from '@sveltejs/kit';
 import { findUser } from '$lib/server/controllers/User.controller.js';
-import { findCarMakes } from '$lib/server/controllers/CarMake.controller.js';
-import { findCarModels } from '$lib/server/controllers/CarModel.controller.js';
 import { findAppointments } from '$lib/server/controllers/Appointment.controller.js';
 import { getSearch } from '$lib/server/controllers/Search.controller.js';
 
@@ -12,10 +10,8 @@ export const load = async (event) => {
 	}
 
 	try {
-		const [user, carMakes, carModels, appointments, search] = await Promise.all([
+		const [user, appointments, search] = await Promise.all([
 			findUser(userId, { userId }),
-			findCarMakes(userId).sort({ name: 1 }),
-			findCarModels(userId).sort({ name: 1 }),
 			findAppointments(userId, { date: { $gte: new Date(new Date().setHours(0, 0, 0, 0)) } }).populate({ path: 'carModel', populate: { path: 'carMake', select: 'name' }, select: 'name carMakeId' }),
 			getSearch(userId),
 		]);
@@ -26,7 +22,7 @@ export const load = async (event) => {
 		}
 		delete user.password;
 
-		return { user: structuredClone(user), carMakes: structuredClone(carMakes), carModels: structuredClone(carModels), appointments: structuredClone(appointments), search };
+		return { user: structuredClone(user), appointments: structuredClone(appointments), search };
 	} catch (err) {
 		throw error(500, err.body || err.toString());
 	}
