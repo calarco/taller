@@ -1,17 +1,17 @@
-import { error, fail, redirect, isRedirect } from '@sveltejs/kit';
-import { getModel } from '$lib/server/db';
+import { error, fail, redirect } from '@sveltejs/kit';
+import { getModel, getNextId } from '$lib/server/db';
+import { handleServerError } from '$lib/server/errors.js';
 import { upsertVehicle } from '$lib/server/controllers/Vehicle.controller';
 
-async function getNewId(userId) {
-	let max = 1;
-	const repair = await findRepair(userId, {}, { repairId: 1 }).sort({ repairId: -1 }).collation({ locale: 'en_US', numericOrdering: true });
-	if (repair?.repairId) {
-		max = Number(repair.repairId) + 1;
-	}
-	if (isNaN(max)) {
-		throw error(500, 'ID invalida');
-	}
-	return String(max);
+function getNewId(userId) {
+	return getNextId(userId, 'repair', async () => {
+		const repair = await findRepair(userId, {}, { repairId: 1 }).sort({ repairId: -1 }).collation({ locale: 'en_US', numericOrdering: true });
+		const max = Number(repair?.repairId ?? 0);
+		if (isNaN(max)) {
+			throw error(500, 'ID invalida');
+		}
+		return max;
+	});
 }
 
 export function findRepair(userId, filters, projection = { __v: 0 }) {
@@ -70,10 +70,7 @@ export async function upsertRepairAction(event) {
 		const data = await upsertRepair(userId, repair);
 		throw redirect(307, `/${event.params.clientId}/${data.vehicleId}#${data.repairId}`);
 	} catch (err) {
-		if (isRedirect(err)) {
-			throw err;
-		}
-		throw error(500, err.body || err.toString());
+		handleServerError(err, 'upsertRepairAction');
 	}
 }
 
@@ -87,16 +84,13 @@ export async function deleteRepairAction(event) {
 		const form = await event.request.formData();
 		const repairId = form.get('repairId');
 		if (!repairId) {
-			return fail(400, { error: 'Missing id' });
+			throw error(400, 'Falta el identificador');
 		}
 
 		const Repair = getModel(userId, 'Repair');
 		await Repair.deleteOne({ repairId });
 		throw redirect(307, `/${event.params.clientId}/${event.params.vehicleId}`);
 	} catch (err) {
-		if (isRedirect(err)) {
-			throw err;
-		}
-		throw error(500, err.body || err.toString());
+		handleServerError(err, 'deleteRepairAction');
 	}
 }

@@ -19,7 +19,7 @@
 			>
 				<span class="icon close"></span>
 			</a>
-			<h4>ERROR</h4>
+			<h4>ERROR {page.status}</h4>
 		</div>
 		<h4>{page.error.message}</h4>
 	</div>

@@ -1,16 +1,16 @@
 import { error, fail } from '@sveltejs/kit';
-import { getModel } from '$lib/server/db';
+import { getModel, getNextId } from '$lib/server/db';
+import { handleServerError } from '$lib/server/errors.js';
 
-async function getNewId(userId) {
-	let max = 1;
-	const carModel = await findCarModel(userId, {}, { carModelId: 1 }).sort({ carModelId: -1 }).collation({ locale: 'en_US', numericOrdering: true });
-	if (carModel?.carModelId) {
-		max = Number(carModel.carModelId) + 1;
-	}
-	if (isNaN(max)) {
-		throw error(500, 'ID invalida');
-	}
-	return String(max);
+function getNewId(userId) {
+	return getNextId(userId, 'carModel', async () => {
+		const carModel = await findCarModel(userId, {}, { carModelId: 1 }).sort({ carModelId: -1 }).collation({ locale: 'en_US', numericOrdering: true });
+		const max = Number(carModel?.carModelId ?? 0);
+		if (isNaN(max)) {
+			throw error(500, 'ID invalida');
+		}
+		return max;
+	});
 }
 
 export function findCarModel(userId, filters, projection = { __v: 0 }) {
@@ -26,7 +26,7 @@ export function findCarModels(userId, filters, projection = { __v: 0 }) {
 export async function createCarModel(userId, carModel) {
 	const existing = await findCarModel(userId, { carMakeId: carModel.carMakeId, name: carModel.name });
 	if (existing) {
-		return fail(400, { carModelError: 'El modelo ya existe' });
+		return existing;
 	}
 	if (!carModel.carModelId) {
 		carModel.carModelId = await getNewId(userId);
@@ -55,9 +55,14 @@ export async function createCarModelAction(event) {
 			return fail(400, { carModelError: 'Ingrese el modelo' });
 		}
 
+		const existing = await findCarModel(userId, { carMakeId: carModel.carMakeId, name: carModel.name });
+		if (existing) {
+			return fail(400, { carModelError: 'El modelo ya existe' });
+		}
+
 		const data = await createCarModel(userId, carModel);
 		return { carModel: JSON.parse(JSON.stringify(data)) };
 	} catch (err) {
-		throw error(500, err.body || err.toString());
+		handleServerError(err, 'createCarModelAction');
 	}
 }

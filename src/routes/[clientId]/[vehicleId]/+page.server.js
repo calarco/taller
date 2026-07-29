@@ -1,7 +1,8 @@
 import { error } from '@sveltejs/kit';
 import { sharedActions } from '$lib/server/actions.js';
+import { handleServerError } from '$lib/server/errors.js';
 import { deleteClientAction } from '$lib/server/controllers/Client.controller.js';
-import { upsertVehicleAction, deleteVehicleAction } from '$lib/server/controllers/Vehicle.controller.js';
+import { findVehicle, upsertVehicleAction, deleteVehicleAction } from '$lib/server/controllers/Vehicle.controller.js';
 import { findRepairs, upsertRepairAction, deleteRepairAction } from '$lib/server/controllers/Repair.controller.js';
 
 export const load = async (event) => {
@@ -12,11 +13,14 @@ export const load = async (event) => {
 	}
 
 	try {
-		const repairs = await findRepairs(userId, { vehicleId }).sort({ date: -1, updatedAt: -1 });
+		const [vehicle, repairs] = await Promise.all([findVehicle(userId, { vehicleId }, { vehicleId: 1 }), findRepairs(userId, { vehicleId }).sort({ date: -1, updatedAt: -1 })]);
+		if (!vehicle) {
+			throw error(404, 'Vehículo no encontrado');
+		}
 
 		return { repairs: structuredClone(repairs) };
 	} catch (err) {
-		throw error(500, err.body || err.toString());
+		handleServerError(err, 'vehicleId page load');
 	}
 };
 

@@ -1,5 +1,6 @@
-import { error, fail, redirect, isRedirect } from '@sveltejs/kit';
+import { error, fail, redirect } from '@sveltejs/kit';
 import { getModel } from '$lib/server/db';
+import { handleServerError } from '$lib/server/errors.js';
 import { createCarModel } from '$lib/server/controllers/CarModel.controller.js';
 import { upsertClient } from '$lib/server/controllers/Client.controller';
 import { deleteRepairs, moveRepairs } from '$lib/server/controllers/Repair.controller';
@@ -91,10 +92,7 @@ export async function upsertVehicleAction(event) {
 		}
 		return { data: JSON.parse(JSON.stringify(data)) };
 	} catch (err) {
-		if (isRedirect(err)) {
-			throw err;
-		}
-		throw error(500, err.body || err.toString());
+		handleServerError(err, 'upsertVehicleAction');
 	}
 }
 
@@ -108,15 +106,12 @@ export async function deleteVehicleAction(event) {
 		const form = await event.request.formData();
 		const vehicleId = form.get('vehicleId');
 		if (!vehicleId) {
-			throw error(400, 'Missing id');
+			throw error(400, 'Falta el identificador');
 		}
 
 		await deleteByVehicleId(userId, vehicleId);
 		throw redirect(307, `/${event.params.clientId}`);
 	} catch (err) {
-		if (isRedirect(err)) {
-			throw err;
-		}
-		throw error(500, err.body || err.toString());
+		handleServerError(err, 'deleteVehicleAction');
 	}
 }

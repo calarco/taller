@@ -22,19 +22,40 @@ No test suite is configured. Correctness is enforced by ESLint (with `eslint-plu
 
 Every user gets their own MongoDB database. The main `taller` DB holds only the `User` collection. All other data (Client, Vehicle, Repair, Appointment, Estimate, CarMake, CarModel) lives in a per-user DB named after their `userId`.
 
-`getModel(userId, model)` in `src/lib/server/db.js` picks the right DB and registers schemas on first use; `initDatabase()` runs once from the `init` hook.
+`getModel(userId, model)` in `src/lib/server/db.js` picks the right DB and registers schemas on first use. `initDatabase()` runs from the `init` hook — once on success, but **again on every request while it keeps failing**, which is why the connection listeners are behind a module-level guard.
 
 Always reach models through `getModel()` — never import a model and call it directly, or you will query the wrong database.
+
+`initDatabase` deliberately does **not** register models: `mongoose.connect()` resolves to the Mongoose singleton, not a `Connection`, so registering there targets a registry nothing reads. Every tenant connection gets its own models via `getModel`.
+
+**The `userId` is the database name**, so `createUserAction` restricts it to `^[a-z0-9_-]{1,63}$`. MongoDB rejects `/ \ . " $ * < > : | ?` and caps names at 63 bytes; without the check you get an account that 500s on every request instead of failing at registration.
 
 ### Auth flow
 
 `src/hooks.server.js` validates the JWT on every request (cookies: `auth-token`, `userId`) and sets `event.locals.userId`. Unauthenticated requests are redirected to `/login`; authenticated requests to `/login` are redirected to `/`. Every `load` and action reads `event.locals.userId` and returns early without it.
 
+### Error handling
+
+Every server-side `catch` ends in `handleServerError(err, context)` from `src/lib/server/errors.js`. It re-throws redirects and `HttpError`s untouched and logs anything else before wrapping it as a 500. **Never re-wrap inside a catch block.** Wrapping a caught error in a fresh `error(500, …)` flattens a deliberate 400 or 404 into a 500, and turns a caught `redirect()` into a 500 reading `[object Object]`.
+
+Choosing how to fail:
+
+- **`fail(400, { <field>Error: 'mensaje' })`** for anything the user can correct. The key must be `<field>Error`; `use:enhance` copies `result.data` into `windowState.error` and `Label.svelte` renders it beside that field. A key no `<Label>` reads — or a field not wrapped in `Label` — is invisible, which is why delete dialogs use `error()` instead.
+- **`error(404, …)`** for missing entities, **`error(400, …)`** for a missing form id, **`error(500, …)`** only for genuine faults. These surface through `src/routes/+error.svelte`, which shows the status.
+
+**Only an action may return `fail()`.** A shared helper returns data or throws. A helper that returns an `ActionFailure` is read as a document by its callers: they take `.someId` off it, get `undefined`, and persist that while the action reports success. A duplicate check that produces a user-facing message belongs in the action, not the helper.
+
+**Logging lives in `handleServerError`, not in the `handleError` hook.** SvelteKit treats `HttpError` as _expected_ and never passes it to `handleError`, and every controller throws one — so a hook alone would log almost nothing. The hook in `hooks.server.js` is the secondary net for what escapes `resolve` untouched.
+
+**`src/error.html` is not decoration.** `+error.svelte` lives inside the root layout, so an error thrown from `+layout.server.js` — the database being unreachable, mainly — cannot render it and falls through to `error.html`. The two are styled to match; change one and change the other. It only appears on a full page load; a client-side navigation renders `+error.svelte`.
+
 ### Data layer
 
 - **Models:** `src/lib/server/models/` — Mongoose schemas, numeric auto-increment IDs per entity, cross-collection links exposed as virtuals (e.g. `Vehicle.carModel`, `Vehicle.client`, `Vehicle.repairs`)
 - **Controllers:** `src/lib/server/controllers/` — business logic; each exports both query helpers (`findVehicle`, `findRepairs`, …) and form-action handlers (`upsertVehicleAction`, …)
-- **Pattern:** lean queries, `_id`/`__v` excluded, `structuredClone` before returning from a `load`, collation-aware numeric sorting for ID generation
+- **Pattern:** lean queries, `_id`/`__v` excluded, `structuredClone` before returning from a `load`
+
+**IDs come from `getNextId(userId, key, findMax)` in `db.js`, never from reading the current maximum.** It `$inc`s a per-tenant `Counter` document (`{ _id: 'client', seq: 52 }`). Reading the max and adding one is worse than racy: creates are upserts keyed on the id just computed, so two concurrent creates pick the same id and the second **overwrites the first** instead of failing. `findMax` is a collation-aware numeric sort for the highest existing id; it runs once per tenant per entity to seed the counter, so a database without one continues its existing sequence.
 
 ### Routing
 

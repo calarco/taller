@@ -14,7 +14,7 @@
 		windowState.loading = true;
 		windowState.error = {};
 		return async ({ result, update }) => {
-			update();
+			await update();
 			windowState.loading = false;
 			if (result.type === 'success' || result.type === 'redirect') {
 				windowState.form = '';

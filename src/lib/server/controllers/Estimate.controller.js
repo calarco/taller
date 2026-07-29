@@ -1,22 +1,22 @@
 import { render } from 'svelte/server';
 import nodemailer from 'nodemailer';
-import { error, fail, redirect, isRedirect } from '@sveltejs/kit';
+import { error, fail, redirect } from '@sveltejs/kit';
 import { MAIL_USER, MAIL_PASS } from '$env/static/private';
-import { getModel } from '$lib/server/db';
+import { getModel, getNextId } from '$lib/server/db';
+import { handleServerError } from '$lib/server/errors.js';
 import { findUser } from '$lib/server/controllers/User.controller.js';
 import { createCarModel } from '$lib/server/controllers/CarModel.controller.js';
 import Estimate from '$lib/components/estimate/Estimate.svelte';
 
-async function getNewId(userId) {
-	let max = 1;
-	const estimate = await findEstimate(userId, {}, { estimateId: 1 }).sort({ estimateId: -1 }).collation({ locale: 'en_US', numericOrdering: true });
-	if (estimate?.estimateId) {
-		max = Number(estimate.estimateId) + 1;
-	}
-	if (isNaN(max)) {
-		throw error(500, 'ID invalida');
-	}
-	return String(max);
+function getNewId(userId) {
+	return getNextId(userId, 'estimate', async () => {
+		const estimate = await findEstimate(userId, {}, { estimateId: 1 }).sort({ estimateId: -1 }).collation({ locale: 'en_US', numericOrdering: true });
+		const max = Number(estimate?.estimateId ?? 0);
+		if (isNaN(max)) {
+			throw error(500, 'ID invalida');
+		}
+		return max;
+	});
 }
 
 export function findEstimate(userId, filters, projection = { __v: 0 }) {
@@ -77,10 +77,7 @@ export async function upsertEstimateAction(event) {
 		}
 		return { data: JSON.parse(JSON.stringify(data)) };
 	} catch (err) {
-		if (isRedirect(err)) {
-			throw err;
-		}
-		throw error(500, err.body || err.toString());
+		handleServerError(err, 'upsertEstimateAction');
 	}
 }
 
@@ -94,17 +91,14 @@ export async function deleteEstimateAction(event) {
 		const form = await event.request.formData();
 		const estimateId = form.get('estimateId');
 		if (!estimateId) {
-			throw error(400, 'Missing id');
+			throw error(400, 'Falta el identificador');
 		}
 
 		const Estimate = getModel(userId, 'Estimate');
 		await Estimate.deleteOne({ estimateId });
 		throw redirect(307, '/');
 	} catch (err) {
-		if (isRedirect(err)) {
-			throw err;
-		}
-		throw error(500, err.body || err.toString());
+		handleServerError(err, 'deleteEstimateAction');
 	}
 }
 
@@ -119,7 +113,7 @@ export async function sendEstimateAction(event) {
 		const estimateId = form.get('estimateId');
 		const email = form.get('email');
 		if (!estimateId) {
-			throw error(400, 'Missing id');
+			throw error(400, 'Falta el identificador');
 		}
 		if (!email) {
 			return fail(400, { emailError: 'Ingrese un email' });
@@ -127,10 +121,12 @@ export async function sendEstimateAction(event) {
 
 		const [estimate, user] = await Promise.all([findEstimate(userId, { estimateId }).populate({ path: 'carModel', populate: { path: 'carMake' } }), findUser(userId, { userId })]);
 		if (!estimate) {
-			throw error(500, 'Presupuesto no encontrado');
+			throw error(404, 'Presupuesto no encontrado');
 		}
 		if (!user) {
-			throw error(500, 'Usuario no encontrado');
+			event.cookies.delete('auth-token', { path: '/' });
+			event.cookies.delete('userId', { path: '/' });
+			throw redirect(307, '/login');
 		}
 
 		const rendered = render(Estimate, { props: { estimate, user } });
@@ -153,14 +149,13 @@ export async function sendEstimateAction(event) {
 			subject: 'Presupuesto',
 			html: rendered.html,
 		});
-		if (data.accepted[0] === email) {
-			await upsertEstimate(userId, { estimateId, email });
+		if (!data?.accepted?.includes(email)) {
+			throw error(502, 'No se pudo enviar el correo');
 		}
+
+		await upsertEstimate(userId, { estimateId, email });
 		return { data: JSON.parse(JSON.stringify(data)) };
 	} catch (err) {
-		if (isRedirect(err)) {
-			throw err;
-		}
-		throw error(500, err.body || err.toString());
+		handleServerError(err, 'sendEstimateAction');
 	}
 }

@@ -1,16 +1,16 @@
 import { error, fail } from '@sveltejs/kit';
-import { getModel } from '$lib/server/db';
+import { getModel, getNextId } from '$lib/server/db';
+import { handleServerError } from '$lib/server/errors.js';
 
-async function getNewId(userId) {
-	let max = 1;
-	const carMake = await findCarMake(userId, {}, { carMakeId: 1 }).sort({ carMakeId: -1 }).collation({ locale: 'en_US', numericOrdering: true });
-	if (carMake?.carMakeId) {
-		max = Number(carMake.carMakeId) + 1;
-	}
-	if (isNaN(max)) {
-		throw error(500, 'ID invalida');
-	}
-	return String(max);
+function getNewId(userId) {
+	return getNextId(userId, 'carMake', async () => {
+		const carMake = await findCarMake(userId, {}, { carMakeId: 1 }).sort({ carMakeId: -1 }).collation({ locale: 'en_US', numericOrdering: true });
+		const max = Number(carMake?.carMakeId ?? 0);
+		if (isNaN(max)) {
+			throw error(500, 'ID invalida');
+		}
+		return max;
+	});
 }
 
 export function findCarMake(userId, filters, projection = { __v: 0 }) {
@@ -48,6 +48,6 @@ export async function createCarMakeAction(event) {
 		const data = await CarMake.create(carMake);
 		return { carMake: JSON.parse(JSON.stringify(data)) };
 	} catch (err) {
-		throw error(500, err.body || err.toString());
+		handleServerError(err, 'createCarMakeAction');
 	}
 }

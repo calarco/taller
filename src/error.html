@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="es">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" href="/favicon.png" />
+		<link rel="preload" as="font" type="font/woff2" href="/Supreme-Variable.woff2" crossorigin />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Error %sveltekit.status%</title>
+		<style>
+			*,
+			*::before,
+			*::after {
+				box-sizing: border-box;
+			}
+
+			:root {
+				color-scheme: light dark;
+			}
+
+			html {
+				font-size: 16px;
+			}
+
+			html,
+			body {
+				height: 100dvh;
+				width: 100vw;
+				margin: 0;
+				overflow: hidden;
+			}
+
+			@font-face {
+				font-family: 'Supreme-Variable';
+				src: url('/Supreme-Variable.woff2') format('woff2');
+				font-weight: 100 800;
+				font-display: swap;
+			}
+
+			@font-face {
+				font-family: 'Supreme-Fallback';
+				src: local('HelveticaNeue-Medium'), local('Helvetica Neue Medium');
+				font-weight: 450 599;
+				size-adjust: 95.21%;
+				ascent-override: 102.93%;
+				descent-override: 29.41%;
+				line-gap-override: 9.45%;
+			}
+
+			body {
+				--font-family: 'Supreme-Variable', 'Supreme-Fallback', system-ui, -apple-system, 'Segoe UI', sans-serif;
+				--body2: 500 0.9rem/1.5rem var(--font-family);
+				--subhead2: 500 1rem/1.75rem var(--font-family);
+
+				--primary-hue: 233;
+
+				--on-background: light-dark(oklch(0 0 360 / 90%), oklch(1 0 360));
+				--on-foreground: light-dark(oklch(1 0 360), oklch(0 0 360 / 90%));
+				--on-foreground-variant: light-dark(oklch(1 0 360 / 30%), oklch(0 0 360 / 15%));
+
+				--background: light-dark(oklch(0.84 0.01 var(--primary-hue)), oklch(0.13 0.01 var(--primary-hue)));
+				--overlay: light-dark(oklch(0.92 0.01 var(--primary-hue) / 0.6), oklch(0.15 0.01 var(--primary-hue) / 0.8));
+				--highlight: light-dark(oklch(0.51 0.03 var(--primary-hue) / 0.1), oklch(0.51 0.03 var(--primary-hue) / 0.1));
+
+				--border-variant: light-dark(oklch(0.6 0.05 var(--primary-hue) / 0.25), oklch(0.3 0.02 var(--primary-hue) / 0.4));
+				--primary: light-dark(oklch(0.61 0.09 var(--primary-hue)), oklch(0.69 0.12 var(--primary-hue)));
+				--error: light-dark(oklch(0.63 0.13 15), oklch(0.65 0.23 21));
+
+				--shadow: 0 0.5px 0.7px rgba(0, 0, 0, 0.079), 0 1.6px 2.5px rgba(0, 0, 0, 0.059), 5px 7px 11px hsla(202, 0%, 35%, 0.1), -5px -5px 10px rgba(255, 255, 255, 0.5);
+				@media (prefers-color-scheme: dark) {
+					--shadow: 0 0.5px 0.7px rgba(0, 0, 0, 0.079), 0 1.6px 2.5px rgba(0, 0, 0, 0.059), 5px 7px 11px hsla(202, 0%, 0%, 0.1), -5px -5px 10px hsla(202, 100%, 50%, 0.01);
+				}
+
+				--duration-fast: 0.1s;
+				--ease-out: cubic-bezier(0.39, 0.575, 0.565, 1);
+				--border-radius: 0.75rem;
+
+				@supports (corner-shape: superellipse(2)) {
+					--border-radius: 1.5rem;
+
+					* {
+						corner-shape: superellipse(2);
+					}
+				}
+
+				-webkit-font-smoothing: antialiased;
+				-moz-osx-font-smoothing: grayscale;
+				font-family: var(--font-family);
+				color: var(--on-background);
+				background: var(--background);
+				user-select: none;
+			}
+
+			h4 {
+				display: inline-block;
+				margin: 0;
+				color: var(--on-background);
+				font: var(--subhead2);
+
+				&::before {
+					content: '';
+					display: inline-block;
+					height: 0;
+					width: 0;
+					margin-top: calc((1 - 2.25) * 0.5em);
+				}
+			}
+
+			.button {
+				position: relative;
+				padding: 0.5rem 1rem;
+				border-radius: var(--border-radius);
+				border: none;
+				background: none;
+				text-align: center;
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				font: var(--body2);
+				color: var(--primary);
+				text-decoration: none;
+				transition:
+					background-color var(--duration-fast) var(--ease-out),
+					color var(--duration-fast) var(--ease-out);
+
+				&:focus-visible {
+					background: var(--highlight);
+				}
+
+				&:hover {
+					cursor: pointer;
+					background: var(--highlight);
+					transition: none;
+				}
+			}
+
+			.icon {
+				display: grid;
+				grid-auto-flow: column;
+				align-items: center;
+				vertical-align: middle;
+
+				&::before {
+					content: '';
+					display: inline-block;
+					width: 1.5rem;
+					height: 1.5rem;
+					vertical-align: -0.47em;
+					background: var(--primary);
+				}
+			}
+
+			.icon.close::before {
+				mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='m6.4 18.308l-.708-.708l5.6-5.6l-5.6-5.6l.708-.708l5.6 5.6l5.6-5.6l.708.708l-5.6 5.6l5.6 5.6l-.708.708l-5.6-5.6z'/%3E%3C/svg%3E");
+			}
+
+			.cover {
+				position: absolute;
+				top: 0;
+				bottom: 0;
+				left: 0;
+				right: 0;
+				min-height: 3rem;
+				display: grid;
+				justify-items: center;
+				align-items: center;
+				background: var(--overlay);
+
+				> div {
+					width: 40rem;
+					max-width: calc(100vw - 2rem);
+					border-radius: var(--border-radius);
+					overflow: hidden;
+					background: var(--error);
+					box-shadow: var(--shadow);
+					outline: 1px solid var(--border-variant);
+					display: grid;
+					align-items: center;
+					grid-template-columns: auto;
+					grid-template-rows: auto 1fr;
+
+					> div {
+						display: grid;
+						grid-template-columns: auto 1fr 3.5rem;
+						justify-items: center;
+						align-items: center;
+						border-bottom: 1px solid var(--on-foreground-variant);
+
+						a {
+							border-radius: 0px;
+							height: 100%;
+							border-right: 1px solid var(--on-foreground-variant);
+
+							.icon::before {
+								background: var(--on-foreground);
+							}
+						}
+					}
+
+					h4 {
+						padding: 0.5rem 1rem;
+						color: var(--on-foreground);
+						text-align: center;
+						user-select: text;
+					}
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="cover">
+			<div>
+				<div>
+					<a class="button" href="/" aria-label="cerrar">
+						<span class="icon close"></span>
+					</a>
+					<h4>ERROR %sveltekit.status%</h4>
+				</div>
+				<h4>%sveltekit.error.message%</h4>
+			</div>
+		</div>
+	</body>
+</html>

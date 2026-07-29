@@ -1,4 +1,4 @@
-import { error } from '@sveltejs/kit';
+import { handleServerError } from '$lib/server/errors.js';
 import { findClients } from '$lib/server/controllers/Client.controller';
 import { findVehicles } from '$lib/server/controllers/Vehicle.controller';
 import { findRepairs } from '$lib/server/controllers/Repair.controller';
@@ -249,6 +249,6 @@ export async function getSearch(userId, value, type) {
 
 		return finalize(search);
 	} catch (err) {
-		throw error(500, err.body || err.toString());
+		handleServerError(err, 'getSearch');
 	}
 }

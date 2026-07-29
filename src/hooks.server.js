@@ -26,3 +26,8 @@ export async function handle({ event, resolve }) {
 	const response = await resolve(event);
 	return response;
 }
+
+export function handleError({ error, event }) {
+	console.error(`[${event.request.method} ${event.url.pathname}]`, error);
+	return { message: error?.toString() || 'Error' };
+}

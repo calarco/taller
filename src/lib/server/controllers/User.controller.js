@@ -1,8 +1,9 @@
-import { error, fail } from '@sveltejs/kit';
+import { fail } from '@sveltejs/kit';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { JWT_KEY } from '$env/static/private';
 import { getModel } from '$lib/server/db';
+import { handleServerError } from '$lib/server/errors.js';
 
 export function findUser(userId, filters) {
 	const User = getModel(userId, 'User');
@@ -50,7 +51,7 @@ export async function loginUserAction(event) {
 		const message = 'Usuario ingresado';
 		return { message };
 	} catch (err) {
-		throw error(500, err.body || err.toString());
+		handleServerError(err, 'loginUserAction');
 	}
 }
 
@@ -67,6 +68,9 @@ export async function createUserAction(event) {
 		if (!userId) {
 			return fail(400, { userIdError: 'Ingrese el usuario' });
 		}
+		if (!/^[a-z0-9_-]{1,63}$/.test(userId)) {
+			return fail(400, { userIdError: 'El usuario solo admite letras, números, guiones y guiones bajos' });
+		}
 		if (!password) {
 			return fail(400, { passwordError: 'Ingrese la contraseña' });
 		}
@@ -80,7 +84,7 @@ export async function createUserAction(event) {
 		const data = await User.create({ userId, password: hashedPassword });
 		return { data: JSON.parse(JSON.stringify(data)) };
 	} catch (err) {
-		throw error(500, err.body || err.toString());
+		handleServerError(err, 'createUserAction');
 	}
 }
 
@@ -110,6 +114,6 @@ export async function editUserAction(event) {
 		delete updated.password;
 		return { user: updated };
 	} catch (err) {
-		throw error(500, err.body || err.toString());
+		handleServerError(err, 'editUserAction');
 	}
 }

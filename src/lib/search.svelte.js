@@ -21,11 +21,11 @@ export function createSearch({ type = '' } = {}) {
 			windowState.loading = true;
 			try {
 				const response = await fetch(`/search?${type ? 'type=' + type + '&' : ''}q=${encodeURIComponent(query)}`, { signal: controller.signal });
-				const data = await response.json();
+				const data = response.ok ? await response.json() : null;
 				if (current !== seq) {
 					return;
 				}
-				results = data || [];
+				results = Array.isArray(data) ? data : [];
 				settled = true;
 			} catch (err) {
 				if (err.name !== 'AbortError') {

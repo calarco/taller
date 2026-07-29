@@ -1,17 +1,17 @@
 import { error, fail } from '@sveltejs/kit';
-import { getModel } from '$lib/server/db';
+import { getModel, getNextId } from '$lib/server/db';
+import { handleServerError } from '$lib/server/errors.js';
 import { createCarModel } from '$lib/server/controllers/CarModel.controller.js';
 
-async function getNewId(userId) {
-	let max = 1;
-	const appointment = await findAppointment(userId, {}, { appointmentId: 1 }).sort({ appointmentId: -1 }).collation({ locale: 'en_US', numericOrdering: true });
-	if (appointment?.appointmentId) {
-		max = Number(appointment.appointmentId) + 1;
-	}
-	if (isNaN(max)) {
-		throw error(500, 'ID invalida');
-	}
-	return String(max);
+function getNewId(userId) {
+	return getNextId(userId, 'appointment', async () => {
+		const appointment = await findAppointment(userId, {}, { appointmentId: 1 }).sort({ appointmentId: -1 }).collation({ locale: 'en_US', numericOrdering: true });
+		const max = Number(appointment?.appointmentId ?? 0);
+		if (isNaN(max)) {
+			throw error(500, 'ID invalida');
+		}
+		return max;
+	});
 }
 
 export function findAppointment(userId, filters, projection = { __v: 0 }) {
@@ -53,7 +53,7 @@ export async function createAppointmentAction(event) {
 		const data = await Appointment.create(appointment);
 		return { data: JSON.parse(JSON.stringify(data)) };
 	} catch (err) {
-		throw error(500, err.body || err.toString());
+		handleServerError(err, 'createAppointmentAction');
 	}
 }
 
@@ -67,7 +67,7 @@ export async function deleteAppointmentAction(event) {
 		const form = await event.request.formData();
 		const appointmentId = form.get('appointmentId');
 		if (!appointmentId) {
-			return fail(400, { error: 'Missing id' });
+			throw error(400, 'Falta el identificador');
 		}
 
 		const Appointment = getModel(userId, 'Appointment');
@@ -75,6 +75,6 @@ export async function deleteAppointmentAction(event) {
 		const message = 'Turno borrado';
 		return { message };
 	} catch (err) {
-		throw error(500, err.body || err.toString());
+		handleServerError(err, 'deleteAppointmentAction');
 	}
 }

@@ -51,7 +51,7 @@
 						windowState.loading = true;
 						windowState.error = {};
 						return async ({ result, update }) => {
-							update({ reset: false });
+							await update({ reset: false });
 							windowState.loading = false;
 							if (result.type === 'failure' && result.data) {
 								windowState.error = result.data;

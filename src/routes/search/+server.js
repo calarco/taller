@@ -1,4 +1,5 @@
-import { error, json } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
+import { handleServerError } from '$lib/server/errors.js';
 import { getSearch } from '$lib/server/controllers/Search.controller.js';
 
 export const GET = async (event) => {
@@ -11,6 +12,6 @@ export const GET = async (event) => {
 		const search = await getSearch(userId, event.url.searchParams.get('q') || '', event.url.searchParams.get('type') || '');
 		return json(search);
 	} catch (err) {
-		throw error(500, err.body || err.toString());
+		handleServerError(err, 'search endpoint');
 	}
 };
