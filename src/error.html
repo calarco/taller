@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<link rel="icon" href="/favicon.png" />
-		<link rel="preload" as="font" type="font/woff2" href="/Supreme-Variable.woff2" crossorigin />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<title>Error %sveltekit.status%</title>
 		<style>
@@ -30,13 +29,6 @@
 			}
 
 			@font-face {
-				font-family: 'Supreme-Variable';
-				src: url('/Supreme-Variable.woff2') format('woff2');
-				font-weight: 100 800;
-				font-display: swap;
-			}
-
-			@font-face {
 				font-family: 'Supreme-Fallback';
 				src: local('HelveticaNeue-Medium'), local('Helvetica Neue Medium');
 				font-weight: 450 599;
@@ -47,7 +39,7 @@
 			}
 
 			body {
-				--font-family: 'Supreme-Variable', 'Supreme-Fallback', system-ui, -apple-system, 'Segoe UI', sans-serif;
+				--font-family: 'Supreme-Fallback', system-ui, -apple-system, 'Segoe UI', sans-serif;
 				--body2: 500 0.9rem/1.5rem var(--font-family);
 				--subhead2: 500 1rem/1.75rem var(--font-family);
 

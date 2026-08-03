@@ -7,6 +7,7 @@
 	import ClientForm from '$lib/components/client/ClientForm.svelte';
 	import EstimateForm from '$lib/components/estimate/EstimateForm.svelte';
 	import '$lib/app.css';
+	import supreme from '$lib/assets/Supreme-Variable.woff2?url';
 
 	let { children } = $props();
 
@@ -46,6 +47,7 @@
 <svelte:head>
 	<title>Sistema Taller</title>
 	<meta name="description" content="Gestión de taller mecánico" />
+	<link rel="preload" as="font" type="font/woff2" href={supreme} crossorigin />
 </svelte:head>
 
 <main>
