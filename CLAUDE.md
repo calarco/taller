@@ -63,7 +63,7 @@ Choosing how to fail:
 
 ```
 /                        → dashboard (requires auth)
-/login                   → auth page
+/login                   → auth page, and the landing page (see below)
 /[clientId]              → client detail
 /[clientId]/[vehicleId]  → vehicle detail
 /estimate/[estimateId]   → estimate (supports print-to-PDF)
@@ -147,6 +147,25 @@ or out. Regenerate the fixture with `npm run demo:fixture` (committed, in `.pret
   `sendEstimate` is blocked too, with `error(403, …)` rather than `fail()` because that email input is
   not wrapped in a `Label`. Both forms still render, `disabled`. Every other mutation lives inside the
   tenant, so the next reset undoes it.
+
+### The landing page
+
+`/login` renders a landing card — title, description, **Ingresar** and **Probar demo** — instead of the
+form when `event.url.hostname` matches the list in `login/+page.server.js` — the public domain plus
+localhost. Every other host gets the plain form, so future tenant subdomains are unaffected. `hooks`
+already 307s `/` → `/login` anonymous and `/login` → `/` authenticated, so no routing changes were
+needed; `Ingresar` just flips local state, it does not navigate.
+
+- **Resolve the hostname in `load`, never in the component.** On the client `page.url.hostname` comes
+  from `location`; on the server it comes from `ORIGIN || get_origin(headers)` in adapter-node. If an
+  `ORIGIN` is ever set those disagree and hydration mismatches. A server-resolved boolean cannot.
+- `/login` has **named actions** — `login` and `demo` — because SvelteKit forbids mixing a `default`
+  action with named ones. `demoLoginAction` checks no password: it looks up `demo`, calls the shared
+  `signIn` helper and `resetDemo`. Hardcoding `demo`/`demo` in the page instead would break silently
+  the day the password changes.
+- Neither action redirects. `update()` re-runs the load, and `hooks` does the redirect on that request.
+- `vite dev` rejects an unrecognised `Host` header with a 403, so host-based behaviour can only be
+  tested against `node build/index.js`, not `npm run dev`.
 
 ### Estimates and email
 

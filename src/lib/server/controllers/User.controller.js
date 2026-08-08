@@ -1,4 +1,4 @@
-import { fail } from '@sveltejs/kit';
+import { error, fail } from '@sveltejs/kit';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { JWT_KEY } from '$env/static/private';
@@ -23,6 +23,17 @@ export function authenticate(cookies) {
 	}
 }
 
+function signIn(event, user) {
+	const token = jwt.sign({ id: user._id.toString(), userId: user.userId }, JWT_KEY, { expiresIn: '30d' });
+	event.cookies.set('auth-token', token, {
+		httpOnly: true,
+		secure: true,
+		path: '/',
+		maxAge: 60 * 60 * 24 * 30,
+	});
+	event.cookies.delete('userId', { path: '/' });
+}
+
 export async function loginUserAction(event) {
 	try {
 		const form = await event.request.formData();
@@ -40,21 +51,30 @@ export async function loginUserAction(event) {
 			return fail(400, { passwordError: 'Usuario o contraseña incorrecta' });
 		}
 
-		const token = jwt.sign({ id: user._id.toString(), userId: user.userId }, JWT_KEY, { expiresIn: '30d' });
-		event.cookies.set('auth-token', token, {
-			httpOnly: true,
-			secure: true,
-			path: '/',
-			maxAge: 60 * 60 * 24 * 30,
-		});
-		event.cookies.delete('userId', { path: '/' });
-
+		signIn(event, user);
 		await resetDemo(userId);
 
 		const message = 'Usuario ingresado';
 		return { message };
 	} catch (err) {
 		handleServerError(err, 'loginUserAction');
+	}
+}
+
+export async function demoLoginAction(event) {
+	try {
+		const user = await findUser('demo', { userId: 'demo' });
+		if (!user) {
+			throw error(404, 'La cuenta de demostración no está disponible');
+		}
+
+		signIn(event, user);
+		await resetDemo('demo');
+
+		const message = 'Usuario ingresado';
+		return { message };
+	} catch (err) {
+		handleServerError(err, 'demoLoginAction');
 	}
 }
 
