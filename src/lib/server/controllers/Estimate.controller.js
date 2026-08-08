@@ -108,6 +108,9 @@ export async function sendEstimateAction(event) {
 		if (!userId) {
 			return;
 		}
+		if (userId === 'demo') {
+			throw error(403, 'El envío de correos está desactivado en la cuenta de demostración');
+		}
 
 		const form = await event.request.formData();
 		const estimateId = form.get('estimateId');

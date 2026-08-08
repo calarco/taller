@@ -10,6 +10,7 @@
 	let { data } = $props();
 
 	let estimate = $derived(data.estimate || {});
+	let isDemo = $derived(data.user?.userId === 'demo');
 	let dialog = $state();
 </script>
 
@@ -47,6 +48,7 @@
 				<form
 					method="POST"
 					action="?/sendEstimate"
+					title={isDemo ? 'No disponible en la cuenta de demostración' : undefined}
 					use:enhance={() => {
 						windowState.loading = true;
 						windowState.error = {};
@@ -60,8 +62,8 @@
 					}}
 				>
 					<input type="hidden" name="estimateId" value={estimate.estimateId} />
-					<input type="email" name="email" placeholder="Dirección de correo" value={estimate.email || ''} />
-					<button type="submit" aria-label="editar">
+					<input type="email" name="email" placeholder="Dirección de correo" value={estimate.email || ''} disabled={isDemo} />
+					<button type="submit" aria-label="editar" disabled={isDemo}>
 						{#if estimate.email}
 							<span class="icon mailok" in:blur={blurEnter} out:blur={blurExit}></span>
 						{:else}

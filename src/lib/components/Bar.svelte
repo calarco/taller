@@ -11,6 +11,7 @@
 	let settingsDialog = $state();
 	let url = $derived(page.url.pathname.split('/'));
 	let user = $derived(page.data.user || {});
+	let isDemo = $derived(user.userId === 'demo');
 	$effect(() => {
 		if (url.length && url[1] === '/login') {
 			logoutDialog.close();
@@ -117,21 +118,21 @@
 		</div>
 	</div>
 </div>
-<Dialog bind:dialog={settingsDialog} title={user.userId} action="?/editUser" actionText="Guardar" --grid-columns="1fr 1fr [end]" --min-width="40rem">
+<Dialog bind:dialog={settingsDialog} title={user.userId} action="?/editUser" actionText="Guardar" disabled={isDemo} --grid-columns="1fr 1fr [end]" --min-width="40rem">
 	<Label title="Nombre" error={windowState.error?.nameError}>
-		<input type="text" name="name" placeholder="-" autoComplete="off" value={user.name || ''} />
+		<input type="text" name="name" placeholder="-" autoComplete="off" value={user.name || ''} disabled={isDemo} />
 	</Label>
 	<Label title="Dirección" error={windowState.error?.addressError}>
-		<input type="text" name="address" placeholder="-" autoComplete="off" value={user.address || ''} />
+		<input type="text" name="address" placeholder="-" autoComplete="off" value={user.address || ''} disabled={isDemo} />
 	</Label>
 	<Label title="Teléfono" error={windowState.error?.phoneError}>
-		<input type="tel" name="phone" pattern="\d*" placeholder="-" autoComplete="off" value={user.phone || ''} />
+		<input type="tel" name="phone" pattern="\d*" placeholder="-" autoComplete="off" value={user.phone || ''} disabled={isDemo} />
 	</Label>
 	<Label title="Correo electrónico" error={windowState.error?.emailError}>
-		<input style="text-transform: lowercase;" type="email" name="email" placeholder="-" autoComplete="off" value={user.email || ''} />
+		<input style="text-transform: lowercase;" type="email" name="email" placeholder="-" autoComplete="off" value={user.email || ''} disabled={isDemo} />
 	</Label>
 	<Label title="Descripción" error={windowState.error?.descriptionError} --column-end="span 2">
-		<input type="text" name="description" placeholder="-" autoComplete="off" value={user.description || ''} />
+		<input type="text" name="description" placeholder="-" autoComplete="off" value={user.description || ''} disabled={isDemo} />
 	</Label>
 </Dialog>
 <Dialog bind:dialog={logoutDialog} title={`¿Cerrar la sesión de ${user.name || user.userId}?`} action="?/logout" actionText="Cerrar sesión" />

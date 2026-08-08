@@ -2,7 +2,7 @@
 	import { enhance } from '$app/forms';
 	import { windowState } from '$lib/shared.svelte.js';
 
-	let { dialog = $bindable(), title, actionText, action, children } = $props();
+	let { dialog = $bindable(), title, actionText, action, disabled = false, children } = $props();
 
 	let closing = $state(false);
 	let closeTimer;
@@ -64,7 +64,7 @@
 			{/if}
 			<div class="dialogButtons">
 				<button type="button" onclick={requestClose}>Cancelar</button>
-				<button type="submit">{actionText || 'Borrar'}</button>
+				<button type="submit" {disabled}>{actionText || 'Borrar'}</button>
 			</div>
 		</form>
 	</div>
@@ -101,6 +101,54 @@
 			}
 		}
 
+		.dialogButtons {
+			grid-column-start: 1;
+			grid-column-end: span end;
+			position: relative;
+			width: 100%;
+			height: 3rem;
+			overflow: hidden;
+			border-top: 1px solid var(--border-variant);
+			display: flex;
+			gap: 1px;
+
+			&:nth-child(1) {
+				border-top: none;
+			}
+
+			button {
+				width: 100%;
+				height: 3rem;
+				padding: 0 1.5rem;
+				border-radius: 0px;
+				background: none;
+				border: none;
+				text-transform: uppercase;
+
+				&:focus {
+					background: none;
+				}
+
+				&:not(:disabled):hover {
+					cursor: pointer;
+					background: var(--highlight);
+				}
+
+				&:not(:first-child)::after {
+					content: '';
+					position: absolute;
+					top: 0;
+					left: -1px;
+					bottom: 0;
+					border-left: 1px solid var(--border-variant);
+				}
+			}
+
+			button[type='submit']:not(:disabled) {
+				color: var(--error);
+			}
+		}
+
 		&.save {
 			outline: 1px solid var(--primary);
 			background: var(--primary);
@@ -121,7 +169,7 @@
 					background: var(--surface);
 					border-top: none;
 
-					> button[type='submit'] {
+					> button[type='submit']:not(:disabled) {
 						color: var(--secondary);
 					}
 				}

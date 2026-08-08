@@ -28,7 +28,9 @@ Always reach models through `getModel()` — never import a model and call it di
 
 `initDatabase` deliberately does **not** register models: `mongoose.connect()` resolves to the Mongoose singleton, not a `Connection`, so registering there targets a registry nothing reads. Every tenant connection gets its own models via `getModel`.
 
-**The `userId` is the database name**, so `createUserAction` restricts it to `^[a-z0-9_-]{1,63}$`. MongoDB rejects `/ \ . " $ * < > : | ?` and caps names at 63 bytes; without the check you get an account that 500s on every request instead of failing at registration.
+**The `userId` is the database name**, so it has to match `^[a-z0-9_-]{1,63}$`. MongoDB rejects `/ \ . " $ * < > : | ?` and caps names at 63 bytes; break that and you get an account that 500s on every request.
+
+**There is no sign-up, and adding one is a mistake.** Accounts are created by inserting a document into `taller.users` by hand — `userId`, a `bcrypt.hash(password, 10)`, and a `name` (the estimate header renders it, and `editUserAction` refuses to save a profile without one). Every route sits behind the auth wall, so a sign-up form is only ever reachable by an already-logged-in user; that makes any account — the `demo` one especially — a way to create unbounded tenant databases that nothing cleans up.
 
 ### Auth flow
 
@@ -61,7 +63,7 @@ Choosing how to fail:
 
 ```
 /                        → dashboard (requires auth)
-/login, /register        → auth pages
+/login                   → auth page
 /[clientId]              → client detail
 /[clientId]/[vehicleId]  → vehicle detail
 /estimate/[estimateId]   → estimate (supports print-to-PDF)
@@ -127,6 +129,24 @@ export const actions = { ...sharedActions, upsertVehicle, deleteVehicle, upsertR
 ```
 
 **A new action reachable from a root-layout component belongs in `sharedActions`, not in one route file.** Putting it in a single `+page.server.js` makes the form 404 on every other route. Route-specific actions (`upsertRepair`, `deleteVehicle`, `sendEstimate`, …) stay in the route that owns them.
+
+### The demo tenant
+
+`demo` (password `demo`) is a throwaway account. `resetDemo` reloads its tenant database from
+`src/lib/server/demo-fixture.json` on demo login and logout; it no-ops for other accounts and swallows
+its own errors, the one place that skips `handleServerError` — a failed reset must not break signing in
+or out. Regenerate the fixture with `npm run demo:fixture` (committed, in `.prettierignore`).
+
+- The fixture stores **day offsets, not dates**. A new date field must be added to `dateFields` in
+  `Demo.controller.js`: Mongoose casts a bare number in a `Date` field to epoch milliseconds, so a
+  missed field lands in 1970 instead of throwing.
+- `insertMany` needs `{ timestamps: false }`, or Mongoose overwrites `createdAt`/`updatedAt` and the
+  whole history collapses onto today. Clear with `deleteMany({})`, not `drop()`, which discards the
+  declared indexes. `Counter` is cleared but never reloaded — `getNextId`'s `findMax` re-seeds it.
+- The `User` document is never touched; `editUser` is blocked instead, so the profile cannot drift.
+  `sendEstimate` is blocked too, with `error(403, …)` rather than `fail()` because that email input is
+  not wrapped in a `Label`. Both forms still render, `disabled`. Every other mutation lives inside the
+  tenant, so the next reset undoes it.
 
 ### Estimates and email
 

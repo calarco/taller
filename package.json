@@ -9,7 +9,8 @@
 		"preview": "vite preview",
 		"prepare": "svelte-kit sync || echo ''",
 		"format": "prettier --write .",
-		"lint": "prettier --check . && eslint ."
+		"lint": "prettier --check . && eslint .",
+		"demo:fixture": "node scripts/generate-demo-fixture.js"
 	},
 	"devDependencies": {
 		"@eslint/compat": "^1.2.5",

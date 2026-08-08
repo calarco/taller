@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import { JWT_KEY } from '$env/static/private';
 import { getModel } from '$lib/server/db';
 import { handleServerError } from '$lib/server/errors.js';
+import { resetDemo } from '$lib/server/controllers/Demo.controller.js';
 
 export function findUser(userId, filters) {
 	const User = getModel(userId, 'User');
@@ -48,43 +49,12 @@ export async function loginUserAction(event) {
 		});
 		event.cookies.delete('userId', { path: '/' });
 
+		await resetDemo(userId);
+
 		const message = 'Usuario ingresado';
 		return { message };
 	} catch (err) {
 		handleServerError(err, 'loginUserAction');
-	}
-}
-
-export async function createUserAction(event) {
-	try {
-		if (!event.locals.userId) {
-			return;
-		}
-
-		const form = await event.request.formData();
-		const userId = (form.get('userId') || '').toLowerCase().trim();
-		const password = form.get('password');
-
-		if (!userId) {
-			return fail(400, { userIdError: 'Ingrese el usuario' });
-		}
-		if (!/^[a-z0-9_-]{1,63}$/.test(userId)) {
-			return fail(400, { userIdError: 'El usuario solo admite letras, números, guiones y guiones bajos' });
-		}
-		if (!password) {
-			return fail(400, { passwordError: 'Ingrese la contraseña' });
-		}
-		const existing = await findUser(userId, { userId });
-		if (existing) {
-			return fail(400, { userIdError: 'El usuario ya existe' });
-		}
-
-		const hashedPassword = await bcrypt.hash(password, 10);
-		const User = getModel(userId, 'User');
-		const data = await User.create({ userId, password: hashedPassword });
-		return { data: JSON.parse(JSON.stringify(data)) };
-	} catch (err) {
-		handleServerError(err, 'createUserAction');
 	}
 }
 
@@ -93,6 +63,9 @@ export async function editUserAction(event) {
 		const userId = event.locals.userId;
 		if (!userId) {
 			return;
+		}
+		if (userId === 'demo') {
+			return fail(400, { nameError: 'No disponible en la cuenta de demostración' });
 		}
 
 		const form = await event.request.formData();

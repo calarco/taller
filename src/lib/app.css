@@ -337,8 +337,8 @@ textarea {
 		box-shadow var(--duration-fast) var(--ease-out),
 		color var(--duration-fast) var(--ease-out);
 
-	&:is(:-webkit-autofill, :autofill):hover,
-	&:hover {
+	&:not(:disabled):is(:-webkit-autofill, :autofill):hover,
+	&:not(:disabled):hover {
 		border: none;
 		background: var(--highlight);
 		transition: none;
@@ -507,6 +507,20 @@ select,
 		display var(--duration-out) var(--ease-in) allow-discrete;
 }
 
+select::picker(select)::-webkit-scrollbar {
+	width: var(--scrollbar-width);
+	height: var(--scrollbar-width);
+	border-radius: 0 var(--border-radius) var(--border-radius) 0;
+}
+select::picker(select)::-webkit-scrollbar-track {
+	border-radius: 0 var(--border-radius) var(--border-radius) 0;
+	background: var(--scrollbar-track);
+}
+select::picker(select)::-webkit-scrollbar-thumb {
+	border-radius: 0 var(--border-radius) var(--border-radius) 0;
+	background: var(--on-background-disabled);
+}
+
 ::picker(select):popover-open {
 	opacity: 1;
 	transform: none;
@@ -610,7 +624,7 @@ input[type='submit'] {
 		background: var(--highlight);
 	}
 
-	&:not(.overlay):hover {
+	&:not(.overlay):not(:disabled):hover {
 		cursor: pointer;
 		background: var(--highlight);
 		transition: none;
@@ -624,15 +638,19 @@ input[type='submit'] {
 		cursor: default;
 		background: none;
 		color: var(--on-background-disabled);
+
+		.icon::before {
+			background: var(--on-background-disabled);
+		}
 	}
 }
 
-button[type='submit'],
-input[type='submit'] {
+button[type='submit']:not(:disabled),
+input[type='submit']:not(:disabled) {
 	color: var(--secondary);
 }
 
-button[type='reset'] {
+button[type='reset']:not(:disabled) {
 	color: var(--error);
 }
 
@@ -893,54 +911,6 @@ a {
 			bottom: 0;
 			border-left: 1px solid var(--primary-border);
 		}
-	}
-}
-
-.dialogButtons {
-	grid-column-start: 1;
-	grid-column-end: span end;
-	position: relative;
-	width: 100%;
-	height: 3rem;
-	overflow: hidden;
-	border-top: 1px solid var(--border-variant);
-	display: flex;
-	gap: 1px;
-
-	&:nth-child(1) {
-		border-top: none;
-	}
-
-	button {
-		width: 100%;
-		height: 3rem;
-		padding: 0 1.5rem;
-		border-radius: 0px;
-		background: none;
-		border: none;
-		text-transform: uppercase;
-
-		&:focus {
-			background: none;
-		}
-
-		&:hover {
-			cursor: pointer;
-			background: var(--highlight);
-		}
-
-		&:not(:first-child)::after {
-			content: '';
-			position: absolute;
-			top: 0;
-			left: -1px;
-			bottom: 0;
-			border-left: 1px solid var(--border-variant);
-		}
-	}
-
-	button[type='submit'] {
-		color: var(--error);
 	}
 }
 
