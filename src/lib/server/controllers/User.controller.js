@@ -6,7 +6,38 @@ import { getModel } from '$lib/server/db';
 import { handleServerError } from '$lib/server/errors.js';
 import { resetDemo } from '$lib/server/controllers/Demo.controller.js';
 
-export function findUser(userId, filters) {
+const buckets = new Map();
+
+function tooManyAttempts(key) {
+	const now = Date.now();
+	if (buckets.size > 10000) {
+		for (const [staleKey, stale] of buckets) {
+			if (now > stale.reset) {
+				buckets.delete(staleKey);
+			}
+		}
+	}
+
+	const bucket = buckets.get(key);
+	if (!bucket || now > bucket.reset) {
+		buckets.set(key, { count: 1, reset: now + 15 * 60 * 1000 });
+		return false;
+	}
+
+	bucket.count += 1;
+	return bucket.count > 10;
+}
+
+function clearAttempts(key) {
+	buckets.delete(key);
+}
+
+export function findUser(userId, filters, projection = { __v: 0, _id: 0, password: 0 }) {
+	const User = getModel(userId, 'User');
+	return User.findOne(filters, projection).lean();
+}
+
+function findUserForAuth(userId, filters) {
 	const User = getModel(userId, 'User');
 	return User.findOne(filters, { __v: 0 }).lean();
 }
@@ -45,12 +76,19 @@ export async function loginUserAction(event) {
 		if (!password) {
 			return fail(400, { passwordError: 'Ingrese la contraseña' });
 		}
-		const user = await findUser(userId, { userId });
+
+		const key = `login:${event.getClientAddress()}`;
+		if (tooManyAttempts(key)) {
+			return fail(429, { passwordError: 'Demasiados intentos, espere unos minutos' });
+		}
+
+		const user = await findUserForAuth(userId, { userId });
 		const passwordCorrect = await bcrypt.compare(password, user?.password || '$2b$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy');
 		if (!user || !passwordCorrect) {
 			return fail(400, { passwordError: 'Usuario o contraseña incorrecta' });
 		}
 
+		clearAttempts(key);
 		signIn(event, user);
 		await resetDemo(userId);
 
@@ -63,7 +101,11 @@ export async function loginUserAction(event) {
 
 export async function demoLoginAction(event) {
 	try {
-		const user = await findUser('demo', { userId: 'demo' });
+		if (tooManyAttempts(`demo:${event.getClientAddress()}`)) {
+			throw error(429, 'Demasiados intentos, espere unos minutos');
+		}
+
+		const user = await findUserForAuth('demo', { userId: 'demo' });
 		if (!user) {
 			throw error(404, 'La cuenta de demostración no está disponible');
 		}
@@ -102,7 +144,7 @@ export async function editUserAction(event) {
 		}
 
 		const User = getModel(userId, 'User');
-		const data = await User.findOneAndUpdate({ userId }, user, { new: true });
+		const data = await User.findOneAndUpdate({ userId }, user, { returnDocument: 'after' });
 		const updated = JSON.parse(JSON.stringify(data));
 		delete updated.password;
 		return { user: updated };

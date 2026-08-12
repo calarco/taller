@@ -14,6 +14,12 @@ function getNewId(userId) {
 	});
 }
 
+export const carModelPopulate = {
+	path: 'carModel',
+	select: 'carModelId name carMakeId -_id',
+	populate: { path: 'carMake', select: 'carMakeId name -_id' },
+};
+
 export function findCarModel(userId, filters, projection = { __v: 0 }) {
 	const CarModel = getModel(userId, 'CarModel');
 	return CarModel.findOne(filters, { ...projection, _id: 0 }).lean();

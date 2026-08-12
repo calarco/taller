@@ -133,9 +133,11 @@ export const actions = { ...sharedActions, upsertVehicle, deleteVehicle, upsertR
 ### The demo tenant
 
 `demo` (password `demo`) is a throwaway account. `resetDemo` reloads its tenant database from
-`src/lib/server/demo-fixture.json` on demo login and logout; it no-ops for other accounts and swallows
-its own errors, the one place that skips `handleServerError` — a failed reset must not break signing in
-or out. Regenerate the fixture with `npm run demo:fixture` (committed, in `.prettierignore`).
+`src/lib/server/demo-fixture.json` on demo login; it no-ops for other accounts and swallows its own
+errors, the one place that skips `handleServerError` — a failed reset must not break signing in.
+Logging out does **not** reset: the next sign-in already does it, so doing both only doubles the work
+and slows down the one path the user is waiting on. Regenerate the fixture with `npm run demo:fixture`
+(committed, in `.prettierignore`).
 
 - The fixture stores **day offsets, not dates**. A new date field must be added to `dateFields` in
   `Demo.controller.js`: Mongoose casts a bare number in a `Date` field to epoch milliseconds, so a

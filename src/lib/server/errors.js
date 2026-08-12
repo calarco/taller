@@ -5,5 +5,5 @@ export function handleServerError(err, context) {
 		throw err;
 	}
 	console.error(`[${context}]`, err);
-	throw error(500, err.toString());
+	throw error(500, 'Error interno del servidor');
 }

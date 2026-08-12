@@ -31,6 +31,7 @@ export default [
 		languageOptions: { parserOptions: { svelteConfig } },
 		rules: {
 			'svelte/prefer-const': 'error',
+			'svelte/no-navigation-without-resolve': 'off',
 		},
 	},
 ];

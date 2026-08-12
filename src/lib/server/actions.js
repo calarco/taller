@@ -5,7 +5,6 @@ import { createCarMakeAction } from '$lib/server/controllers/CarMake.controller.
 import { createCarModelAction } from '$lib/server/controllers/CarModel.controller.js';
 import { createAppointmentAction, deleteAppointmentAction } from '$lib/server/controllers/Appointment.controller.js';
 import { upsertEstimateAction } from '$lib/server/controllers/Estimate.controller.js';
-import { resetDemo } from '$lib/server/controllers/Demo.controller.js';
 
 export const sharedActions = {
 	editUser: editUserAction,

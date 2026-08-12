@@ -4,20 +4,17 @@ import { findVehicles } from '$lib/server/controllers/Vehicle.controller';
 import { findRepairs } from '$lib/server/controllers/Repair.controller';
 import { findEstimates } from '$lib/server/controllers/Estimate.controller';
 import { findCarMakes } from '$lib/server/controllers/CarMake.controller';
-import { findCarModels } from '$lib/server/controllers/CarModel.controller';
+import { findCarModels, carModelPopulate } from '$lib/server/controllers/CarModel.controller';
 
 const LIMIT = 25;
 const QUERY_LIMIT = 50;
 
-const carModelPopulate = {
-	path: 'carModel',
-	populate: { path: 'carMake', select: 'name' },
-	select: 'name carMakeId',
-};
+const clientPopulate = { path: 'client', select: 'name lastName -_id' };
 
 const repairPopulate = {
 	path: 'vehicle',
-	populate: [carModelPopulate, { path: 'client', select: 'name lastName' }],
+	select: 'vehicleId clientId carModelId -_id',
+	populate: [carModelPopulate, clientPopulate],
 };
 
 function escapeRegex(value) {
@@ -233,12 +230,7 @@ export async function getSearch(userId, value, type) {
 		const plateFilter = query.plateLower ? anyFilter(['vehicleId', 'vin'], query.plateLower) : [];
 		const vehicleFilter = [...plateFilter, ...(carModelIds.length ? [{ carModelId: { $in: carModelIds } }] : [])];
 
-		const vehicles = vehicleFilter.length
-			? await findVehicles(userId, { $or: vehicleFilter })
-					.sort({ updatedAt: -1 })
-					.populate([carModelPopulate, { path: 'client', select: 'name lastName' }])
-					.limit(QUERY_LIMIT)
-			: [];
+		const vehicles = vehicleFilter.length ? await findVehicles(userId, { $or: vehicleFilter }).sort({ updatedAt: -1 }).populate([carModelPopulate, clientPopulate]).limit(QUERY_LIMIT) : [];
 
 		const search = [
 			...clients.map((x) => mapClient(x, rank(query, fullName(x), x.name, x.lastName, x.dni, x.phone, x.email))),

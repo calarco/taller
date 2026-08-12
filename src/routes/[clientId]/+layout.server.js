@@ -2,6 +2,7 @@ import { error } from '@sveltejs/kit';
 import { handleServerError } from '$lib/server/errors.js';
 import { findClient } from '$lib/server/controllers/Client.controller.js';
 import { findVehicles } from '$lib/server/controllers/Vehicle.controller.js';
+import { carModelPopulate } from '$lib/server/controllers/CarModel.controller.js';
 
 export const load = async (event) => {
 	const userId = event.locals.userId;
@@ -11,12 +12,7 @@ export const load = async (event) => {
 	}
 
 	try {
-		const [client, vehicles] = await Promise.all([
-			findClient(userId, { clientId }),
-			findVehicles(userId, { clientId })
-				.sort({ updatedAt: -1 })
-				.populate({ path: 'carModel', populate: { path: 'carMake', select: 'name' }, select: 'name carMakeId' }),
-		]);
+		const [client, vehicles] = await Promise.all([findClient(userId, { clientId }), findVehicles(userId, { clientId }).sort({ updatedAt: -1 }).populate(carModelPopulate)]);
 		if (!client) {
 			throw error(404, 'Cliente no encontrado');
 		}

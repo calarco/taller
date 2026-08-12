@@ -35,7 +35,7 @@ export function deleteByVehicleId(userId, vehicleId) {
 
 export async function upsertVehicle(userId, vehicle) {
 	const Vehicle = getModel(userId, 'Vehicle');
-	const data = await Vehicle.findOneAndUpdate({ vehicleId: vehicle.oldVehicleId || vehicle.vehicleId }, vehicle, { new: true, upsert: true });
+	const data = await Vehicle.findOneAndUpdate({ vehicleId: vehicle.oldVehicleId || vehicle.vehicleId }, vehicle, { returnDocument: 'after', upsert: true });
 	if (vehicle.oldVehicleId && vehicle.oldVehicleId !== vehicle.vehicleId) {
 		await moveRepairs(userId, vehicle.oldVehicleId, vehicle.vehicleId);
 	}

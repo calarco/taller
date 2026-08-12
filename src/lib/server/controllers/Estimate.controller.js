@@ -6,8 +6,20 @@ import { getModel, getNextId } from '$lib/server/db';
 import { handleServerError } from '$lib/server/errors.js';
 import { str, toNumber } from '$lib/server/validate.js';
 import { findUser } from '$lib/server/controllers/User.controller.js';
-import { createCarModel } from '$lib/server/controllers/CarModel.controller.js';
+import { createCarModel, carModelPopulate } from '$lib/server/controllers/CarModel.controller.js';
 import Estimate from '$lib/components/estimate/Estimate.svelte';
+
+const transporter = nodemailer.createTransport({
+	host: 'mail.smtp2go.com',
+	port: 2525,
+	secure: false,
+	requireTLS: true,
+	pool: true,
+	auth: {
+		user: MAIL_USER,
+		pass: MAIL_PASS,
+	},
+});
 
 function toParts(values) {
 	const parts = [];
@@ -70,7 +82,7 @@ export function deleteEstimates(userId, filters) {
 
 export function upsertEstimate(userId, estimate) {
 	const Estimate = getModel(userId, 'Estimate');
-	return Estimate.findOneAndUpdate({ estimateId: estimate.estimateId }, estimate, { new: true, upsert: true });
+	return Estimate.findOneAndUpdate({ estimateId: estimate.estimateId }, estimate, { returnDocument: 'after', upsert: true });
 }
 
 export async function upsertEstimateAction(event) {
@@ -169,10 +181,13 @@ export async function sendEstimateAction(event) {
 			throw error(400, 'Falta el identificador');
 		}
 		if (!email) {
-			return fail(400, { emailError: 'Ingrese un email' });
+			throw error(400, 'Ingrese un email');
+		}
+		if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+			throw error(400, 'Ingrese un email válido');
 		}
 
-		const [estimate, user] = await Promise.all([findEstimate(userId, { estimateId }).populate({ path: 'carModel', populate: { path: 'carMake' } }), findUser(userId, { userId })]);
+		const [estimate, user] = await Promise.all([findEstimate(userId, { estimateId }).populate(carModelPopulate), findUser(userId, { userId })]);
 		if (!estimate) {
 			throw error(404, 'Presupuesto no encontrado');
 		}
@@ -186,15 +201,6 @@ export async function sendEstimateAction(event) {
 			throw error(500, 'Presupuesto no renderizado');
 		}
 
-		const transporter = nodemailer.createTransport({
-			host: 'mail.smtp2go.com',
-			port: 2525,
-			secure: false,
-			auth: {
-				user: MAIL_USER,
-				pass: MAIL_PASS,
-			},
-		});
 		const data = await transporter.sendMail({
 			from: 'taller@calarco.com.ar',
 			to: email,
@@ -207,7 +213,7 @@ export async function sendEstimateAction(event) {
 
 		const EstimateModel = getModel(userId, 'Estimate');
 		await EstimateModel.updateOne({ estimateId }, { email });
-		return { data: JSON.parse(JSON.stringify(data)) };
+		return { message: 'Presupuesto enviado' };
 	} catch (err) {
 		handleServerError(err, 'sendEstimateAction');
 	}

@@ -32,7 +32,7 @@ export function deleteRepairs(userId, filters) {
 
 export async function upsertRepair(userId, repair) {
 	const Repair = getModel(userId, 'Repair');
-	const data = await Repair.findOneAndUpdate({ repairId: repair.repairId }, repair, { new: true, upsert: true });
+	const data = await Repair.findOneAndUpdate({ repairId: repair.repairId }, repair, { returnDocument: 'after', upsert: true });
 	await touchVehicle(userId, data.vehicleId);
 	return data;
 }

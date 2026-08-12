@@ -27,7 +27,7 @@ export function findClients(userId, filters, projection = { __v: 0 }) {
 
 export function upsertClient(userId, client) {
 	const Client = getModel(userId, 'Client');
-	return Client.findOneAndUpdate({ clientId: client.clientId }, client, { new: true, upsert: true });
+	return Client.findOneAndUpdate({ clientId: client.clientId }, client, { returnDocument: 'after', upsert: true });
 }
 
 export function touchClient(userId, clientId) {

@@ -66,13 +66,13 @@ export function getModel(userId, model) {
 export async function getNextId(userId, key, findMax) {
 	const Counter = getModel(userId, 'Counter');
 
-	const bumped = await Counter.findOneAndUpdate({ _id: key }, { $inc: { seq: 1 } }, { new: true });
+	const bumped = await Counter.findOneAndUpdate({ _id: key }, { $inc: { seq: 1 } }, { returnDocument: 'after' });
 	if (bumped) {
 		return String(bumped.seq);
 	}
 
 	const max = await findMax();
 	await Counter.updateOne({ _id: key }, { $setOnInsert: { seq: max } }, { upsert: true });
-	const seeded = await Counter.findOneAndUpdate({ _id: key }, { $inc: { seq: 1 } }, { new: true });
+	const seeded = await Counter.findOneAndUpdate({ _id: key }, { $inc: { seq: 1 } }, { returnDocument: 'after' });
 	return String(seeded.seq);
 }
