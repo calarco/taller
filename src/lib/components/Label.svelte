@@ -1,6 +1,6 @@
 <script>
 	import { fly, fade } from 'svelte/transition';
-	import { enter, exit, flyEnter } from '$lib/motion.js';
+	import { enter, exit, flyEnter, flyExit } from '$lib/motion.js';
 
 	let { title, error, isCreate, onCreate, showCreate, children } = $props();
 
@@ -16,7 +16,7 @@
 	<span class="label">
 		{title}
 		{#if error && !hideError}
-			<div class="error" in:fly={flyEnter} out:fly={{ y: '-1rem', ...exit }}>
+			<div class="error" in:fly={flyEnter} out:fly={flyExit}>
 				<button
 					tabindex="-1"
 					type="button"

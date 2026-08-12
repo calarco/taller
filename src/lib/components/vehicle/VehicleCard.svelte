@@ -2,7 +2,7 @@
 	import { slide } from 'svelte/transition';
 	import { slideEnter, slideExit } from '$lib/motion.js';
 	import { page } from '$app/state';
-	import { windowState } from '$lib/shared.svelte.js';
+	import { openForm, openDialog } from '$lib/shared.svelte.js';
 	import Card from '$lib/components/Card.svelte';
 	import Dialog from '$lib/components/Dialog.svelte';
 	import Plate from '$lib/components/vehicle/Plate.svelte';
@@ -46,18 +46,10 @@
 	</a>
 	{#if isActive}
 		<div class="cardButtons" in:slide={slideEnter} out:slide={slideExit}>
-			<button type="button" onclick={() => dialog.showModal()} aria-label="borrar">
+			<button type="button" onclick={() => openDialog(dialog)} aria-label="borrar">
 				<span class="icon delete"></span>
 			</button>
-			<button
-				type="button"
-				onclick={() => {
-					windowState.form = 'vehicle';
-					windowState.id = vehicle?.vehicleId;
-					windowState.data = vehicle;
-				}}
-				aria-label="editar"
-			>
+			<button type="button" onclick={() => openForm('vehicle', vehicle?.vehicleId, vehicle)} aria-label="editar">
 				<span class="icon edit"></span>
 			</button>
 		</div>

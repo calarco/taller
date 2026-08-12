@@ -1,6 +1,7 @@
 import { error, fail, redirect } from '@sveltejs/kit';
 import { getModel, getNextId } from '$lib/server/db';
 import { handleServerError } from '$lib/server/errors.js';
+import { str } from '$lib/server/validate.js';
 import { findVehicles, deleteByVehicleId } from '$lib/server/controllers/Vehicle.controller';
 
 function getNewId(userId) {
@@ -29,6 +30,14 @@ export function upsertClient(userId, client) {
 	return Client.findOneAndUpdate({ clientId: client.clientId }, client, { new: true, upsert: true });
 }
 
+export function touchClient(userId, clientId) {
+	if (!clientId) {
+		return;
+	}
+	const Client = getModel(userId, 'Client');
+	return Client.updateOne({ clientId }, { $currentDate: { updatedAt: true } });
+}
+
 export async function upsertClientAction(event) {
 	try {
 		const userId = event.locals.userId;
@@ -38,20 +47,20 @@ export async function upsertClientAction(event) {
 
 		const form = await event.request.formData();
 		const client = {
-			clientId: form.get('clientId'),
-			name: (form.get('name') || '').trim(),
-			lastName: (form.get('lastName') || '').trim(),
-			dni: (form.get('dni') || '').trim().toUpperCase(),
-			work: (form.get('work') || '').trim(),
-			phone: (form.get('phone') || '').trim(),
-			email: (form.get('email') || '').trim().toLowerCase(),
+			clientId: str(form.get('clientId')),
+			name: str(form.get('name')),
+			lastName: str(form.get('lastName')),
+			dni: str(form.get('dni')).toUpperCase(),
+			work: str(form.get('work')),
+			phone: str(form.get('phone')),
+			email: str(form.get('email')).toLowerCase(),
 		};
 
-		if (!client.clientId) {
-			client.clientId = await getNewId(userId);
-		}
 		if (!client.name) {
 			return fail(400, { nameError: 'Ingrese el nombre' });
+		}
+		if (!client.clientId) {
+			client.clientId = await getNewId(userId);
 		}
 
 		const data = await upsertClient(userId, client);
@@ -72,9 +81,14 @@ export async function deleteClientAction(event) {
 		}
 
 		const form = await event.request.formData();
-		const clientId = form.get('clientId');
+		const clientId = str(form.get('clientId'));
 		if (!clientId) {
 			throw error(400, 'Falta el identificador');
+		}
+
+		const client = await findClient(userId, { clientId }, { clientId: 1 });
+		if (!client) {
+			throw error(404, 'Cliente no encontrado');
 		}
 
 		const vehicles = await findVehicles(userId, { clientId });

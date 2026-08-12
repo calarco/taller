@@ -8,31 +8,15 @@ import { upsertEstimateAction } from '$lib/server/controllers/Estimate.controlle
 import { resetDemo } from '$lib/server/controllers/Demo.controller.js';
 
 export const sharedActions = {
-	editUser: async (event) => {
-		return await editUserAction(event);
-	},
+	editUser: editUserAction,
 	logout: async (event) => {
-		await resetDemo(event.locals.userId);
 		event.cookies.delete('auth-token', { path: '/' });
-		event.cookies.delete('userId', { path: '/' });
 		throw redirect(307, '/login');
 	},
-	createCarMake: async (event) => {
-		return await createCarMakeAction(event);
-	},
-	createCarModel: async (event) => {
-		return await createCarModelAction(event);
-	},
-	upsertClient: async (event) => {
-		return await upsertClientAction(event);
-	},
-	createAppointment: async (event) => {
-		return await createAppointmentAction(event);
-	},
-	deleteAppointment: async (event) => {
-		return await deleteAppointmentAction(event);
-	},
-	upsertEstimate: async (event) => {
-		return await upsertEstimateAction(event);
-	},
+	createCarMake: createCarMakeAction,
+	createCarModel: createCarModelAction,
+	upsertClient: upsertClientAction,
+	createAppointment: createAppointmentAction,
+	deleteAppointment: deleteAppointmentAction,
+	upsertEstimate: upsertEstimateAction,
 };

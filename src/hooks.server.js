@@ -10,7 +10,6 @@ export async function handle({ event, resolve }) {
 	const auth = authenticate(event.cookies);
 	if (!auth?.userId) {
 		event.cookies.delete('auth-token', { path: '/' });
-		event.cookies.delete('userId', { path: '/' });
 
 		if (event.url.pathname !== '/login') {
 			throw redirect(307, '/login');

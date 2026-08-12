@@ -2,7 +2,7 @@
 	import { fly, blur } from 'svelte/transition';
 	import { page } from '$app/state';
 	import { panelBlurExit, panelFlyEnterX, panelFlyExitX } from '$lib/motion.js';
-	import { windowState } from '$lib/shared.svelte.js';
+	import { windowState, openForm } from '$lib/shared.svelte.js';
 	import Section from '$lib/components/Section.svelte';
 	import RepairForm from '$lib/components/repair/RepairForm.svelte';
 	import RepairCard from '$lib/components/repair/RepairCard.svelte';
@@ -22,16 +22,7 @@
 							<RepairForm repair={windowState.data} />
 						</div>
 					{/if}
-					<button
-						type="button"
-						class="createButton"
-						onclick={() => {
-							windowState.form = 'repair';
-							windowState.id = '';
-							windowState.data = {};
-						}}
-						aria-label="crear"
-					>
+					<button type="button" class="createButton" onclick={() => openForm('repair')} aria-label="crear">
 						<div>
 							<span class="icon repair"></span>
 						</div>

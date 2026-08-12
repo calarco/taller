@@ -3,27 +3,21 @@
 	import { blurExit, flyEnter, panelEnter, panelExit } from '$lib/motion.js';
 	import { enhance } from '$app/forms';
 	import Label from '$lib/components/Label.svelte';
-	import { windowState } from '$lib/shared.svelte';
+	import { windowState } from '$lib/shared.svelte.js';
+	import { enhanceSubmit } from '$lib/forms.js';
 
 	let { data } = $props();
 
 	let hide = $state(false);
 	let showForm = $state(false);
 
-	function submit() {
-		windowState.loading = true;
-		windowState.error = {};
-		return async ({ result, update }) => {
-			update();
-			windowState.loading = false;
+	const submit = enhanceSubmit({
+		onResult: (result) => {
 			if (result.type === 'success' || result.type === 'redirect') {
 				hide = true;
 			}
-			if (result.type === 'failure' && result.data) {
-				windowState.error = result.data;
-			}
-		};
-	}
+		},
+	});
 </script>
 
 <div class="cover" in:fade={panelEnter} out:fade={panelExit}>

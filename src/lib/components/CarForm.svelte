@@ -1,37 +1,94 @@
 <script>
 	import { fade, fly } from 'svelte/transition';
-	import { enter, exit, flyEnter } from '$lib/motion.js';
-	import { enhance } from '$app/forms';
+	import { enter, exit, flyEnter, flyExit } from '$lib/motion.js';
 	import { invalidate } from '$app/navigation';
 	import { page } from '$app/state';
 	import { windowState } from '$lib/shared.svelte.js';
+	import { postAction } from '$lib/forms.js';
 	import Label from '$lib/components/Label.svelte';
 
 	let { carModelProp } = $props();
 
-	let carModelId = $derived(carModelProp || '');
-	let carMakeId = $derived(page.data.carModels?.find((x) => x.carModelId === carModelId)?.carMakeId || '');
+	let carModelId = $state(carModelProp || '');
+	let carMakeId = $state('');
+	let carMakeName = $state('');
+	let carModelName = $state('');
+	let createMake = $state(false);
+	let createModel = $state(false);
 
 	let carMakes = $derived(page.data.carMakes || []);
 	let carModels = $derived(page.data.carModels?.filter((x) => x.carMakeId === carMakeId) || []);
 
-	let createMake = $derived(!carMakes.length);
-	let createModel = $derived(carMakeId && !carModels.length);
+	let propMakeId = $derived(page.data.carModels?.find((x) => x.carModelId === carModelProp)?.carMakeId || '');
 
-	let carModelName = $state('');
+	let seededProp, seededMake;
 	$effect(() => {
-		if (!createModel) {
+		if (seededProp !== carModelProp) {
+			seededProp = carModelProp;
+			seededMake = undefined;
+			carModelId = carModelProp || '';
+			carMakeName = '';
 			carModelName = '';
-			delete windowState.error?.carModelError;
+			createMake = false;
+			createModel = false;
+		}
+		if (propMakeId && seededMake !== propMakeId) {
+			seededMake = propMakeId;
+			carMakeId = propMakeId;
 		}
 	});
+
+	let isCreatingMake = $derived(createMake || !carMakes.length);
+	let isCreatingModel = $derived(!!carMakeId && (createModel || !carModels.length));
 
 	function focus(el) {
 		el.focus();
 	}
+
+	function onEnter(run) {
+		return (e) => {
+			if (e.key === 'Enter') {
+				e.preventDefault();
+				run();
+			}
+		};
+	}
+
+	async function createCarMake() {
+		if (!carMakeName.trim()) {
+			windowState.error = { carMakeError: 'Ingrese la marca' };
+			return;
+		}
+		const result = await postAction('?/createCarMake', { name: carMakeName });
+		await invalidate('/cars');
+		if (result?.type === 'success' && result.data?.carMake) {
+			carMakeId = result.data.carMake.carMakeId;
+			carModelId = '';
+			carMakeName = '';
+			createMake = false;
+		}
+	}
+
+	async function createCarModel() {
+		if (!carModelName.trim()) {
+			windowState.error = { carModelError: 'Ingrese el modelo' };
+			return;
+		}
+		const result = await postAction('?/createCarModel', { carMakeId, name: carModelName });
+		await invalidate('/cars');
+		if (result?.type === 'success' && result.data?.carModel) {
+			carModelId = result.data.carModel.carModelId;
+			carModelName = '';
+			createModel = false;
+		}
+	}
 </script>
 
 <fieldset>
+	<input type="hidden" name="carMakeId" value={carMakeId} />
+	<input type="hidden" name="carModelId" value={carModelId} />
+	<input type="hidden" name="carModelName" value={isCreatingModel ? carModelName : ''} />
+
 	<Label
 		title="Marca"
 		isCreate={createMake}
@@ -45,36 +102,24 @@
 		error={windowState.error?.carMakeError}
 	>
 		<div class="formSlot">
-			{#if createMake}
-				<form
-					action="?/createCarMake"
-					method="POST"
-					use:enhance={() => {
-						windowState.loading = true;
-						windowState.error = {};
-						return async ({ result, update }) => {
-							await update({ invalidateAll: false });
-							await invalidate('/cars');
-							windowState.loading = false;
-							if (result.type === 'success' && result.data?.carMake) {
-								carMakeId = result.data.carMake.carMakeId;
-								createMake = false;
-							}
-							if (result.type === 'failure' && result.data) {
-								windowState.error = result.data;
-							}
-						};
-					}}
-					in:fly={flyEnter}
-					out:fly={{ y: '-1rem', ...exit }}
-				>
-					<input type="text" name="name" placeholder="-" autoComplete="off" use:focus />
-					<button type="submit" aria-label="crear">
+			{#if isCreatingMake}
+				<div class="inlineCreate" in:fly={flyEnter} out:fly={flyExit}>
+					<input type="text" placeholder="-" autocomplete="off" bind:value={carMakeName} onkeydown={onEnter(createCarMake)} use:focus />
+					<button type="button" onclick={createCarMake} aria-label="crear">
 						<span class="icon ok"></span>
 					</button>
-				</form>
+				</div>
 			{:else}
-				<select name="carMakeId" placeholder="-" autoComplete="off" bind:value={carMakeId} in:fade={enter} out:fade={exit}>
+				<select
+					placeholder="-"
+					bind:value={carMakeId}
+					onchange={() => {
+						carModelId = '';
+						createModel = false;
+					}}
+					in:fade={enter}
+					out:fade={exit}
+				>
 					{#each carMakes as carMake (carMake.carMakeId)}
 						<option value={carMake.carMakeId}>
 							{carMake.name}
@@ -91,44 +136,21 @@
 			e.preventDefault();
 			createModel = !createModel;
 			createMake = false;
-			delete windowState.error?.carMakeError;
+			delete windowState.error?.carModelError;
 		}}
 		showCreate={carModels.length}
 		error={windowState.error?.carModelError}
 	>
 		<div class="formSlot">
-			{#if carMakeId && (createModel || !carModels.length)}
-				<input type="hidden" name="carModelName" value={carModelName} />
-				<form
-					action="?/createCarModel"
-					method="POST"
-					use:enhance={() => {
-						windowState.loading = true;
-						windowState.error = {};
-						return async ({ result, update }) => {
-							await update({ invalidateAll: false });
-							await invalidate('/cars');
-							if (result.type === 'success' && result.data?.carModel) {
-								carModelId = result.data.carModel.carModelId;
-								createModel = false;
-							}
-							if (result.type === 'failure' && result.data) {
-								windowState.error = result.data;
-							}
-							windowState.loading = false;
-						};
-					}}
-					in:fly={flyEnter}
-					out:fly={{ y: '-1rem', ...exit }}
-				>
-					<input type="hidden" name="carMakeId" value={carMakeId} />
-					<input type="text" name="name" placeholder="-" autoComplete="off" disabled={createMake} bind:value={carModelName} use:focus />
-					<button type="submit" disabled={createMake} aria-label="crear">
+			{#if isCreatingModel}
+				<div class="inlineCreate" in:fly={flyEnter} out:fly={flyExit}>
+					<input type="text" placeholder="-" autocomplete="off" disabled={isCreatingMake} bind:value={carModelName} onkeydown={onEnter(createCarModel)} use:focus />
+					<button type="button" onclick={createCarModel} disabled={isCreatingMake} aria-label="crear">
 						<span class="icon ok"></span>
 					</button>
-				</form>
+				</div>
 			{:else}
-				<select name="carModelId" placeholder="-" autoComplete="off" disabled={!carMakeId} bind:value={carModelId} in:fade={enter} out:fade={exit}>
+				<select placeholder="-" disabled={!carMakeId} bind:value={carModelId} in:fade={enter} out:fade={exit}>
 					{#each carModels as carModel (carModel.carModelId)}
 						<option value={carModel.carModelId}>
 							{carModel.name}
@@ -154,7 +176,7 @@
 		position: relative;
 		height: 2rem;
 
-		> form {
+		> .inlineCreate {
 			position: absolute;
 			top: 0;
 			bottom: 0;

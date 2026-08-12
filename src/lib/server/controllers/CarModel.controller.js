@@ -1,6 +1,7 @@
 import { error, fail } from '@sveltejs/kit';
 import { getModel, getNextId } from '$lib/server/db';
 import { handleServerError } from '$lib/server/errors.js';
+import { str } from '$lib/server/validate.js';
 
 function getNewId(userId) {
 	return getNextId(userId, 'carModel', async () => {
@@ -44,8 +45,8 @@ export async function createCarModelAction(event) {
 
 		const form = await event.request.formData();
 		const carModel = {
-			carMakeId: form.get('carMakeId'),
-			name: (form.get('name') || '').trim(),
+			carMakeId: str(form.get('carMakeId')),
+			name: str(form.get('name')),
 		};
 
 		if (!carModel.carMakeId) {

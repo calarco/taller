@@ -2,21 +2,13 @@
 	import { fade, fly, blur } from 'svelte/transition';
 	import { blurExit, flyEnter, panelEnter, panelExit } from '$lib/motion.js';
 	import { page } from '$app/state';
-	import { windowState } from '$lib/shared.svelte.js';
+	import { closeForm } from '$lib/shared.svelte.js';
 </script>
 
 <div class="cover" in:fade={panelEnter} out:fade={panelExit}>
 	<div in:fly={flyEnter} out:blur={blurExit}>
 		<div>
-			<a
-				class="button"
-				href="/"
-				aria-label="cerrar"
-				onclick={() => {
-					windowState.form = '';
-					windowState.id = '';
-				}}
-			>
+			<a class="button" href="/" aria-label="cerrar" onclick={closeForm}>
 				<span class="icon close"></span>
 			</a>
 			<h4>ERROR {page.status}</h4>

@@ -2,7 +2,8 @@
 	import { fly, blur } from 'svelte/transition';
 	import { blurEnter, blurExit, panelBlurExit, panelFlyEnterX, panelFlyExitX } from '$lib/motion.js';
 	import { enhance } from '$app/forms';
-	import { windowState } from '$lib/shared.svelte.js';
+	import { windowState, openForm, openDialog } from '$lib/shared.svelte.js';
+	import { enhanceSubmit } from '$lib/forms.js';
 	import Section from '$lib/components/Section.svelte';
 	import Dialog from '$lib/components/Dialog.svelte';
 	import Plate from '$lib/components/vehicle/Plate.svelte';
@@ -18,17 +19,10 @@
 	{#key estimate.estimateId}
 		<div class="panelFill" in:fly={panelFlyEnterX} out:fly={panelFlyExitX}>
 			<div class="buttons">
-				<button type="button" onclick={() => dialog.showModal()} aria-label="borrar">
+				<button type="button" onclick={() => openDialog(dialog)} aria-label="borrar">
 					<span class="icon delete"></span>
 				</button>
-				<button
-					type="button"
-					onclick={() => {
-						windowState.form = 'estimate';
-						windowState.id = estimate.estimateId;
-					}}
-					aria-label="editar"
-				>
+				<button type="button" onclick={() => openForm('estimate', estimate.estimateId)} aria-label="editar">
 					<span class="icon edit"></span>
 				</button>
 				<button
@@ -45,22 +39,7 @@
 				>
 					<span class="icon print"></span>
 				</button>
-				<form
-					method="POST"
-					action="?/sendEstimate"
-					title={isDemo ? 'No disponible en la cuenta de demostración' : undefined}
-					use:enhance={() => {
-						windowState.loading = true;
-						windowState.error = {};
-						return async ({ result, update }) => {
-							await update({ reset: false });
-							windowState.loading = false;
-							if (result.type === 'failure' && result.data) {
-								windowState.error = result.data;
-							}
-						};
-					}}
-				>
+				<form method="POST" action="?/sendEstimate" title={isDemo ? 'No disponible en la cuenta de demostración' : undefined} use:enhance={enhanceSubmit({ reset: false })}>
 					<input type="hidden" name="estimateId" value={estimate.estimateId} />
 					<input type="email" name="email" placeholder="Dirección de correo" value={estimate.email || ''} disabled={isDemo} />
 					<button type="submit" aria-label="editar" disabled={isDemo}>

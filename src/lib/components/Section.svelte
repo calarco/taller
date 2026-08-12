@@ -1,7 +1,7 @@
 <script>
 	import { fade } from 'svelte/transition';
 	import { enter, exit } from '$lib/motion.js';
-	import { windowState } from '$lib/shared.svelte.js';
+	import { closeForm } from '$lib/shared.svelte.js';
 
 	let { overlay, children, cards } = $props();
 </script>
@@ -14,19 +14,7 @@
 		{/if}
 	</div>
 	{#if overlay}
-		<button
-			type="button"
-			class="overlay"
-			aria-label="cerrar"
-			tabindex="-1"
-			onclick={() => {
-				windowState.form = '';
-				windowState.id = '';
-				windowState.data = {};
-			}}
-			in:fade={enter}
-			out:fade={exit}
-		></button>
+		<button type="button" class="overlay" aria-label="cerrar" tabindex="-1" onclick={closeForm} in:fade={enter} out:fade={exit}></button>
 	{/if}
 </section>
 

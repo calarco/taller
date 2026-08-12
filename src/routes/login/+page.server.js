@@ -5,10 +5,6 @@ export const load = (event) => {
 };
 
 export const actions = {
-	login: async (event) => {
-		return await loginUserAction(event);
-	},
-	demo: async (event) => {
-		return await demoLoginAction(event);
-	},
+	login: loginUserAction,
+	demo: demoLoginAction,
 };

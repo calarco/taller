@@ -1,19 +1,16 @@
 <script>
 	import { page } from '$app/state';
-	import { windowState } from '$lib/shared.svelte.js';
+	import { windowState, openForm, toISODate, toLocalISODate } from '$lib/shared.svelte.js';
 	import AppointmentForm from './AppointmentForm.svelte';
 	import AppointmentCard from './AppointmentCard.svelte';
 
 	let { date } = $props();
 
-	const today = new Date();
-	today.setHours(0, 0, 0, 0);
-	date.setHours(0, 0, 0, 0);
-	const id = date.toISOString().substring(0, 10);
-	const isCurrent = id === today.toISOString().substring(0, 10);
-	const isWeekend = [0, 6].indexOf(date.getDay()) !== -1;
+	let id = $derived(toLocalISODate(date));
+	let isCurrent = $derived(id === toLocalISODate(new Date()));
+	let isWeekend = $derived([0, 6].indexOf(date.getDay()) !== -1);
 	let isCreate = $derived(windowState.form === 'appointment' && windowState.id === id);
-	let appointments = $derived((page.data.appointments ?? []).filter((x) => new Date(x.date).toISOString().substring(0, 10) === id));
+	let appointments = $derived((page.data.appointments ?? []).filter((x) => toISODate(new Date(x.date)) === id));
 
 	let element;
 	$effect(() => {
@@ -32,16 +29,9 @@
 	<div class="list">
 		<div class={['createSlot', { isCreate }]}>
 			{#if isCreate}
-				<AppointmentForm {date} />
+				<AppointmentForm date={id} />
 			{/if}
-			<button
-				type="button"
-				onclick={() => {
-					windowState.form = 'appointment';
-					windowState.id = id;
-				}}
-				aria-label="crear"
-			>
+			<button type="button" onclick={() => openForm('appointment', id)} aria-label="crear">
 				<span class="icon create"></span>
 			</button>
 		</div>

@@ -1,4 +1,4 @@
-import { windowState } from '$lib/shared.svelte.js';
+import { startLoading, endLoading } from '$lib/shared.svelte.js';
 
 export function createSearch({ type = '' } = {}) {
 	let value = $state('');
@@ -18,7 +18,7 @@ export function createSearch({ type = '' } = {}) {
 		const controller = new AbortController();
 		const timer = setTimeout(async () => {
 			const current = ++seq;
-			windowState.loading = true;
+			startLoading();
 			try {
 				const response = await fetch(`/search?${type ? 'type=' + type + '&' : ''}q=${encodeURIComponent(query)}`, { signal: controller.signal });
 				const data = response.ok ? await response.json() : null;
@@ -33,9 +33,7 @@ export function createSearch({ type = '' } = {}) {
 					settled = true;
 				}
 			} finally {
-				if (current === seq) {
-					windowState.loading = false;
-				}
+				endLoading();
 			}
 		}, 200);
 

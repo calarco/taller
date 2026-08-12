@@ -24,14 +24,14 @@ export function authenticate(cookies) {
 }
 
 function signIn(event, user) {
-	const token = jwt.sign({ id: user._id.toString(), userId: user.userId }, JWT_KEY, { expiresIn: '30d' });
+	const days = user.userId === 'demo' ? 1 : 30;
+	const token = jwt.sign({ id: user._id.toString(), userId: user.userId }, JWT_KEY, { expiresIn: `${days}d` });
 	event.cookies.set('auth-token', token, {
 		httpOnly: true,
 		secure: true,
 		path: '/',
-		maxAge: 60 * 60 * 24 * 30,
+		maxAge: 60 * 60 * 24 * days,
 	});
-	event.cookies.delete('userId', { path: '/' });
 }
 
 export async function loginUserAction(event) {

@@ -1,6 +1,6 @@
 <script>
 	import { page } from '$app/state';
-	import { windowState } from '$lib/shared.svelte.js';
+	import { openForm, openDialog } from '$lib/shared.svelte.js';
 	import Dialog from '$lib/components/Dialog.svelte';
 
 	let client = $derived(page.data.client || {});
@@ -41,17 +41,10 @@
 <div class="card">
 	{@render clientContent()}
 	<div class="cardButtons">
-		<button type="button" onclick={() => dialog.showModal()} aria-label="borrar">
+		<button type="button" onclick={() => openDialog(dialog)} aria-label="borrar">
 			<span class="icon delete"></span>
 		</button>
-		<button
-			type="button"
-			onclick={() => {
-				windowState.form = 'client';
-				windowState.id = client.clientId;
-			}}
-			aria-label="editar"
-		>
+		<button type="button" onclick={() => openForm('client', client.clientId)} aria-label="editar">
 			<span class="icon edit"></span>
 		</button>
 	</div>

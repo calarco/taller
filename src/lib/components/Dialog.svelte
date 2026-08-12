@@ -1,11 +1,14 @@
 <script>
 	import { enhance } from '$app/forms';
 	import { windowState } from '$lib/shared.svelte.js';
+	import { enhanceSubmit } from '$lib/forms.js';
 
 	let { dialog = $bindable(), title, actionText, action, disabled = false, children } = $props();
 
 	let closing = $state(false);
 	let closeTimer;
+
+	$effect(() => () => clearTimeout(closeTimer));
 
 	function finishClose() {
 		clearTimeout(closeTimer);
@@ -17,6 +20,7 @@
 
 	function requestClose() {
 		if (!dialog?.open || closing) return;
+		windowState.error = {};
 		closing = true;
 		clearTimeout(closeTimer);
 		closeTimer = setTimeout(finishClose, 300);
@@ -44,20 +48,14 @@
 		<form
 			{action}
 			method="POST"
-			use:enhance={() => {
-				windowState.loading = true;
-				windowState.error = {};
-				return async ({ result, update }) => {
+			use:enhance={enhanceSubmit({
+				reset: false,
+				onResult: (result) => {
 					if (result.type === 'success' || result.type === 'redirect') {
 						requestClose();
 					}
-					if (result.type === 'failure' && result.data) {
-						windowState.error = result.data;
-					}
-					await update({ reset: false });
-					windowState.loading = false;
-				};
-			}}
+				},
+			})}
 		>
 			{#if children}
 				{@render children()}

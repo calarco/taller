@@ -26,19 +26,9 @@ export const load = async (event) => {
 
 export const actions = {
 	...sharedActions,
-	deleteClient: async (event) => {
-		return await deleteClientAction(event);
-	},
-	upsertVehicle: async (event) => {
-		return await upsertVehicleAction(event);
-	},
-	deleteVehicle: async (event) => {
-		return await deleteVehicleAction(event);
-	},
-	upsertRepair: async (event) => {
-		return await upsertRepairAction(event);
-	},
-	deleteRepair: async (event) => {
-		return await deleteRepairAction(event);
-	},
+	deleteClient: deleteClientAction,
+	upsertVehicle: upsertVehicleAction,
+	deleteVehicle: deleteVehicleAction,
+	upsertRepair: upsertRepairAction,
+	deleteRepair: deleteRepairAction,
 };

@@ -1,7 +1,8 @@
 import { error, fail, redirect } from '@sveltejs/kit';
 import { getModel, getNextId } from '$lib/server/db';
 import { handleServerError } from '$lib/server/errors.js';
-import { upsertVehicle } from '$lib/server/controllers/Vehicle.controller';
+import { str, toNumber, toDate } from '$lib/server/validate.js';
+import { touchVehicle } from '$lib/server/controllers/Vehicle.controller';
 
 function getNewId(userId) {
 	return getNextId(userId, 'repair', async () => {
@@ -32,7 +33,7 @@ export function deleteRepairs(userId, filters) {
 export async function upsertRepair(userId, repair) {
 	const Repair = getModel(userId, 'Repair');
 	const data = await Repair.findOneAndUpdate({ repairId: repair.repairId }, repair, { new: true, upsert: true });
-	await upsertVehicle(userId, { vehicleId: data.vehicleId, updatedAt: true });
+	await touchVehicle(userId, data.vehicleId);
 	return data;
 }
 
@@ -50,21 +51,34 @@ export async function upsertRepairAction(event) {
 
 		const form = await event.request.formData();
 		const repair = {
-			repairId: form.get('repairId'),
+			repairId: str(form.get('repairId')),
 			vehicleId: event.params.vehicleId,
-			date: new Date(form.get('date') + 'T00:00:00.000'),
-			km: form.get('km'),
-			description: form.get('description'),
-			detail: form.get('detail'),
-			cost: form.get('cost') || 0,
-			labor: form.get('labor') || 0,
+			date: toDate(form.get('date')),
+			km: toNumber(form.get('km')),
+			description: str(form.get('description')),
+			detail: str(form.get('detail')),
+			cost: toNumber(form.get('cost')) ?? 0,
+			labor: toNumber(form.get('labor')) ?? 0,
 		};
 
-		if (!repair.repairId) {
-			repair.repairId = await getNewId(userId);
-		}
 		if (!repair.description) {
 			return fail(400, { descriptionError: 'Ingrese una descripción' });
+		}
+		if (!repair.date) {
+			return fail(400, { dateError: 'Ingrese una fecha válida' });
+		}
+		if (repair.km === null) {
+			return fail(400, { kmError: 'Ingrese un kilometraje válido' });
+		}
+		if (repair.cost === null || repair.cost < 0) {
+			return fail(400, { costError: 'Ingrese un importe válido' });
+		}
+		if (repair.labor === null || repair.labor < 0) {
+			return fail(400, { laborError: 'Ingrese un importe válido' });
+		}
+		repair.km = repair.km ?? null;
+		if (!repair.repairId) {
+			repair.repairId = await getNewId(userId);
 		}
 
 		const data = await upsertRepair(userId, repair);
@@ -82,13 +96,16 @@ export async function deleteRepairAction(event) {
 		}
 
 		const form = await event.request.formData();
-		const repairId = form.get('repairId');
+		const repairId = str(form.get('repairId'));
 		if (!repairId) {
 			throw error(400, 'Falta el identificador');
 		}
 
 		const Repair = getModel(userId, 'Repair');
-		await Repair.deleteOne({ repairId });
+		const { deletedCount } = await Repair.deleteOne({ repairId, vehicleId: event.params.vehicleId });
+		if (!deletedCount) {
+			throw error(404, 'Reparación no encontrada');
+		}
 		throw redirect(307, `/${event.params.clientId}/${event.params.vehicleId}`);
 	} catch (err) {
 		handleServerError(err, 'deleteRepairAction');

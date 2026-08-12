@@ -4,10 +4,6 @@ import { upsertVehicleAction } from '$lib/server/controllers/Vehicle.controller.
 
 export const actions = {
 	...sharedActions,
-	deleteClient: async (event) => {
-		return await deleteClientAction(event);
-	},
-	upsertVehicle: async (event) => {
-		return await upsertVehicleAction(event);
-	},
+	deleteClient: deleteClientAction,
+	upsertVehicle: upsertVehicleAction,
 };

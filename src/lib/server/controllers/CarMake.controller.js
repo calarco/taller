@@ -1,6 +1,7 @@
 import { error, fail } from '@sveltejs/kit';
 import { getModel, getNextId } from '$lib/server/db';
 import { handleServerError } from '$lib/server/errors.js';
+import { str } from '$lib/server/validate.js';
 
 function getNewId(userId) {
 	return getNextId(userId, 'carMake', async () => {
@@ -32,8 +33,7 @@ export async function createCarMakeAction(event) {
 
 		const form = await event.request.formData();
 		const carMake = {
-			carMakeId: await getNewId(userId),
-			name: (form.get('name') || '').trim(),
+			name: str(form.get('name')),
 		};
 
 		if (!carMake.name) {
@@ -43,6 +43,7 @@ export async function createCarMakeAction(event) {
 		if (existing) {
 			return fail(400, { carMakeError: 'La marca ya existe' });
 		}
+		carMake.carMakeId = await getNewId(userId);
 
 		const CarMake = getModel(userId, 'CarMake');
 		const data = await CarMake.create(carMake);

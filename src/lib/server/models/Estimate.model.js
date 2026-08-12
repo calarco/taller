@@ -1,5 +1,14 @@
 import mongoose from 'mongoose';
 
+const PartSchema = mongoose.Schema(
+	{
+		amount: Number,
+		name: String,
+		price: Number,
+	},
+	{ _id: false, versionKey: false }
+);
+
 const EstimateSchema = mongoose.Schema(
 	{
 		estimateId: String,
@@ -8,7 +17,7 @@ const EstimateSchema = mongoose.Schema(
 		km: Number,
 		description: String,
 		labor: Number,
-		parts: { type: Array, default: [] },
+		parts: { type: [PartSchema], default: [] },
 		email: String,
 	},
 	{

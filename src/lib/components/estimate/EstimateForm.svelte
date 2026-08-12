@@ -8,12 +8,21 @@
 	import CarForm from '$lib/components/CarForm.svelte';
 
 	let estimate = $derived(windowState.id ? page.data.estimate : {});
-	let labor = $derived(estimate.labor || '');
-	let parts = $derived(estimate.parts || []);
+
+	let labor = $state(estimate.labor ?? '');
+	let parts = $state([...(estimate.parts ?? [])]);
+	let estimateId;
+	$effect(() => {
+		if (estimateId !== estimate.estimateId) {
+			estimateId = estimate.estimateId;
+			labor = estimate.labor ?? '';
+			parts = [...(estimate.parts ?? [])];
+		}
+	});
 	let amount = $state('');
 	let name = $state('');
 	let price = $state('');
-	let total = $derived(labor + parts.reduce((a, { price }) => a + price, 0));
+	let total = $derived(Number(labor || 0) + parts.reduce((a, x) => a + Number(x.price || 0), 0));
 </script>
 
 <Form action="?/upsertEstimate" isCreate={!windowState.id} --grid-columns="2fr 5fr 3fr [end]">
@@ -66,14 +75,14 @@
 			</ul>
 		</div>
 		<Label title="Cantidad">
-			<input type="number" min="0" name="amount" placeholder="1" bind:value={amount} />
+			<input type="number" min="0" placeholder="1" bind:value={amount} />
 		</Label>
 		<Label title="Repuesto" error={windowState.error?.nameError}>
-			<input type="text" name="name" placeholder="-" autoComplete="off" bind:value={name} />
+			<input type="text" placeholder="-" autocomplete="off" bind:value={name} />
 		</Label>
 		<Label title="Precio" --template-columns="max-content 1fr auto">
 			<h6 class="unit">$</h6>
-			<input type="number" min="0" name="price" placeholder="0" bind:value={price} class="price" />
+			<input type="number" min="0" placeholder="0" bind:value={price} class="price" />
 			<button
 				type="button"
 				onclick={() => {
@@ -82,7 +91,7 @@
 					} else if (parts.find((x) => x.name === name)) {
 						windowState.error = { nameError: 'Repuesto ya ingresado' };
 					} else {
-						parts = [...parts, { amount: amount || 1, name, price: price || 0 }];
+						parts = [...parts, { amount: Number(amount) || 1, name, price: Number(price) || 0 }];
 						amount = name = price = '';
 						windowState.error = {};
 					}

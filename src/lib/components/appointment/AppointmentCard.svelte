@@ -1,6 +1,7 @@
 <script>
 	import { slide } from 'svelte/transition';
 	import { slideEnter, slideExit } from '$lib/motion.js';
+	import { openDialog } from '$lib/shared.svelte.js';
 	import Dialog from '$lib/components/Dialog.svelte';
 
 	let { appointment } = $props();
@@ -20,7 +21,7 @@
 
 <div class="card" in:slide={slideEnter} out:slide={slideExit}>
 	{@render appointmentContent()}
-	<button type="button" onclick={() => dialog.showModal()} aria-label="borrar">
+	<button type="button" onclick={() => openDialog(dialog)} aria-label="borrar">
 		<span class="icon delete"></span>
 	</button>
 	<Dialog bind:dialog title="¿Borrar turno?" action="?/deleteAppointment">

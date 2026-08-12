@@ -18,7 +18,6 @@ export const load = async (event) => {
 		]);
 		if (!user) {
 			event.cookies.delete('auth-token', { path: '/' });
-			event.cookies.delete('userId', { path: '/' });
 			throw redirect(307, '/login');
 		}
 		delete user.password;

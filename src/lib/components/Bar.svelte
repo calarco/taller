@@ -3,7 +3,7 @@
 	import { sineIn } from 'svelte/easing';
 	import { blurEnter, blurExit, enter, exit, panelBlurExit, panelExit, panelFlyEnterX } from '$lib/motion.js';
 	import { page } from '$app/state';
-	import { windowState } from '$lib/shared.svelte.js';
+	import { windowState, openForm, openDialog } from '$lib/shared.svelte.js';
 	import Dialog from '$lib/components/Dialog.svelte';
 	import Label from '$lib/components/Label.svelte';
 
@@ -12,11 +12,6 @@
 	let url = $derived(page.url.pathname.split('/'));
 	let user = $derived(page.data.user || {});
 	let isDemo = $derived(user.userId === 'demo');
-	$effect(() => {
-		if (url.length && url[1] === '/login') {
-			logoutDialog.close();
-		}
-	});
 </script>
 
 <div class="bar">
@@ -41,9 +36,7 @@
 					class={['createButton', { isActive: windowState.form === 'client' }]}
 					onclick={() => {
 						if (windowState.form !== 'client') {
-							windowState.form = 'client';
-							windowState.id = '';
-							windowState.data = {};
+							openForm('client');
 						}
 					}}
 					aria-label="crear"
@@ -88,9 +81,7 @@
 					class={['createButton', { isActive: windowState.form === 'estimate' }]}
 					onclick={() => {
 						if (windowState.form !== 'estimate') {
-							windowState.form = 'estimate';
-							windowState.id = '';
-							windowState.data = {};
+							openForm('estimate');
 						}
 					}}
 					aria-label="crear"
@@ -108,10 +99,10 @@
 				</button>
 			</div>
 			<div class="buttons">
-				<button type="button" onclick={() => settingsDialog.showModal()} aria-label="settings">
+				<button type="button" onclick={() => openDialog(settingsDialog)} aria-label="settings">
 					<span>{user.name || user.userId}</span>
 				</button>
-				<button type="button" onclick={() => logoutDialog.showModal()} aria-label="borrar">
+				<button type="button" onclick={() => openDialog(logoutDialog)} aria-label="borrar">
 					<span class="icon logout"></span>
 				</button>
 			</div>

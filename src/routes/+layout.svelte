@@ -1,6 +1,6 @@
 <script>
 	import { page, navigating } from '$app/state';
-	import { windowState } from '$lib/shared.svelte.js';
+	import { windowState, closeForm, startLoading, endLoading } from '$lib/shared.svelte.js';
 	import Appointments from '$lib/components/appointment/Appointments.svelte';
 	import Search from '$lib/components/Search.svelte';
 	import Bar from '$lib/components/Bar.svelte';
@@ -14,30 +14,20 @@
 	let url = $derived(page.url.pathname);
 	$effect(() => {
 		if (url) {
-			windowState.form = '';
-			windowState.id = '';
-			windowState.data = {};
-			windowState.loading = false;
+			closeForm();
 		}
 	});
 	$effect(() => {
-		if (typeof windowState.form === 'string') {
-			windowState.error = {};
+		if (!navigating.to) {
+			return;
 		}
-	});
-	$effect(() => {
-		if (navigating.to) {
-			windowState.loading = true;
-		} else {
-			windowState.loading = false;
-		}
+		startLoading();
+		return endLoading;
 	});
 
 	function onkeydown(e) {
-		if (e.key === 'Escape' && windowState.form) {
-			windowState.form = '';
-			windowState.id = '';
-			windowState.data = {};
+		if (e.key === 'Escape' && windowState.form && !document.querySelector('dialog[open]')) {
+			closeForm();
 		}
 	}
 </script>

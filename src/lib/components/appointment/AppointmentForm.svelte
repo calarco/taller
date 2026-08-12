@@ -7,7 +7,7 @@
 	let { date } = $props();
 </script>
 
-<Form action="?/createAppointment">
+<Form action="?/createAppointment" isCreate>
 	<input type="hidden" name="date" value={date} />
 	<Label title="Descripción" error={windowState.error?.descriptionError}>
 		<input type="text" name="description" placeholder="-" autoComplete="off" />

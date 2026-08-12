@@ -34,6 +34,12 @@
 		}, options);
 
 		observer.observe(e);
+
+		return {
+			destroy() {
+				observer.disconnect();
+			},
+		};
 	}
 </script>
 

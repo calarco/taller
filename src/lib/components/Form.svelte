@@ -2,7 +2,8 @@
 	import { fly, blur } from 'svelte/transition';
 	import { blurExit, flyEnter } from '$lib/motion.js';
 	import { enhance } from '$app/forms';
-	import { windowState } from '$lib/shared.svelte.js';
+	import { closeForm } from '$lib/shared.svelte.js';
+	import { enhanceSubmit } from '$lib/forms.js';
 
 	let { action, isCreate, children } = $props();
 </script>
@@ -10,36 +11,19 @@
 <form
 	{action}
 	method="POST"
-	use:enhance={() => {
-		windowState.loading = true;
-		windowState.error = {};
-		return async ({ result, update }) => {
-			await update();
-			windowState.loading = false;
+	use:enhance={enhanceSubmit({
+		onResult: (result) => {
 			if (result.type === 'success' || result.type === 'redirect') {
-				windowState.form = '';
-				windowState.id = '';
+				closeForm();
 			}
-			if (result.type === 'failure' && result.data) {
-				windowState.error = result.data;
-			}
-		};
-	}}
+		},
+	})}
 	in:fly={flyEnter}
 	out:blur={blurExit}
 >
 	{@render children()}
 	<div class="formButtons">
-		<button
-			type="button"
-			onclick={() => {
-				windowState.form = '';
-				windowState.id = '';
-				windowState.data = {};
-			}}
-		>
-			Cancelar
-		</button>
+		<button type="button" onclick={closeForm}> Cancelar </button>
 		<button type="submit">
 			{#if isCreate}
 				Crear

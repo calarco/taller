@@ -13,6 +13,7 @@
 	let isCreate = $derived(!vehicle?.vehicleId);
 	let clients = $derived((search.results ?? page.data.search ?? []).filter((x) => x.clientId && x.clientName));
 	let clientId = $derived(clients.find((x) => x.clientName === search.value)?.clientId || '');
+	let clientPlaceholder = $derived([page.data.client?.name, page.data.client?.lastName].filter(Boolean).join(' ') || '-');
 </script>
 
 <Form action="?/upsertVehicle" {isCreate} --grid-columns="1fr [start] 1fr 1fr [end]">
@@ -30,10 +31,10 @@
 		<input type="hidden" name="oldVehicleId" value={vehicle.vehicleId} />
 		<input type="hidden" name="clientId" value={clientId} />
 		<Label title="Cliente" error={windowState.error?.clientIdError} --column-end="span 3">
-			<input class="client" list="clients" name="clientName" placeholder={page.data.client.name + ' ' + page.data.client.lastName} autoComplete="off" bind:value={search.value} />
+			<input class="client" list="clients" name="clientName" placeholder={clientPlaceholder} autocomplete="off" bind:value={search.value} />
 			<datalist id="clients">
 				{#each clients as client (client.id)}
-					<option key={client.clientId} value={client.clientName}></option>
+					<option value={client.clientName}></option>
 				{/each}
 			</datalist>
 		</Label>
@@ -50,7 +51,8 @@
 		<h6 class="unit">L</h6>
 	</Label>
 	<Label title="Combustible" --column-end="span 2">
-		<select name="fuel" placeholder="-" autoComplete="off" value={vehicle?.fuel || ''}>
+		<select name="fuel" value={vehicle?.fuel || ''}>
+			<option value="">-</option>
 			<option value="Nafta">Nafta</option>
 			<option value="Diesel">Diesel</option>
 			<option value="GNC">GNC</option>

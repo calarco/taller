@@ -1,7 +1,7 @@
 <script>
 	import { fly, blur } from 'svelte/transition';
 	import { panelBlurExit, panelFlyEnterX, panelFlyExitX } from '$lib/motion.js';
-	import { windowState } from '$lib/shared.svelte.js';
+	import { windowState, openForm } from '$lib/shared.svelte.js';
 	import Section from '$lib/components/Section.svelte';
 	import VehicleForm from '$lib/components/vehicle/VehicleForm.svelte';
 	import VehicleCard from '$lib/components/vehicle/VehicleCard.svelte';
@@ -23,16 +23,7 @@
 									<VehicleForm vehicle={windowState.data} />
 								</div>
 							{/if}
-							<button
-								type="button"
-								class="createButton"
-								onclick={() => {
-									windowState.form = 'vehicle';
-									windowState.id = '';
-									windowState.data = {};
-								}}
-								aria-label="crear"
-							>
+							<button type="button" class="createButton" onclick={() => openForm('vehicle')} aria-label="crear">
 								<div>
 									<span class="icon vehicle"></span>
 								</div>
