@@ -1,38 +1,17 @@
 import { error, fail, redirect } from '@sveltejs/kit';
-import { getModel, getNextId } from '$lib/server/db';
+import { getModel, repository } from '$lib/server/db';
 import { handleServerError } from '$lib/server/errors.js';
 import { str, toNumber, toDate } from '$lib/server/validate.js';
 import { touchVehicle } from '$lib/server/controllers/Vehicle.controller';
 
-function getNewId(userId) {
-	return getNextId(userId, 'repair', async () => {
-		const repair = await findRepair(userId, {}, { repairId: 1 }).sort({ repairId: -1 }).collation({ locale: 'en_US', numericOrdering: true });
-		const max = Number(repair?.repairId ?? 0);
-		if (isNaN(max)) {
-			throw error(500, 'ID invalida');
-		}
-		return max;
-	});
-}
+const repairs = repository('Repair', 'repairId');
 
-export function findRepair(userId, filters, projection = { __v: 0 }) {
-	const Repair = getModel(userId, 'Repair');
-	return Repair.findOne(filters, { ...projection, _id: 0 }).lean();
-}
-
-export function findRepairs(userId, filters, projection = { __v: 0 }) {
-	const Repair = getModel(userId, 'Repair');
-	return Repair.find(filters, { ...projection, _id: 0 }).lean();
-}
-
-export function deleteRepairs(userId, filters) {
-	const Repair = getModel(userId, 'Repair');
-	return Repair.deleteMany(filters);
-}
+export const findRepair = repairs.find;
+export const findRepairs = repairs.findMany;
+export const deleteRepairs = repairs.removeMany;
 
 export async function upsertRepair(userId, repair) {
-	const Repair = getModel(userId, 'Repair');
-	const data = await Repair.findOneAndUpdate({ repairId: repair.repairId }, repair, { returnDocument: 'after', upsert: true });
+	const data = await repairs.upsert(userId, repair);
 	await touchVehicle(userId, data.vehicleId);
 	return data;
 }
@@ -78,7 +57,7 @@ export async function upsertRepairAction(event) {
 		}
 		repair.km = repair.km ?? null;
 		if (!repair.repairId) {
-			repair.repairId = await getNewId(userId);
+			repair.repairId = await repairs.nextId(userId);
 		}
 
 		const data = await upsertRepair(userId, repair);

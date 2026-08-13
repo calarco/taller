@@ -1,34 +1,14 @@
 import { error, fail, redirect } from '@sveltejs/kit';
-import { getModel, getNextId } from '$lib/server/db';
+import { getModel, repository, toPlain } from '$lib/server/db';
 import { handleServerError } from '$lib/server/errors.js';
 import { str } from '$lib/server/validate.js';
 import { findVehicles, deleteByVehicleId } from '$lib/server/controllers/Vehicle.controller';
 
-function getNewId(userId) {
-	return getNextId(userId, 'client', async () => {
-		const client = await findClient(userId, {}, { clientId: 1 }).sort({ clientId: -1 }).collation({ locale: 'en_US', numericOrdering: true });
-		const max = Number(client?.clientId ?? 0);
-		if (isNaN(max)) {
-			throw error(500, 'ID invalida');
-		}
-		return max;
-	});
-}
+const clients = repository('Client', 'clientId');
 
-export function findClient(userId, filters, projection = { __v: 0 }) {
-	const Client = getModel(userId, 'Client');
-	return Client.findOne(filters, { ...projection, _id: 0 }).lean();
-}
-
-export function findClients(userId, filters, projection = { __v: 0 }) {
-	const Client = getModel(userId, 'Client');
-	return Client.find(filters, { ...projection, _id: 0 }).lean();
-}
-
-export function upsertClient(userId, client) {
-	const Client = getModel(userId, 'Client');
-	return Client.findOneAndUpdate({ clientId: client.clientId }, client, { returnDocument: 'after', upsert: true });
-}
+export const findClient = clients.find;
+export const findClients = clients.findMany;
+export const upsertClient = clients.upsert;
 
 export function touchClient(userId, clientId) {
 	if (!clientId) {
@@ -60,14 +40,14 @@ export async function upsertClientAction(event) {
 			return fail(400, { nameError: 'Ingrese el nombre' });
 		}
 		if (!client.clientId) {
-			client.clientId = await getNewId(userId);
+			client.clientId = await clients.nextId(userId);
 		}
 
 		const data = await upsertClient(userId, client);
 		if (data.clientId !== event.params.clientId) {
 			throw redirect(307, `/${data.clientId}`);
 		}
-		return { client: JSON.parse(JSON.stringify(data)) };
+		return { client: toPlain(data) };
 	} catch (err) {
 		handleServerError(err, 'upsertClientAction');
 	}

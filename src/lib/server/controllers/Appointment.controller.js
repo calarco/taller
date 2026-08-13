@@ -1,29 +1,13 @@
 import { error, fail } from '@sveltejs/kit';
-import { getModel, getNextId } from '$lib/server/db';
+import { getModel, repository, toPlain } from '$lib/server/db';
 import { handleServerError } from '$lib/server/errors.js';
 import { str, toDate } from '$lib/server/validate.js';
 import { createCarModel } from '$lib/server/controllers/CarModel.controller.js';
 
-function getNewId(userId) {
-	return getNextId(userId, 'appointment', async () => {
-		const appointment = await findAppointment(userId, {}, { appointmentId: 1 }).sort({ appointmentId: -1 }).collation({ locale: 'en_US', numericOrdering: true });
-		const max = Number(appointment?.appointmentId ?? 0);
-		if (isNaN(max)) {
-			throw error(500, 'ID invalida');
-		}
-		return max;
-	});
-}
+const appointments = repository('Appointment', 'appointmentId');
 
-export function findAppointment(userId, filters, projection = { __v: 0 }) {
-	const Appointment = getModel(userId, 'Appointment');
-	return Appointment.findOne(filters, { ...projection, _id: 0 }).lean();
-}
-
-export function findAppointments(userId, filters, projection = { __v: 0 }) {
-	const Appointment = getModel(userId, 'Appointment');
-	return Appointment.find(filters, { ...projection, _id: 0 }).lean();
-}
+export const findAppointment = appointments.find;
+export const findAppointments = appointments.findMany;
 
 export async function createAppointmentAction(event) {
 	try {
@@ -51,11 +35,11 @@ export async function createAppointmentAction(event) {
 			const carModel = await createCarModel(userId, { carMakeId: appointment.carMakeId, name: appointment.carModelName });
 			appointment.carModelId = carModel.carModelId;
 		}
-		appointment.appointmentId = await getNewId(userId);
+		appointment.appointmentId = await appointments.nextId(userId);
 
 		const Appointment = getModel(userId, 'Appointment');
 		const data = await Appointment.create(appointment);
-		return { data: JSON.parse(JSON.stringify(data)) };
+		return { data: toPlain(data) };
 	} catch (err) {
 		handleServerError(err, 'createAppointmentAction');
 	}

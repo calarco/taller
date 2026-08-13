@@ -7,7 +7,8 @@ export async function init() {
 }
 
 export async function handle({ event, resolve }) {
-	const auth = authenticate(event.cookies);
+	const auth = await authenticate(event.cookies);
+
 	if (!auth?.userId) {
 		event.cookies.delete('auth-token', { path: '/' });
 

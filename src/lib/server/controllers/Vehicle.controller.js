@@ -1,5 +1,5 @@
 import { error, fail, redirect } from '@sveltejs/kit';
-import { getModel } from '$lib/server/db';
+import { getModel, repository, toPlain } from '$lib/server/db';
 import { handleServerError } from '$lib/server/errors.js';
 import { str, toNumber } from '$lib/server/validate.js';
 import { createCarModel } from '$lib/server/controllers/CarModel.controller.js';
@@ -7,15 +7,10 @@ import { touchClient } from '$lib/server/controllers/Client.controller';
 import { deleteEstimates } from '$lib/server/controllers/Estimate.controller.js';
 import { deleteRepairs, moveRepairs } from '$lib/server/controllers/Repair.controller';
 
-export function findVehicle(userId, filters, projection = { __v: 0 }) {
-	const Vehicle = getModel(userId, 'Vehicle');
-	return Vehicle.findOne(filters, { ...projection, _id: 0 }).lean();
-}
+const vehicles = repository('Vehicle', 'vehicleId');
 
-export function findVehicles(userId, filters, projection = { __v: 0 }) {
-	const Vehicle = getModel(userId, 'Vehicle');
-	return Vehicle.find(filters, { ...projection, _id: 0 }).lean();
-}
+export const findVehicle = vehicles.find;
+export const findVehicles = vehicles.findMany;
 
 export async function touchVehicle(userId, vehicleId) {
 	if (!vehicleId) {
@@ -117,7 +112,7 @@ export async function upsertVehicleAction(event) {
 		if (data.vehicleId !== event.params.vehicleId) {
 			throw redirect(307, `/${data.clientId}/${data.vehicleId}`);
 		}
-		return { data: JSON.parse(JSON.stringify(data)) };
+		return { data: toPlain(data) };
 	} catch (err) {
 		handleServerError(err, 'upsertVehicleAction');
 	}

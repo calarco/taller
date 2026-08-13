@@ -1,4 +1,4 @@
-import { error, redirect } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 import { render } from 'svelte/server';
 import { sharedActions } from '$lib/server/actions.js';
 import { handleServerError } from '$lib/server/errors.js';
@@ -19,11 +19,8 @@ export const load = async (event) => {
 		if (!estimate) {
 			throw error(404, 'Presupuesto no encontrado');
 		}
-		if (!user) {
-			event.cookies.delete('auth-token', { path: '/' });
-			throw redirect(307, '/login');
-		}
-		const rendered = await render(Estimate, { props: { estimate, user } });
+
+		const rendered = render(Estimate, { props: { estimate, user } });
 		if (!rendered?.html) {
 			throw error(500, 'Presupuesto no renderizado');
 		}

@@ -2,8 +2,9 @@ import { error, fail } from '@sveltejs/kit';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { JWT_KEY } from '$env/static/private';
-import { getModel } from '$lib/server/db';
+import { getModel, toPlain } from '$lib/server/db';
 import { handleServerError } from '$lib/server/errors.js';
+import { str } from '$lib/server/validate.js';
 import { resetDemo } from '$lib/server/controllers/Demo.controller.js';
 
 const buckets = new Map();
@@ -42,16 +43,24 @@ function findUserForAuth(userId, filters) {
 	return User.findOne(filters, { __v: 0 }).lean();
 }
 
-export function authenticate(cookies) {
+export async function authenticate(cookies) {
 	const token = cookies.get('auth-token');
 	if (!token) {
 		return;
 	}
+
+	let auth;
 	try {
-		return jwt.verify(token, JWT_KEY, { algorithms: ['HS256'] });
+		auth = jwt.verify(token, JWT_KEY, { algorithms: ['HS256'] });
 	} catch {
 		return;
 	}
+	if (!auth?.userId) {
+		return;
+	}
+
+	const user = await findUser(auth.userId, { userId: auth.userId }, { userId: 1, _id: 0 });
+	return user ? auth : undefined;
 }
 
 function signIn(event, user) {
@@ -68,7 +77,7 @@ function signIn(event, user) {
 export async function loginUserAction(event) {
 	try {
 		const form = await event.request.formData();
-		const userId = (form.get('userId') || '').toLowerCase().trim();
+		const userId = str(form.get('userId')).toLowerCase();
 		const password = form.get('password');
 		if (!userId) {
 			return fail(400, { userIdError: 'Ingrese el usuario' });
@@ -126,17 +135,18 @@ export async function editUserAction(event) {
 		if (!userId) {
 			return;
 		}
+
 		if (userId === 'demo') {
 			return fail(400, { nameError: 'No disponible en la cuenta de demostración' });
 		}
 
 		const form = await event.request.formData();
 		const user = {
-			name: (form.get('name') || '').trim(),
-			description: (form.get('description') || '').trim(),
-			phone: (form.get('phone') || '').trim(),
-			address: (form.get('address') || '').trim(),
-			email: (form.get('email') || '').trim().toLowerCase(),
+			name: str(form.get('name')),
+			description: str(form.get('description')),
+			phone: str(form.get('phone')),
+			address: str(form.get('address')),
+			email: str(form.get('email')).toLowerCase(),
 		};
 
 		if (!user.name) {
@@ -144,10 +154,8 @@ export async function editUserAction(event) {
 		}
 
 		const User = getModel(userId, 'User');
-		const data = await User.findOneAndUpdate({ userId }, user, { returnDocument: 'after' });
-		const updated = JSON.parse(JSON.stringify(data));
-		delete updated.password;
-		return { user: updated };
+		const data = await User.findOneAndUpdate({ userId }, user, { returnDocument: 'after', projection: { __v: 0, _id: 0, password: 0 } });
+		return { user: toPlain(data) };
 	} catch (err) {
 		handleServerError(err, 'editUserAction');
 	}

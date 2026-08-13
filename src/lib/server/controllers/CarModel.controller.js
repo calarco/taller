@@ -1,18 +1,9 @@
-import { error, fail } from '@sveltejs/kit';
-import { getModel, getNextId } from '$lib/server/db';
+import { fail } from '@sveltejs/kit';
+import { getModel, repository, toPlain } from '$lib/server/db';
 import { handleServerError } from '$lib/server/errors.js';
 import { str } from '$lib/server/validate.js';
 
-function getNewId(userId) {
-	return getNextId(userId, 'carModel', async () => {
-		const carModel = await findCarModel(userId, {}, { carModelId: 1 }).sort({ carModelId: -1 }).collation({ locale: 'en_US', numericOrdering: true });
-		const max = Number(carModel?.carModelId ?? 0);
-		if (isNaN(max)) {
-			throw error(500, 'ID invalida');
-		}
-		return max;
-	});
-}
+const carModels = repository('CarModel', 'carModelId');
 
 export const carModelPopulate = {
 	path: 'carModel',
@@ -20,15 +11,8 @@ export const carModelPopulate = {
 	populate: { path: 'carMake', select: 'carMakeId name -_id' },
 };
 
-export function findCarModel(userId, filters, projection = { __v: 0 }) {
-	const CarModel = getModel(userId, 'CarModel');
-	return CarModel.findOne(filters, { ...projection, _id: 0 }).lean();
-}
-
-export function findCarModels(userId, filters, projection = { __v: 0 }) {
-	const CarModel = getModel(userId, 'CarModel');
-	return CarModel.find(filters, { ...projection, _id: 0 }).lean();
-}
+export const findCarModel = carModels.find;
+export const findCarModels = carModels.findMany;
 
 export async function createCarModel(userId, carModel) {
 	const existing = await findCarModel(userId, { carMakeId: carModel.carMakeId, name: carModel.name });
@@ -36,7 +20,7 @@ export async function createCarModel(userId, carModel) {
 		return existing;
 	}
 	if (!carModel.carModelId) {
-		carModel.carModelId = await getNewId(userId);
+		carModel.carModelId = await carModels.nextId(userId);
 	}
 	const CarModel = getModel(userId, 'CarModel');
 	return CarModel.create(carModel);
@@ -68,7 +52,7 @@ export async function createCarModelAction(event) {
 		}
 
 		const data = await createCarModel(userId, carModel);
-		return { carModel: JSON.parse(JSON.stringify(data)) };
+		return { carModel: toPlain(data) };
 	} catch (err) {
 		handleServerError(err, 'createCarModelAction');
 	}

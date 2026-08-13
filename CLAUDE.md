@@ -57,7 +57,7 @@ Choosing how to fail:
 - **Controllers:** `src/lib/server/controllers/` — business logic; each exports both query helpers (`findVehicle`, `findRepairs`, …) and form-action handlers (`upsertVehicleAction`, …)
 - **Pattern:** lean queries, `_id`/`__v` excluded, `structuredClone` before returning from a `load`
 
-**IDs come from `getNextId(userId, key, findMax)` in `db.js`, never from reading the current maximum.** It `$inc`s a per-tenant `Counter` document (`{ _id: 'client', seq: 52 }`). Reading the max and adding one is worse than racy: creates are upserts keyed on the id just computed, so two concurrent creates pick the same id and the second **overwrites the first** instead of failing. `findMax` is a collation-aware numeric sort for the highest existing id; it runs once per tenant per entity to seed the counter, so a database without one continues its existing sequence.
+**IDs come from `repository(model, idField).nextId(userId)` in `db.js`, never from reading the current maximum.** It `$inc`s a per-tenant `Counter` document (`{ _id: 'client', seq: 52 }`), keyed on `idField` minus its `Id` suffix — `clientId` → `client`. Reading the max and adding one is worse than racy: creates are upserts keyed on the id just computed, so two concurrent creates pick the same id and the second **overwrites the first** instead of failing. The seeding fallback is a collation-aware numeric sort for the highest existing id; it runs once per tenant per entity, so a database without a counter continues its existing sequence.
 
 ### Routing
 
@@ -144,7 +144,7 @@ and slows down the one path the user is waiting on. Regenerate the fixture with 
   missed field lands in 1970 instead of throwing.
 - `insertMany` needs `{ timestamps: false }`, or Mongoose overwrites `createdAt`/`updatedAt` and the
   whole history collapses onto today. Clear with `deleteMany({})`, not `drop()`, which discards the
-  declared indexes. `Counter` is cleared but never reloaded — `getNextId`'s `findMax` re-seeds it.
+  declared indexes. `Counter` is cleared but never reloaded — `nextId` re-seeds it from the highest existing id.
 - The `User` document is never touched; `editUser` is blocked instead, so the profile cannot drift.
   `sendEstimate` is blocked too, with `error(403, …)` rather than `fail()` because that email input is
   not wrapped in a `Label`. Both forms still render, `disabled`. Every other mutation lives inside the

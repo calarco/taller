@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { error } from '@sveltejs/kit';
 import { MONGODB_URI } from '$env/static/private';
 import { handleServerError } from '$lib/server/errors.js';
 import AppointmentSchema from '$lib/server/models/Appointment.model';
@@ -23,29 +24,16 @@ const schemas = {
 	Vehicle: VehicleSchema,
 };
 
-function checkModels(db) {
-	for (const [name, schema] of Object.entries(schemas)) {
-		if (!db.models[name]) {
-			db.model(name, schema);
-		}
-	}
-}
-
 let listening = false;
-
-function watchConnection() {
-	if (listening) {
-		return;
-	}
-	listening = true;
-	mongoose.connection.on('error', (err) => console.error('[mongo] connection error', err));
-	mongoose.connection.on('disconnected', () => console.error('[mongo] disconnected'));
-	mongoose.connection.on('reconnected', () => console.error('[mongo] reconnected'));
-}
 
 export async function initDatabase() {
 	try {
-		watchConnection();
+		if (!listening) {
+			listening = true;
+			mongoose.connection.on('error', (err) => console.error('[mongo] connection error', err));
+			mongoose.connection.on('disconnected', () => console.error('[mongo] disconnected'));
+			mongoose.connection.on('reconnected', () => console.error('[mongo] reconnected'));
+		}
 		return await mongoose.connect(MONGODB_URI, { serverSelectionTimeoutMS: 5000 });
 	} catch (err) {
 		handleServerError(err, 'initDatabase');
@@ -59,20 +47,60 @@ export function getModel(userId, model) {
 	}
 
 	const db = mongoose.connection.useDb(name, { useCache: true });
-	checkModels(db);
+	for (const [schemaName, schema] of Object.entries(schemas)) {
+		if (!db.models[schemaName]) {
+			db.model(schemaName, schema);
+		}
+	}
 	return db.model(model);
 }
 
-export async function getNextId(userId, key, findMax) {
-	const Counter = getModel(userId, 'Counter');
-
-	const bumped = await Counter.findOneAndUpdate({ _id: key }, { $inc: { seq: 1 } }, { returnDocument: 'after' });
-	if (bumped) {
-		return String(bumped.seq);
+export function toPlain(doc) {
+	if (!doc) {
+		return doc;
 	}
+	const plain = doc.toObject ? doc.toObject({ virtuals: false }) : { ...doc };
+	delete plain._id;
+	delete plain.__v;
+	return plain;
+}
 
-	const max = await findMax();
-	await Counter.updateOne({ _id: key }, { $setOnInsert: { seq: max } }, { upsert: true });
-	const seeded = await Counter.findOneAndUpdate({ _id: key }, { $inc: { seq: 1 } }, { returnDocument: 'after' });
-	return String(seeded.seq);
+export function repository(modelName, idField) {
+	const model = (userId) => getModel(userId, modelName);
+
+	return {
+		find: (userId, filters, projection = { __v: 0 }) =>
+			model(userId)
+				.findOne(filters, { ...projection, _id: 0 })
+				.lean(),
+		findMany: (userId, filters, projection = { __v: 0 }) =>
+			model(userId)
+				.find(filters, { ...projection, _id: 0 })
+				.lean(),
+		upsert: (userId, doc) => model(userId).findOneAndUpdate({ [idField]: doc[idField] }, doc, { returnDocument: 'after', upsert: true }),
+		removeMany: (userId, filters) => model(userId).deleteMany(filters),
+		nextId: async (userId) => {
+			const counterKey = idField.replace(/Id$/, '');
+			const Counter = getModel(userId, 'Counter');
+
+			const bumped = await Counter.findOneAndUpdate({ _id: counterKey }, { $inc: { seq: 1 } }, { returnDocument: 'after' });
+			if (bumped) {
+				return String(bumped.seq);
+			}
+
+			const doc = await model(userId)
+				.findOne({}, { [idField]: 1, _id: 0 })
+				.sort({ [idField]: -1 })
+				.collation({ locale: 'en_US', numericOrdering: true })
+				.lean();
+			const max = Number(doc?.[idField] ?? 0);
+			if (isNaN(max)) {
+				throw error(500, 'ID invalida');
+			}
+
+			await Counter.updateOne({ _id: counterKey }, { $setOnInsert: { seq: max } }, { upsert: true });
+			const seeded = await Counter.findOneAndUpdate({ _id: counterKey }, { $inc: { seq: 1 } }, { returnDocument: 'after' });
+			return String(seeded.seq);
+		},
+	};
 }

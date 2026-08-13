@@ -2,7 +2,7 @@ import { render } from 'svelte/server';
 import nodemailer from 'nodemailer';
 import { error, fail, redirect } from '@sveltejs/kit';
 import { MAIL_USER, MAIL_PASS } from '$env/static/private';
-import { getModel, getNextId } from '$lib/server/db';
+import { getModel, repository, toPlain } from '$lib/server/db';
 import { handleServerError } from '$lib/server/errors.js';
 import { str, toNumber } from '$lib/server/validate.js';
 import { findUser } from '$lib/server/controllers/User.controller.js';
@@ -54,36 +54,12 @@ function toParts(values) {
 	return parts;
 }
 
-function getNewId(userId) {
-	return getNextId(userId, 'estimate', async () => {
-		const estimate = await findEstimate(userId, {}, { estimateId: 1 }).sort({ estimateId: -1 }).collation({ locale: 'en_US', numericOrdering: true });
-		const max = Number(estimate?.estimateId ?? 0);
-		if (isNaN(max)) {
-			throw error(500, 'ID invalida');
-		}
-		return max;
-	});
-}
+const estimates = repository('Estimate', 'estimateId');
 
-export function findEstimate(userId, filters, projection = { __v: 0 }) {
-	const Estimate = getModel(userId, 'Estimate');
-	return Estimate.findOne(filters, { ...projection, _id: 0 }).lean();
-}
-
-export function findEstimates(userId, filters, projection = { __v: 0 }) {
-	const Estimate = getModel(userId, 'Estimate');
-	return Estimate.find(filters, { ...projection, _id: 0 }).lean();
-}
-
-export function deleteEstimates(userId, filters) {
-	const Estimate = getModel(userId, 'Estimate');
-	return Estimate.deleteMany(filters);
-}
-
-export function upsertEstimate(userId, estimate) {
-	const Estimate = getModel(userId, 'Estimate');
-	return Estimate.findOneAndUpdate({ estimateId: estimate.estimateId }, estimate, { returnDocument: 'after', upsert: true });
-}
+export const findEstimate = estimates.find;
+export const findEstimates = estimates.findMany;
+export const deleteEstimates = estimates.removeMany;
+export const upsertEstimate = estimates.upsert;
 
 export async function upsertEstimateAction(event) {
 	try {
@@ -123,7 +99,7 @@ export async function upsertEstimateAction(event) {
 		estimate.km = estimate.km ?? null;
 		estimate.labor = estimate.labor ?? 0;
 		if (!estimate.estimateId) {
-			estimate.estimateId = await getNewId(userId);
+			estimate.estimateId = await estimates.nextId(userId);
 		}
 		if (estimate.carModelName && estimate.carMakeId && !estimate.carModelId) {
 			const carModel = await createCarModel(userId, { carMakeId: estimate.carMakeId, name: estimate.carModelName });
@@ -134,7 +110,7 @@ export async function upsertEstimateAction(event) {
 		if (data.estimateId) {
 			throw redirect(307, `/estimate/${data.estimateId}`);
 		}
-		return { data: JSON.parse(JSON.stringify(data)) };
+		return { data: toPlain(data) };
 	} catch (err) {
 		handleServerError(err, 'upsertEstimateAction');
 	}
@@ -170,6 +146,7 @@ export async function sendEstimateAction(event) {
 		if (!userId) {
 			return;
 		}
+
 		if (userId === 'demo') {
 			throw error(403, 'El envío de correos está desactivado en la cuenta de demostración');
 		}
@@ -190,10 +167,6 @@ export async function sendEstimateAction(event) {
 		const [estimate, user] = await Promise.all([findEstimate(userId, { estimateId }).populate(carModelPopulate), findUser(userId, { userId })]);
 		if (!estimate) {
 			throw error(404, 'Presupuesto no encontrado');
-		}
-		if (!user) {
-			event.cookies.delete('auth-token', { path: '/' });
-			throw redirect(307, '/login');
 		}
 
 		const rendered = render(Estimate, { props: { estimate, user } });

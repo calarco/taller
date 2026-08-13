@@ -1,4 +1,3 @@
-import { redirect } from '@sveltejs/kit';
 import { handleServerError } from '$lib/server/errors.js';
 import { findUser } from '$lib/server/controllers/User.controller.js';
 import { findAppointments } from '$lib/server/controllers/Appointment.controller.js';
@@ -17,10 +16,6 @@ export const load = async (event) => {
 			findAppointments(userId, { date: { $gte: new Date(new Date().setHours(0, 0, 0, 0)) } }).populate(carModelPopulate),
 			getSearch(userId),
 		]);
-		if (!user) {
-			event.cookies.delete('auth-token', { path: '/' });
-			throw redirect(307, '/login');
-		}
 
 		return { user: structuredClone(user), appointments: structuredClone(appointments), search };
 	} catch (err) {
