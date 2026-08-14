@@ -24,7 +24,7 @@
 					</div>
 				{:else}
 					<div in:fly={panelFlyEnterX} out:blur={panelBlurExit}>
-						<a class="button" href="/" aria-label="cerrar">
+						<a class="button" href="/">
 							<span class="icon back"></span>Cliente
 						</a>
 					</div>
@@ -39,7 +39,6 @@
 							openForm('client');
 						}
 					}}
-					aria-label="crear"
 				>
 					<div>
 						{#if windowState.form === 'client' && !windowState.id}
@@ -59,13 +58,13 @@
 			<div class="title">
 				{#if url[1] === 'estimate'}
 					<div in:fly={panelFlyEnterX} out:blur={panelBlurExit}>
-						<a class="button" href="/" aria-label="cerrar">
+						<a class="button" href="/">
 							<span class="icon back"></span>Presupuesto
 						</a>
 					</div>
 				{:else if url[2]}
 					<div in:fly={panelFlyEnterX} out:blur={panelBlurExit}>
-						<a class="button" href={`/${url[1]}`} aria-label="cerrar">
+						<a class="button" href={`/${url[1]}`}>
 							<span class="icon back"></span>Reparaciones
 						</a>
 					</div>
@@ -84,7 +83,6 @@
 							openForm('estimate');
 						}
 					}}
-					aria-label="crear"
 				>
 					<div>
 						{#if windowState.form === 'estimate' && !windowState.id}
@@ -99,10 +97,10 @@
 				</button>
 			</div>
 			<div class="buttons">
-				<button type="button" onclick={() => openDialog(settingsDialog)} aria-label="settings">
+				<button type="button" onclick={() => openDialog(settingsDialog)} aria-label={`Configuración de ${user.name || user.userId}`}>
 					<span>{user.name || user.userId}</span>
 				</button>
-				<button type="button" onclick={() => openDialog(logoutDialog)} aria-label="borrar">
+				<button type="button" onclick={() => openDialog(logoutDialog)} aria-label="Cerrar sesión">
 					<span class="icon logout"></span>
 				</button>
 			</div>

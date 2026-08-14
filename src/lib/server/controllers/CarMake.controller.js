@@ -1,5 +1,5 @@
 import { fail } from '@sveltejs/kit';
-import { getModel, repository, toPlain } from '$lib/server/db';
+import { repository, toPlain } from '$lib/server/db';
 import { handleServerError } from '$lib/server/errors.js';
 import { str } from '$lib/server/validate.js';
 
@@ -29,8 +29,7 @@ export async function createCarMakeAction(event) {
 		}
 		carMake.carMakeId = await carMakes.nextId(userId);
 
-		const CarMake = getModel(userId, 'CarMake');
-		const data = await CarMake.create(carMake);
+		const data = await carMakes.create(userId, carMake);
 		return { carMake: toPlain(data) };
 	} catch (err) {
 		handleServerError(err, 'createCarMakeAction');

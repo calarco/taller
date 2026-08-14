@@ -31,7 +31,7 @@
 			{#if isCreate}
 				<AppointmentForm date={id} />
 			{/if}
-			<button type="button" onclick={() => openForm('appointment', id)} aria-label="crear">
+			<button type="button" onclick={() => openForm('appointment', id)} aria-label="Crear un turno">
 				<span class="icon create"></span>
 			</button>
 		</div>

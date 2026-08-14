@@ -22,7 +22,7 @@
 							<RepairForm repair={windowState.data} />
 						</div>
 					{/if}
-					<button type="button" class="createButton" onclick={() => openForm('repair')} aria-label="crear">
+					<button type="button" class="createButton" onclick={() => openForm('repair')}>
 						<div>
 							<span class="icon repair"></span>
 						</div>

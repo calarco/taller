@@ -47,10 +47,10 @@
 	</a>
 	{#if isActive}
 		<div class="cardButtons" in:slide={slideEnter} out:slide={slideExit}>
-			<button type="button" onclick={() => openDialog(dialog)} aria-label="borrar">
+			<button type="button" onclick={() => openDialog(dialog)} aria-label="Borrar la reparación">
 				<span class="icon delete"></span>
 			</button>
-			<button type="button" onclick={() => openForm('repair', repair.repairId, repair)} aria-label="editar">
+			<button type="button" onclick={() => openForm('repair', repair.repairId, repair)} aria-label="Editar la reparación">
 				<span class="icon edit"></span>
 			</button>
 		</div>

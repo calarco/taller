@@ -19,10 +19,10 @@
 	{#key estimate.estimateId}
 		<div class="panelFill" in:fly={panelFlyEnterX} out:fly={panelFlyExitX}>
 			<div class="buttons">
-				<button type="button" onclick={() => openDialog(dialog)} aria-label="borrar">
+				<button type="button" onclick={() => openDialog(dialog)} aria-label="Borrar el presupuesto">
 					<span class="icon delete"></span>
 				</button>
-				<button type="button" onclick={() => openForm('estimate', estimate.estimateId)} aria-label="editar">
+				<button type="button" onclick={() => openForm('estimate', estimate.estimateId)} aria-label="Editar el presupuesto">
 					<span class="icon edit"></span>
 				</button>
 				<button
@@ -35,14 +35,14 @@
 						window.print();
 						printContainer.innerHTML = '';
 					}}
-					aria-label="imprimir"
+					aria-label="Imprimir el presupuesto"
 				>
 					<span class="icon print"></span>
 				</button>
 				<form method="POST" action="?/sendEstimate" title={isDemo ? 'No disponible en la cuenta de demostración' : undefined} use:enhance={enhanceSubmit({ reset: false })}>
 					<input type="hidden" name="estimateId" value={estimate.estimateId} />
 					<input type="email" name="email" placeholder="Dirección de correo" value={estimate.email || ''} disabled={isDemo} />
-					<button type="submit" aria-label="editar" disabled={isDemo}>
+					<button type="submit" aria-label="Enviar el presupuesto" disabled={isDemo}>
 						{#if estimate.email}
 							<span class="icon mailok" in:blur={blurEnter} out:blur={blurExit}></span>
 						{:else}

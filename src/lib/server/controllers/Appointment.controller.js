@@ -1,5 +1,5 @@
 import { error, fail } from '@sveltejs/kit';
-import { getModel, repository, toPlain } from '$lib/server/db';
+import { repository, toPlain } from '$lib/server/db';
 import { handleServerError } from '$lib/server/errors.js';
 import { str, toDate } from '$lib/server/validate.js';
 import { createCarModel } from '$lib/server/controllers/CarModel.controller.js';
@@ -37,8 +37,7 @@ export async function createAppointmentAction(event) {
 		}
 		appointment.appointmentId = await appointments.nextId(userId);
 
-		const Appointment = getModel(userId, 'Appointment');
-		const data = await Appointment.create(appointment);
+		const data = await appointments.create(userId, appointment);
 		return { data: toPlain(data) };
 	} catch (err) {
 		handleServerError(err, 'createAppointmentAction');
@@ -58,8 +57,7 @@ export async function deleteAppointmentAction(event) {
 			throw error(400, 'Falta el identificador');
 		}
 
-		const Appointment = getModel(userId, 'Appointment');
-		const { deletedCount } = await Appointment.deleteOne({ appointmentId });
+		const { deletedCount } = await appointments.remove(userId, { appointmentId });
 		if (!deletedCount) {
 			throw error(404, 'Turno no encontrado');
 		}

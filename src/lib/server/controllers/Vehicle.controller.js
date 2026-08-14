@@ -11,21 +11,16 @@ const vehicles = repository('Vehicle', 'vehicleId');
 
 export const findVehicle = vehicles.find;
 export const findVehicles = vehicles.findMany;
+export const deleteVehicles = vehicles.removeMany;
 
 export async function touchVehicle(userId, vehicleId) {
 	if (!vehicleId) {
 		return;
 	}
-	const Vehicle = getModel(userId, 'Vehicle');
-	await Vehicle.updateOne({ vehicleId }, { $currentDate: { updatedAt: true } });
+	await vehicles.touch(userId, vehicleId);
 
 	const vehicle = await findVehicle(userId, { vehicleId }, { clientId: 1 });
 	await touchClient(userId, vehicle?.clientId);
-}
-
-export function deleteByVehicleId(userId, vehicleId) {
-	const Vehicle = getModel(userId, 'Vehicle');
-	return Promise.all([Vehicle.deleteOne({ vehicleId }), deleteRepairs(userId, { vehicleId }), deleteEstimates(userId, { vehicleId })]);
 }
 
 export async function upsertVehicle(userId, vehicle) {
@@ -136,7 +131,7 @@ export async function deleteVehicleAction(event) {
 			throw error(404, 'Vehículo no encontrado');
 		}
 
-		await deleteByVehicleId(userId, vehicleId);
+		await Promise.all([vehicles.remove(userId, { vehicleId }), deleteRepairs(userId, { vehicleId }), deleteEstimates(userId, { vehicleId })]);
 		throw redirect(307, `/${event.params.clientId}`);
 	} catch (err) {
 		handleServerError(err, 'deleteVehicleAction');

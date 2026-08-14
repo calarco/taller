@@ -23,7 +23,7 @@
 									<VehicleForm vehicle={windowState.data} />
 								</div>
 							{/if}
-							<button type="button" class="createButton" onclick={() => openForm('vehicle')} aria-label="crear">
+							<button type="button" class="createButton" onclick={() => openForm('vehicle')}>
 								<div>
 									<span class="icon vehicle"></span>
 								</div>

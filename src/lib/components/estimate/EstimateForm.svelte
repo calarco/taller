@@ -61,7 +61,7 @@
 						<input type="hidden" name="part" value={JSON.stringify(part)} />
 						<div>
 							<p class="price"><span>$</span>{new Intl.NumberFormat('es-AR').format(part.price)}</p>
-							<button type="button" onclick={() => (parts = parts.filter((x) => x.name !== part.name))} aria-label="borrar">
+							<button type="button" onclick={() => (parts = parts.filter((x) => x.name !== part.name))} aria-label="Borrar el repuesto">
 								<span class="icon delete"></span>
 							</button>
 						</div>
@@ -96,7 +96,7 @@
 						windowState.error = {};
 					}
 				}}
-				aria-label="crear"
+				aria-label="Agregar el repuesto"
 			>
 				<span class="icon create"></span>
 			</button>

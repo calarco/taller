@@ -21,7 +21,7 @@
 
 <div class="card" in:slide={slideEnter} out:slide={slideExit}>
 	{@render appointmentContent()}
-	<button type="button" onclick={() => openDialog(dialog)} aria-label="borrar">
+	<button type="button" onclick={() => openDialog(dialog)} aria-label="Borrar el turno">
 		<span class="icon delete"></span>
 	</button>
 	<Dialog bind:dialog title="¿Borrar turno?" action="?/deleteAppointment">

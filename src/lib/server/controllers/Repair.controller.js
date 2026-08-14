@@ -80,8 +80,7 @@ export async function deleteRepairAction(event) {
 			throw error(400, 'Falta el identificador');
 		}
 
-		const Repair = getModel(userId, 'Repair');
-		const { deletedCount } = await Repair.deleteOne({ repairId, vehicleId: event.params.vehicleId });
+		const { deletedCount } = await repairs.remove(userId, { repairId, vehicleId: event.params.vehicleId });
 		if (!deletedCount) {
 			throw error(404, 'Reparación no encontrada');
 		}

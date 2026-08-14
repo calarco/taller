@@ -15,8 +15,8 @@ const VehicleSchema = mongoose.Schema(
 	}
 );
 
-VehicleSchema.index({ vehicleId: 1 });
-VehicleSchema.index({ clientId: 1 });
+VehicleSchema.index({ vehicleId: 1 }, { unique: true });
+VehicleSchema.index({ clientId: 1, updatedAt: -1 });
 VehicleSchema.index({ carModelId: 1 });
 
 VehicleSchema.set('toObject', { virtuals: true });

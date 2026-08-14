@@ -25,7 +25,7 @@ const EstimateSchema = mongoose.Schema(
 	}
 );
 
-EstimateSchema.index({ estimateId: 1 });
+EstimateSchema.index({ estimateId: 1 }, { unique: true });
 EstimateSchema.index({ vehicleId: 1 });
 EstimateSchema.index({ updatedAt: -1 });
 

@@ -11,7 +11,8 @@ const CarModelSchema = mongoose.Schema(
 	}
 );
 
-CarModelSchema.index({ carModelId: 1 });
+CarModelSchema.index({ carModelId: 1 }, { unique: true });
+CarModelSchema.index({ carMakeId: 1, name: 1 }, { unique: true });
 
 CarModelSchema.set('toObject', { virtuals: true });
 CarModelSchema.set('toJSON', { virtuals: true });

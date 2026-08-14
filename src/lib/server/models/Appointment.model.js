@@ -12,7 +12,8 @@ const AppointmentSchema = mongoose.Schema(
 	}
 );
 
-AppointmentSchema.index({ appointmentId: 1 });
+AppointmentSchema.index({ appointmentId: 1 }, { unique: true });
+AppointmentSchema.index({ date: 1 });
 
 AppointmentSchema.set('toObject', { virtuals: true });
 AppointmentSchema.set('toJSON', { virtuals: true });

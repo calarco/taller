@@ -1,8 +1,10 @@
 import { error, fail, redirect } from '@sveltejs/kit';
-import { getModel, repository, toPlain } from '$lib/server/db';
+import { repository, toPlain } from '$lib/server/db';
 import { handleServerError } from '$lib/server/errors.js';
 import { str } from '$lib/server/validate.js';
-import { findVehicles, deleteByVehicleId } from '$lib/server/controllers/Vehicle.controller';
+import { findVehicles, deleteVehicles } from '$lib/server/controllers/Vehicle.controller';
+import { deleteRepairs } from '$lib/server/controllers/Repair.controller';
+import { deleteEstimates } from '$lib/server/controllers/Estimate.controller.js';
 
 const clients = repository('Client', 'clientId');
 
@@ -10,13 +12,7 @@ export const findClient = clients.find;
 export const findClients = clients.findMany;
 export const upsertClient = clients.upsert;
 
-export function touchClient(userId, clientId) {
-	if (!clientId) {
-		return;
-	}
-	const Client = getModel(userId, 'Client');
-	return Client.updateOne({ clientId }, { $currentDate: { updatedAt: true } });
-}
+export const touchClient = clients.touch;
 
 export async function upsertClientAction(event) {
 	try {
@@ -71,12 +67,14 @@ export async function deleteClientAction(event) {
 			throw error(404, 'Cliente no encontrado');
 		}
 
-		const vehicles = await findVehicles(userId, { clientId });
-		if (vehicles?.length) {
-			await Promise.all(vehicles.map((x) => deleteByVehicleId(userId, x.vehicleId)));
-		}
-		const Client = getModel(userId, 'Client');
-		await Client.deleteOne({ clientId });
+		const vehicles = await findVehicles(userId, { clientId }, { vehicleId: 1 });
+		const vehicleId = { $in: vehicles.map((x) => x.vehicleId) };
+
+		await deleteRepairs(userId, { vehicleId });
+		await deleteEstimates(userId, { vehicleId });
+		await deleteVehicles(userId, { clientId });
+		await clients.remove(userId, { clientId });
+
 		throw redirect(307, '/');
 	} catch (err) {
 		handleServerError(err, 'deleteClientAction');

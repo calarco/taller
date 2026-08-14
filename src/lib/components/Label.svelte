@@ -5,6 +5,7 @@
 	let { title, error, isCreate, onCreate, showCreate, children } = $props();
 
 	let hideError = $state(false);
+
 	$effect(() => {
 		if (error) {
 			hideError = false;
@@ -12,19 +13,12 @@
 	});
 </script>
 
-<label>
-	<span class="label">
-		{title}
+<div class="field">
+	<div class="titleRow">
+		<span class="label">{title}</span>
 		{#if error && !hideError}
 			<div class="error" in:fly={flyEnter} out:fly={flyExit}>
-				<button
-					tabindex="-1"
-					type="button"
-					onclick={(e) => {
-						e.preventDefault();
-						hideError = !hideError;
-					}}
-				>
+				<button type="button" onclick={() => (hideError = true)} aria-label="ocultar el error">
 					<span class="icon info"></span>
 					{error}
 				</button>
@@ -32,19 +26,19 @@
 		{/if}
 		{#if showCreate}
 			<div class="create" in:fade={enter} out:fade={exit}>
-				<button type="button" onmousedown={onCreate} aria-label="crear">
+				<button type="button" onmousedown={(e) => e.preventDefault()} onclick={onCreate} aria-label={`Crear ${title}`}>
 					<span class={['icon', 'create', { isCreate }]}></span>
 				</button>
 			</div>
 		{/if}
-	</span>
-	<div>
+	</div>
+	<div class="control">
 		{@render children()}
 	</div>
-</label>
+</div>
 
 <style>
-	label {
+	.field {
 		grid-column-end: var(--column-end, span 1);
 		flex-grow: 1;
 		width: 100%;
@@ -54,7 +48,7 @@
 		display: grid;
 		gap: 0.5rem;
 
-		> div {
+		> .control {
 			position: relative;
 			min-height: 1.75rem;
 			display: grid;
@@ -65,11 +59,8 @@
 		}
 	}
 
-	.label {
+	.titleRow {
 		position: relative;
-		font: inherit;
-		color: inherit;
-		margin: 0;
 		width: 100%;
 		min-height: 1.75rem;
 		display: grid;
@@ -107,7 +98,7 @@
 				text-transform: none;
 				color: var(--on-foreground);
 				font: var(--body2);
-				font-size: 0.96em;
+				font-size: 0.72rem;
 
 				&:hover:not(:has(*:hover)),
 				&:hover {

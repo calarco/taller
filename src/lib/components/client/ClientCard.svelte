@@ -41,10 +41,10 @@
 <div class="card">
 	{@render clientContent()}
 	<div class="cardButtons">
-		<button type="button" onclick={() => openDialog(dialog)} aria-label="borrar">
+		<button type="button" onclick={() => openDialog(dialog)} aria-label="Borrar el cliente">
 			<span class="icon delete"></span>
 		</button>
-		<button type="button" onclick={() => openForm('client', client.clientId)} aria-label="editar">
+		<button type="button" onclick={() => openForm('client', client.clientId)} aria-label="Editar el cliente">
 			<span class="icon edit"></span>
 		</button>
 	</div>

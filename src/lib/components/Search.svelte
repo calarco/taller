@@ -11,6 +11,7 @@
 	const search = createSearch();
 
 	let activeIndex = $state(-1);
+	let searchInput = $state();
 	let results = $derived((search.results ?? page.data.search ?? []).map((x) => ({ ...x, updatedAt: new Date(x.updatedAt) })));
 	const rows = $state([]);
 
@@ -45,31 +46,42 @@
 
 <div class="panel">
 	<Section overlay={windowState.form === 'estimate'}>
-		<label class="searchBar">
+		<div class="searchBar">
 			<div>
 				{#if !search.value}
-					<div in:blur={blurEnter} out:blur={blurExit}>
+					<label class="slot" for="searchInput" in:blur={blurEnter} out:blur={blurExit}>
 						<span class="icon search"></span>
-					</div>
+					</label>
 				{:else}
-					<div class="close" in:blur={blurEnter} out:blur={blurExit}>
+					<div class="slot close" in:blur={blurEnter} out:blur={blurExit}>
 						<button
 							type="button"
-							onmousedown={(e) => {
-								e.preventDefault();
+							onmousedown={(e) => e.preventDefault()}
+							onclick={() => {
 								search.value = '';
 								activeIndex = -1;
-								document.getElementById('searchInput').focus();
+								searchInput?.focus();
 							}}
-							aria-label="borrar"
+							aria-label="borrar la búsqueda"
 						>
 							<span class="icon close"></span>
 						</button>
 					</div>
 				{/if}
 			</div>
-			<input id="searchInput" type="search" name="search" placeholder="BUSCAR" autocomplete="off" bind:value={search.value} oninput={() => (activeIndex = -1)} {onkeydown} />
-		</label>
+			<input
+				bind:this={searchInput}
+				id="searchInput"
+				type="search"
+				name="search"
+				placeholder="BUSCAR"
+				aria-label="Buscar"
+				autocomplete="off"
+				bind:value={search.value}
+				oninput={() => (activeIndex = -1)}
+				{onkeydown}
+			/>
+		</div>
 		{#if !results.length && search.settled}
 			<h5 class="empty" in:slide={slideEnter} out:slide={slideExit}>No se encontraron resultados</h5>
 		{/if}
@@ -216,7 +228,7 @@
 				border-right: 1px solid var(--border-variant);
 			}
 
-			> div {
+			> .slot {
 				position: absolute;
 				top: 0;
 				bottom: 0;
@@ -236,7 +248,7 @@
 				}
 			}
 
-			> div.close:hover {
+			> .slot.close:hover {
 				background: var(--highlight);
 			}
 

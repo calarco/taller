@@ -92,8 +92,7 @@
 	<Label
 		title="Marca"
 		isCreate={createMake}
-		onCreate={(e) => {
-			e.preventDefault();
+		onCreate={() => {
 			createMake = !createMake;
 			createModel = false;
 			delete windowState.error?.carMakeError;
@@ -105,7 +104,7 @@
 			{#if isCreatingMake}
 				<div class="inlineCreate" in:fly={flyEnter} out:fly={flyExit}>
 					<input type="text" placeholder="-" autocomplete="off" bind:value={carMakeName} onkeydown={onEnter(createCarMake)} use:focus />
-					<button type="button" onclick={createCarMake} aria-label="crear">
+					<button type="button" onclick={createCarMake} aria-label="Guardar la marca">
 						<span class="icon ok"></span>
 					</button>
 				</div>
@@ -132,8 +131,7 @@
 	<Label
 		title="Modelo"
 		isCreate={createModel}
-		onCreate={(e) => {
-			e.preventDefault();
+		onCreate={() => {
 			createModel = !createModel;
 			createMake = false;
 			delete windowState.error?.carModelError;
@@ -145,7 +143,7 @@
 			{#if isCreatingModel}
 				<div class="inlineCreate" in:fly={flyEnter} out:fly={flyExit}>
 					<input type="text" placeholder="-" autocomplete="off" disabled={isCreatingMake} bind:value={carModelName} onkeydown={onEnter(createCarModel)} use:focus />
-					<button type="button" onclick={createCarModel} disabled={isCreatingMake} aria-label="crear">
+					<button type="button" onclick={createCarModel} disabled={isCreatingMake} aria-label="Guardar el modelo">
 						<span class="icon ok"></span>
 					</button>
 				</div>

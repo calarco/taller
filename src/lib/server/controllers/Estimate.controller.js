@@ -129,8 +129,7 @@ export async function deleteEstimateAction(event) {
 			throw error(400, 'Falta el identificador');
 		}
 
-		const Estimate = getModel(userId, 'Estimate');
-		const { deletedCount } = await Estimate.deleteOne({ estimateId });
+		const { deletedCount } = await estimates.remove(userId, { estimateId });
 		if (!deletedCount) {
 			throw error(404, 'Presupuesto no encontrado');
 		}

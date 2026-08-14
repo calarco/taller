@@ -34,11 +34,13 @@ export async function initDatabase() {
 			mongoose.connection.on('disconnected', () => console.error('[mongo] disconnected'));
 			mongoose.connection.on('reconnected', () => console.error('[mongo] reconnected'));
 		}
-		return await mongoose.connect(MONGODB_URI, { serverSelectionTimeoutMS: 5000 });
+		return await mongoose.connect(MONGODB_URI, { serverSelectionTimeoutMS: 5000, bufferCommands: false });
 	} catch (err) {
 		handleServerError(err, 'initDatabase');
 	}
 }
+
+const registered = new Set();
 
 export function getModel(userId, model) {
 	let name = 'taller';
@@ -47,9 +49,12 @@ export function getModel(userId, model) {
 	}
 
 	const db = mongoose.connection.useDb(name, { useCache: true });
-	for (const [schemaName, schema] of Object.entries(schemas)) {
-		if (!db.models[schemaName]) {
-			db.model(schemaName, schema);
+	if (!registered.has(name)) {
+		registered.add(name);
+		for (const [schemaName, schema] of Object.entries(schemas)) {
+			if (!db.models[schemaName]) {
+				db.model(schemaName, schema);
+			}
 		}
 	}
 	return db.model(model);
@@ -77,7 +82,15 @@ export function repository(modelName, idField) {
 			model(userId)
 				.find(filters, { ...projection, _id: 0 })
 				.lean(),
+		create: (userId, doc) => model(userId).create(doc),
 		upsert: (userId, doc) => model(userId).findOneAndUpdate({ [idField]: doc[idField] }, doc, { returnDocument: 'after', upsert: true }),
+		touch: (userId, id) => {
+			if (!id) {
+				return;
+			}
+			return model(userId).updateOne({ [idField]: id }, { $currentDate: { updatedAt: true } });
+		},
+		remove: (userId, filters) => model(userId).deleteOne(filters),
 		removeMany: (userId, filters) => model(userId).deleteMany(filters),
 		nextId: async (userId) => {
 			const counterKey = idField.replace(/Id$/, '');

@@ -15,8 +15,9 @@ const ClientSchema = mongoose.Schema(
 	}
 );
 
-ClientSchema.index({ clientId: 1 });
+ClientSchema.index({ clientId: 1 }, { unique: true });
 ClientSchema.index({ updatedAt: -1 });
+ClientSchema.index({ name: 1, lastName: 1 });
 
 ClientSchema.set('toObject', { virtuals: true });
 ClientSchema.set('toJSON', { virtuals: true });

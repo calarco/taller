@@ -10,7 +10,8 @@ const CarMakeSchema = mongoose.Schema(
 	}
 );
 
-CarMakeSchema.index({ carMakeId: 1 });
+CarMakeSchema.index({ carMakeId: 1 }, { unique: true });
+CarMakeSchema.index({ name: 1 });
 
 CarMakeSchema.set('toObject', { virtuals: true });
 CarMakeSchema.set('toJSON', { virtuals: true });
