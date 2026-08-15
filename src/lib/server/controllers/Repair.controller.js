@@ -7,7 +7,9 @@ import { touchVehicle } from '$lib/server/controllers/Vehicle.controller';
 const repairs = repository('Repair', 'repairId');
 
 export const findRepair = repairs.find;
+
 export const findRepairs = repairs.findMany;
+
 export const deleteRepairs = repairs.removeMany;
 
 export async function upsertRepair(userId, repair) {

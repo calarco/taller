@@ -13,6 +13,7 @@
 	let estimate = $derived(data.estimate || {});
 	let isDemo = $derived(data.user?.userId === 'demo');
 	let dialog = $state();
+	let printContent = $state();
 </script>
 
 <div class="panel" in:fly={panelFlyEnterX} out:blur={panelBlurExit}>
@@ -27,11 +28,9 @@
 				</button>
 				<button
 					type="button"
-					onclick={(e) => {
-						e.preventDefault();
-						var printContainer = document.getElementById('print-container');
-						var printContent = document.getElementById('print-content').innerHTML;
-						printContainer.innerHTML = printContent;
+					onclick={() => {
+						const printContainer = document.getElementById('printContainer');
+						printContainer.innerHTML = printContent.innerHTML;
 						window.print();
 						printContainer.innerHTML = '';
 					}}
@@ -53,7 +52,7 @@
 			</div>
 			<div class="estimate">
 				<Section overlay={windowState.form === 'estimate'} cards>
-					<div id="print-content">
+					<div bind:this={printContent}>
 						<!-- eslint-disable-next-line svelte/no-at-html-tags -- rendered by svelte/server, already escaped -->
 						{@html data.html}
 					</div>

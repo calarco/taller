@@ -6,6 +6,7 @@ import { str } from '$lib/server/validate.js';
 const carMakes = repository('CarMake', 'carMakeId');
 
 export const findCarMake = carMakes.find;
+
 export const findCarMakes = carMakes.findMany;
 
 export async function createCarMakeAction(event) {

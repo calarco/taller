@@ -12,6 +12,7 @@ export const carModelPopulate = {
 };
 
 export const findCarModel = carModels.find;
+
 export const findCarModels = carModels.findMany;
 
 export async function createCarModel(userId, carModel) {

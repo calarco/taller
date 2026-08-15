@@ -57,7 +57,7 @@
 			</div>
 		{/if}
 	</div>
-	<div id="print-container"></div>
+	<div id="printContainer"></div>
 </main>
 
 <style>
@@ -97,7 +97,7 @@
 		pointer-events: none;
 	}
 
-	#print-container {
+	#printContainer {
 		display: none;
 		pointer-events: none;
 		position: absolute;
@@ -122,7 +122,7 @@
 			visibility: hidden;
 		}
 
-		#print-container {
+		#printContainer {
 			display: block;
 			visibility: visible;
 		}

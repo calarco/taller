@@ -9,17 +9,15 @@ import { findUser } from '$lib/server/controllers/User.controller.js';
 import { createCarModel, carModelPopulate } from '$lib/server/controllers/CarModel.controller.js';
 import Estimate from '$lib/components/estimate/Estimate.svelte';
 
-const transporter = nodemailer.createTransport({
-	host: 'mail.smtp2go.com',
-	port: 2525,
-	secure: false,
-	requireTLS: true,
-	pool: true,
-	auth: {
-		user: MAIL_USER,
-		pass: MAIL_PASS,
-	},
-});
+const estimates = repository('Estimate', 'estimateId');
+
+export const findEstimate = estimates.find;
+
+export const findEstimates = estimates.findMany;
+
+export const deleteEstimates = estimates.removeMany;
+
+export const upsertEstimate = estimates.upsert;
 
 function toParts(values) {
 	const parts = [];
@@ -53,13 +51,6 @@ function toParts(values) {
 	}
 	return parts;
 }
-
-const estimates = repository('Estimate', 'estimateId');
-
-export const findEstimate = estimates.find;
-export const findEstimates = estimates.findMany;
-export const deleteEstimates = estimates.removeMany;
-export const upsertEstimate = estimates.upsert;
 
 export async function upsertEstimateAction(event) {
 	try {
@@ -172,6 +163,18 @@ export async function sendEstimateAction(event) {
 		if (!rendered?.html) {
 			throw error(500, 'Presupuesto no renderizado');
 		}
+
+		const transporter = nodemailer.createTransport({
+			host: 'mail.smtp2go.com',
+			port: 2525,
+			secure: false,
+			requireTLS: true,
+			pool: true,
+			auth: {
+				user: MAIL_USER,
+				pass: MAIL_PASS,
+			},
+		});
 
 		const data = await transporter.sendMail({
 			from: 'taller@calarco.com.ar',

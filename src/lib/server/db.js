@@ -43,14 +43,14 @@ export async function initDatabase() {
 const registered = new Set();
 
 export function getModel(userId, model) {
-	let name = 'taller';
+	let database = 'taller';
 	if (model !== 'User') {
-		name = userId;
+		database = userId;
 	}
 
-	const db = mongoose.connection.useDb(name, { useCache: true });
-	if (!registered.has(name)) {
-		registered.add(name);
+	const db = mongoose.connection.useDb(database, { useCache: true });
+	if (!registered.has(database)) {
+		registered.add(database);
 		for (const [schemaName, schema] of Object.entries(schemas)) {
 			if (!db.models[schemaName]) {
 				db.model(schemaName, schema);

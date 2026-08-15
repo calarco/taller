@@ -9,7 +9,9 @@ import { deleteEstimates } from '$lib/server/controllers/Estimate.controller.js'
 const clients = repository('Client', 'clientId');
 
 export const findClient = clients.find;
+
 export const findClients = clients.findMany;
+
 export const upsertClient = clients.upsert;
 
 export const touchClient = clients.touch;

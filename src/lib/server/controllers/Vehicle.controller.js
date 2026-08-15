@@ -10,7 +10,9 @@ import { deleteRepairs, moveRepairs } from '$lib/server/controllers/Repair.contr
 const vehicles = repository('Vehicle', 'vehicleId');
 
 export const findVehicle = vehicles.find;
+
 export const findVehicles = vehicles.findMany;
+
 export const deleteVehicles = vehicles.removeMany;
 
 export async function touchVehicle(userId, vehicleId) {

@@ -7,6 +7,7 @@ import { createCarModel } from '$lib/server/controllers/CarModel.controller.js';
 const appointments = repository('Appointment', 'appointmentId');
 
 export const findAppointment = appointments.find;
+
 export const findAppointments = appointments.findMany;
 
 export async function createAppointmentAction(event) {
