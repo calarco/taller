@@ -1,4 +1,5 @@
 <script>
+	import { untrack } from 'svelte';
 	import { windowState, toISODate, toLocalISODate } from '$lib/shared.svelte.js';
 	import Form from '$lib/components/Form.svelte';
 	import Label from '$lib/components/Label.svelte';
@@ -6,8 +7,8 @@
 	let { repair } = $props();
 
 	let isCreate = $derived(!repair?.repairId);
-	let cost = $state(repair?.cost ?? '');
-	let labor = $state(repair?.labor ?? '');
+	let cost = $state(untrack(() => repair?.cost ?? ''));
+	let labor = $state(untrack(() => repair?.labor ?? ''));
 	let total = $derived(Number(cost || 0) + Number(labor || 0));
 
 	let repairId;

@@ -1,4 +1,5 @@
 <script>
+	import { untrack } from 'svelte';
 	import { slide } from 'svelte/transition';
 	import { slideEnter, slideExit } from '$lib/motion.js';
 	import { page } from '$app/state';
@@ -9,8 +10,8 @@
 
 	let estimate = $derived(windowState.id ? page.data.estimate : {});
 
-	let labor = $state(estimate.labor ?? '');
-	let parts = $state([...(estimate.parts ?? [])]);
+	let labor = $state(untrack(() => estimate.labor ?? ''));
+	let parts = $state(untrack(() => [...(estimate.parts ?? [])]));
 	let estimateId;
 	$effect(() => {
 		if (estimateId !== estimate.estimateId) {

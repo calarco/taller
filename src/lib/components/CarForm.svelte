@@ -1,4 +1,5 @@
 <script>
+	import { untrack } from 'svelte';
 	import { fade, fly } from 'svelte/transition';
 	import { enter, exit, flyEnter, flyExit } from '$lib/motion.js';
 	import { invalidate } from '$app/navigation';
@@ -9,7 +10,7 @@
 
 	let { carModelProp } = $props();
 
-	let carModelId = $state(carModelProp || '');
+	let carModelId = $state(untrack(() => carModelProp || ''));
 	let carMakeId = $state('');
 	let carMakeName = $state('');
 	let carModelName = $state('');
