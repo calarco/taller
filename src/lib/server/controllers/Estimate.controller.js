@@ -4,7 +4,7 @@ import { error, fail, redirect } from '@sveltejs/kit';
 import { MAIL_USER, MAIL_PASS } from '$env/static/private';
 import { getModel, repository, toPlain } from '$lib/server/db';
 import { handleServerError } from '$lib/server/errors.js';
-import { str, toNumber } from '$lib/server/validate.js';
+import { str, toNumber, tooManyAttempts } from '$lib/server/validate.js';
 import { findUser } from '$lib/server/controllers/User.controller.js';
 import { createCarModel, carModelPopulate } from '$lib/server/controllers/CarModel.controller.js';
 import Estimate from '$lib/components/estimate/Estimate.svelte';
@@ -98,7 +98,7 @@ export async function upsertEstimateAction(event) {
 		}
 
 		const data = await upsertEstimate(userId, estimate);
-		if (data.estimateId) {
+		if (data.estimateId !== event.params.estimateId) {
 			throw redirect(307, `/estimate/${data.estimateId}`);
 		}
 		return { data: toPlain(data) };
@@ -130,6 +130,23 @@ export async function deleteEstimateAction(event) {
 	}
 }
 
+let transporter;
+
+function getTransporter() {
+	transporter ??= nodemailer.createTransport({
+		host: 'mail.smtp2go.com',
+		port: 2525,
+		secure: false,
+		requireTLS: true,
+		pool: true,
+		auth: {
+			user: MAIL_USER,
+			pass: MAIL_PASS,
+		},
+	});
+	return transporter;
+}
+
 export async function sendEstimateAction(event) {
 	try {
 		const userId = event.locals.userId;
@@ -159,24 +176,16 @@ export async function sendEstimateAction(event) {
 			throw error(404, 'Presupuesto no encontrado');
 		}
 
+		if (tooManyAttempts(`email:${userId}`)) {
+			throw error(429, 'Demasiados envíos, espere unos minutos');
+		}
+
 		const rendered = render(Estimate, { props: { estimate, user } });
 		if (!rendered?.html) {
 			throw error(500, 'Presupuesto no renderizado');
 		}
 
-		const transporter = nodemailer.createTransport({
-			host: 'mail.smtp2go.com',
-			port: 2525,
-			secure: false,
-			requireTLS: true,
-			pool: true,
-			auth: {
-				user: MAIL_USER,
-				pass: MAIL_PASS,
-			},
-		});
-
-		const data = await transporter.sendMail({
+		const data = await getTransporter().sendMail({
 			from: 'taller@calarco.com.ar',
 			to: email,
 			subject: 'Presupuesto',

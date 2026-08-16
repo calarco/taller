@@ -24,6 +24,12 @@ export async function handle({ event, resolve }) {
 	}
 
 	const response = await resolve(event);
+	response.headers.set('x-content-type-options', 'nosniff');
+	response.headers.set('referrer-policy', 'strict-origin-when-cross-origin');
+	response.headers.set('x-frame-options', 'DENY');
+	if (event.locals.userId) {
+		response.headers.set('cache-control', 'no-store');
+	}
 	return response;
 }
 

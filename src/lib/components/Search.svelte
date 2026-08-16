@@ -44,6 +44,21 @@
 	}
 </script>
 
+{#snippet updatedAt(date, href)}
+	<a {href} class="updatedAt">
+		<div>
+			{date.getDate()}/{date.toLocaleDateString('default', { month: 'short' }).substring(0, 3)}/{date.toLocaleDateString('default', { year: 'numeric' }).substring(2, 4)}
+		</div>
+		<div>
+			{date.toLocaleTimeString([], {
+				hour: '2-digit',
+				minute: '2-digit',
+				hour12: false,
+			})}
+		</div>
+	</a>
+{/snippet}
+
 <div class="panel">
 	<Section overlay={windowState.form === 'estimate'}>
 		<div class="searchBar">
@@ -115,20 +130,7 @@
 							</a>
 						{/if}
 					</div>
-					<a href={`/${result.clientId}/${result.vehicleId || ''}${result.repairId ? '#' + result.repairId : ''}`} class="updatedAt">
-						<div>
-							{result.updatedAt.getDate()}/{result.updatedAt.toLocaleDateString('default', { month: 'short' }).substring(0, 3)}/{result.updatedAt
-								.toLocaleDateString('default', { year: 'numeric' })
-								.substring(2, 4)}
-						</div>
-						<div>
-							{result.updatedAt.toLocaleTimeString([], {
-								hour: '2-digit',
-								minute: '2-digit',
-								hour12: false,
-							})}
-						</div>
-					</a>
+					{@render updatedAt(result.updatedAt, `/${result.clientId}/${result.vehicleId || ''}${result.repairId ? '#' + result.repairId : ''}`)}
 				{/if}
 				{#if result.estimateId}
 					<a class="estimateResult" href={`/estimate/${result.estimateId}`}>
@@ -156,20 +158,7 @@
 							</div>
 						{/if}
 					</a>
-					<a href={`/estimate/${result.estimateId}`} class="updatedAt">
-						<div>
-							{result.updatedAt.getDate()}/{result.updatedAt.toLocaleDateString('default', { month: 'short' }).substring(0, 3)}/{result.updatedAt
-								.toLocaleDateString('default', { year: 'numeric' })
-								.substring(2, 4)}
-						</div>
-						<div>
-							{result.updatedAt.toLocaleTimeString([], {
-								hour: '2-digit',
-								minute: '2-digit',
-								hour12: false,
-							})}
-						</div>
-					</a>
+					{@render updatedAt(result.updatedAt, `/estimate/${result.estimateId}`)}
 				{/if}
 			</div>
 		{/each}

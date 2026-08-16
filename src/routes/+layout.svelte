@@ -80,9 +80,6 @@
 		gap: 1rem;
 		grid-template-columns: [panel-left] minmax(0, 2fr) [panel-right] minmax(0, 3fr);
 		grid-template-rows: [panel-top] minmax(0, 1fr);
-
-		@media (min-width: 1440px) {
-		}
 	}
 
 	.client {

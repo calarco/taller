@@ -22,11 +22,4 @@ ClientSchema.index({ name: 1, lastName: 1 });
 ClientSchema.set('toObject', { virtuals: true });
 ClientSchema.set('toJSON', { virtuals: true });
 
-ClientSchema.virtual('vehicles', {
-	ref: 'Vehicle',
-	localField: 'clientId',
-	foreignField: 'clientId',
-	justOne: true,
-});
-
 export default ClientSchema;

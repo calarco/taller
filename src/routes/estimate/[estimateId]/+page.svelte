@@ -31,8 +31,12 @@
 					onclick={() => {
 						const printContainer = document.getElementById('printContainer');
 						printContainer.innerHTML = printContent.innerHTML;
+						const cleanup = () => {
+							printContainer.innerHTML = '';
+							window.removeEventListener('afterprint', cleanup);
+						};
+						window.addEventListener('afterprint', cleanup);
 						window.print();
-						printContainer.innerHTML = '';
 					}}
 					aria-label="Imprimir el presupuesto"
 				>

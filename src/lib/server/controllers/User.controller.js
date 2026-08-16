@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 import { JWT_KEY } from '$env/static/private';
 import { getModel, toPlain } from '$lib/server/db';
 import { handleServerError } from '$lib/server/errors.js';
-import { str } from '$lib/server/validate.js';
+import { str, tooManyAttempts, clearAttempts } from '$lib/server/validate.js';
 import { resetDemo } from '$lib/server/controllers/Demo.controller.js';
 
 export function findUser(userId, filters, projection = { __v: 0, _id: 0, password: 0 }) {
@@ -35,32 +35,6 @@ export async function authenticate(cookies) {
 
 	const user = await findUser(auth.userId, { userId: auth.userId }, { userId: 1, _id: 0 });
 	return user ? auth : undefined;
-}
-
-const buckets = new Map();
-
-function tooManyAttempts(key) {
-	const now = Date.now();
-	if (buckets.size > 10000) {
-		for (const [staleKey, stale] of buckets) {
-			if (now > stale.reset) {
-				buckets.delete(staleKey);
-			}
-		}
-	}
-
-	const bucket = buckets.get(key);
-	if (!bucket || now > bucket.reset) {
-		buckets.set(key, { count: 1, reset: now + 15 * 60 * 1000 });
-		return false;
-	}
-
-	bucket.count += 1;
-	return bucket.count > 10;
-}
-
-function clearAttempts(key) {
-	buckets.delete(key);
 }
 
 function signIn(event, user) {

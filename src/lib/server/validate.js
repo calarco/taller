@@ -25,3 +25,29 @@ export function toDate(value) {
 	const date = new Date(`${raw}T00:00:00.000Z`);
 	return isNaN(date.getTime()) ? null : date;
 }
+
+const buckets = new Map();
+
+export function tooManyAttempts(key) {
+	const now = Date.now();
+	if (buckets.size > 10000) {
+		for (const [staleKey, stale] of buckets) {
+			if (now > stale.reset) {
+				buckets.delete(staleKey);
+			}
+		}
+	}
+
+	const bucket = buckets.get(key);
+	if (!bucket || now > bucket.reset) {
+		buckets.set(key, { count: 1, reset: now + 30 * 60 * 1000 });
+		return false;
+	}
+
+	bucket.count += 1;
+	return bucket.count > 15;
+}
+
+export function clearAttempts(key) {
+	buckets.delete(key);
+}

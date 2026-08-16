@@ -45,7 +45,7 @@
 	</Label>
 	<Label title="Mano de obra" --template-columns="max-content 1fr">
 		<h6 class="unit">$</h6>
-		<input type="number" min="1" name="labor" placeholder="0" autoComplete="off" bind:value={labor} class="price" />
+		<input type="number" min="0" name="labor" placeholder="0" autoComplete="off" bind:value={labor} class="price" />
 	</Label>
 	<fieldset>
 		<div class="parts">

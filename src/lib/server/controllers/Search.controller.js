@@ -62,17 +62,17 @@ function fullName(entity) {
 }
 
 function mapClient(x, score) {
-	const repair = x.vehicles?.repairs?.length ? x.vehicles.repairs[0] : null;
+	const repair = x.vehicle?.repair ?? null;
 	return {
 		id: 'c' + x.clientId,
 		clientId: x.clientId,
 		clientName: fullName(x),
-		vehicleId: x.vehicles?.vehicleId,
-		carModelId: x.vehicles?.carModelId,
-		carModel: x.vehicles?.carModel,
+		vehicleId: x.vehicle?.vehicleId,
+		carModelId: x.vehicle?.carModelId,
+		carModel: x.vehicle?.carModel,
 		repairId: repair?.repairId || '',
 		description: repair?.description || '',
-		updatedAt: new Date(Math.max(repair?.updatedAt || 0, x.vehicles?.updatedAt || 0, x.updatedAt)),
+		updatedAt: new Date(Math.max(repair?.updatedAt || 0, x.vehicle?.updatedAt || 0, x.updatedAt)),
 		score,
 	};
 }
@@ -170,7 +170,7 @@ async function findClientRows(userId, filters, sort, limit) {
 		const vehicle = vehicleByClient.get(client.clientId);
 		if (vehicle) {
 			const repair = repairByVehicle.get(vehicle.vehicleId);
-			client.vehicles = { ...vehicle, repairs: repair ? [repair] : [] };
+			client.vehicle = { ...vehicle, repair: repair ?? null };
 		}
 	}
 	return clients;
