@@ -2,27 +2,7 @@ import mongoose from 'mongoose';
 import { error } from '@sveltejs/kit';
 import { MONGODB_URI } from '$env/static/private';
 import { handleServerError } from '$lib/server/errors.js';
-import AppointmentSchema from '$lib/server/models/Appointment.model';
-import CarMakeSchema from '$lib/server/models/CarMake.model';
-import CarModelSchema from '$lib/server/models/CarModel.model';
-import ClientSchema from '$lib/server/models/Client.model';
-import CounterSchema from '$lib/server/models/Counter.model';
-import EstimateSchema from '$lib/server/models/Estimate.model';
-import RepairSchema from '$lib/server/models/Repair.model';
-import UserSchema from '$lib/server/models/User.model';
-import VehicleSchema from '$lib/server/models/Vehicle.model';
-
-const schemas = {
-	Appointment: AppointmentSchema,
-	CarMake: CarMakeSchema,
-	CarModel: CarModelSchema,
-	Client: ClientSchema,
-	Counter: CounterSchema,
-	Estimate: EstimateSchema,
-	Repair: RepairSchema,
-	User: UserSchema,
-	Vehicle: VehicleSchema,
-};
+import { mainSchemas, tenantSchemas } from '$lib/server/models/index.js';
 
 let listening = false;
 
@@ -43,14 +23,18 @@ export async function initDatabase() {
 const registered = new Set();
 
 export function getModel(userId, model) {
-	let database = 'taller';
-	if (model !== 'User') {
-		database = userId;
+	const main = model === 'User';
+	const database = main ? 'taller' : userId;
+	const schemas = main ? mainSchemas : tenantSchemas;
+
+	if (!database) {
+		throw error(500, 'Sesion invalida');
 	}
 
+	const key = `${database}/${main ? 'main' : 'tenant'}`;
 	const db = mongoose.connection.useDb(database, { useCache: true });
-	if (!registered.has(database)) {
-		registered.add(database);
+	if (!registered.has(key)) {
+		registered.add(key);
 		for (const [schemaName, schema] of Object.entries(schemas)) {
 			if (!db.models[schemaName]) {
 				db.model(schemaName, schema);

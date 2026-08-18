@@ -254,11 +254,15 @@ is in no transition list, so fading the tint alone makes the blur snap on at ful
 
 ## Estimates and email
 
-`src/lib/components/estimate/Estimate.svelte` is built from `svelte-email` primitives, not ordinary markup. It
-is rendered to an HTML **string** server-side with `render()` from `svelte/server`, and the same component
-produces both the page body (`load` returns `data.html`, injected with `{@html}`) and the email body
-(`sendEstimateAction` renders it again and mails it). Changing it affects both. SMTP host and port are
-hardcoded in `Estimate.controller.js`; only the credentials come from the environment.
+`src/lib/components/estimate/Estimate.svelte` is built from `svelte-email` primitives, not ordinary markup, and
+is rendered to an HTML **string** server-side with `render()` from `svelte/server`. The page `load` renders it
+alone (`data.html`, injected with `{@html}`); `sendEstimateAction` renders `EstimateEmail.svelte`, which wraps
+it in `Html`/`Head`/`Body` plus `Preview`, and mails that. Changing `Estimate.svelte` affects both. SMTP host
+and port are hardcoded in `Estimate.controller.js`; only the credentials come from the environment.
+
+**That wrapper is email-only.** `{@html}` drops the string mid-document, where the parser merges a second
+`<body>`'s attributes onto the real one and its `font-family` overrides the app's. `<html>` accepts only
+`<head>`/`<body>`/`<frameset>`, so `Preview` and the content sit inside `Body`, never directly under `Html`.
 
 Print-to-PDF: the page copies its estimate node's `innerHTML` into the root layout's `#printContainer` and
 calls `window.print()`; an `@media print` block hides everything else.

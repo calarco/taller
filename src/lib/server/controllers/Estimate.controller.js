@@ -7,7 +7,7 @@ import { handleServerError } from '$lib/server/errors.js';
 import { str, toNumber, tooManyAttempts } from '$lib/server/validate.js';
 import { findUser } from '$lib/server/controllers/User.controller.js';
 import { createCarModel, carModelPopulate } from '$lib/server/controllers/CarModel.controller.js';
-import Estimate from '$lib/components/estimate/Estimate.svelte';
+import EstimateEmail from '$lib/components/estimate/EstimateEmail.svelte';
 
 const estimates = repository('Estimate', 'estimateId');
 
@@ -180,7 +180,7 @@ export async function sendEstimateAction(event) {
 			throw error(429, 'Demasiados envíos, espere unos minutos');
 		}
 
-		const rendered = render(Estimate, { props: { estimate, user } });
+		const rendered = render(EstimateEmail, { props: { estimate, user } });
 		if (!rendered?.html) {
 			throw error(500, 'Presupuesto no renderizado');
 		}

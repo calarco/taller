@@ -1,5 +1,5 @@
 <script>
-	import { Container, Head, Heading, Hr, Html, Link, Preview, Text, Section } from 'svelte-email';
+	import { Container, Heading, Hr, Link, Text } from 'svelte-email';
 
 	let { estimate, user } = $props();
 
@@ -38,121 +38,115 @@
 	const sign = styleToString({ padding: '0 0.25rem' });
 </script>
 
-<Html lang="en">
-	<Head />
-	<Preview preview={estimate.description} />
-	<Section style={{ fontFamily }}>
-		<Container align="center" style={section}>
-			{#if user.description}
-				<Heading as="h5" style={text}>
-					{user.description}
-				</Heading>
+<Container align="center" style={section}>
+	{#if user.description}
+		<Heading as="h5" style={text}>
+			{user.description}
+		</Heading>
+	{/if}
+	<Heading as="h1" style={title}>
+		{user.name || user.userId}
+	</Heading>
+	<Container align="center" style={plain}>
+		<Text style={text}>
+			{#if user.address}
+				<span style={inline}>{user.address}</span>
 			{/if}
-			<Heading as="h1" style={title}>
-				{user.name || user.userId}
-			</Heading>
-			<Container align="center" style={plain}>
-				<Text style={text}>
-					{#if user.address}
-						<span style={inline}>{user.address}</span>
-					{/if}
-					{#if user.phone}
-						<span style={inline}>{user.phone}</span>
-					{/if}
-					{#if user.email}
-						<span style={inline}>{user.email}</span>
-					{/if}
-				</Text>
-			</Container>
-		</Container>
-		<Hr style={hr} />
-		<Container align="center" style={section}>
-			<Heading as="h4" style={text}>
-				Presupuesto - {Intl.DateTimeFormat('es-AR', { year: 'numeric', month: 'long', day: 'numeric' }).format(estimate.createdAt)}
-			</Heading>
-			<Text style={{ margin: '1rem 0 0 0', fontFamily }}>
-				{#if estimate.carModel}
-					<span style={inline}>{estimate.carModel.carMake?.name} {estimate.carModel.name}</span>
-				{/if}
-				{#if estimate.vehicleId}
-					<span style={inline}>{estimate.vehicleId}</span>
-				{/if}
-				{#if estimate.km}
-					<span style={inline}>{currency(estimate.km)} km</span>
-				{/if}
-			</Text>
-		</Container>
-		<table style={styleToString({ padding: '1rem' })}>
-			<tbody style={styleToString(table)}>
-				<tr style={styleToString(label)}>
-					<td align="left" colspan="2" width="100%">
-						<Text style={head}>Reparación</Text>
-					</td>
-					<td align="right">
-						<Text style={priceHead}>Mano de obra</Text>
-					</td>
-				</tr>
-				<tr>
-					<td align="left" colspan="2" width="100%">
-						<Text style={cell}>{estimate.description}</Text>
-					</td>
-					<td align="right">
-						<Text style={priceCell}><span style={sign}>$</span> {currency(estimate.labor)}</Text>
-					</td>
-				</tr>
-			</tbody>
-		</table>
-		{#if estimate.parts.length}
-			<table style={styleToString({ padding: '0 1rem' })}>
-				<tbody style={styleToString(table)}>
-					<tr style={styleToString(label)}>
-						<td align="center">
-							<Text style={amountHead}>Cantidad</Text>
-						</td>
-						<td align="left" width="100%">
-							<Text style={head}>Repuesto</Text>
-						</td>
-						<td align="right">
-							<Text style={priceHead}>Precio</Text>
-						</td>
-					</tr>
-					{#each estimate.parts as part (part.name)}
-						<tr>
-							<td align="center">
-								<Text style={amountCell}>{part.amount}</Text>
-							</td>
-							<td width="100%">
-								<Text style={cell}>{part.name}</Text>
-							</td>
-							<td align="right">
-								<Text style={priceCell}><span style={sign}>$</span> {currency(part.price)}</Text>
-							</td>
-						</tr>
-					{/each}
-				</tbody>
-			</table>
-			<table style={styleToString({ padding: '1rem' })}>
-				<tbody style={styleToString(table)}>
-					<tr style={styleToString(label)}>
-						<td align="left" colspan="2" width="100%"></td>
-						<td align="right">
-							<Text style={priceHead}>Total</Text>
-						</td>
-					</tr>
-					<tr>
-						<td align="left" colspan="2" width="100%"></td>
-						<td align="right">
-							<Text style={priceCell}><span style={sign}>$</span> {currency(estimate.labor + estimate.parts.reduce((a, { price }) => a + price, 0))}</Text>
-						</td>
-					</tr>
-				</tbody>
-			</table>
+			{#if user.phone}
+				<span style={inline}>{user.phone}</span>
+			{/if}
+			{#if user.email}
+				<span style={inline}>{user.email}</span>
+			{/if}
+		</Text>
+	</Container>
+</Container>
+<Hr style={hr} />
+<Container align="center" style={section}>
+	<Heading as="h4" style={text}>
+		Presupuesto - {Intl.DateTimeFormat('es-AR', { year: 'numeric', month: 'long', day: 'numeric' }).format(estimate.createdAt)}
+	</Heading>
+	<Text style={{ margin: '1rem 0 0 0', fontFamily }}>
+		{#if estimate.carModel}
+			<span style={inline}>{estimate.carModel.carMake?.name} {estimate.carModel.name}</span>
 		{/if}
-		<Hr style={hr} />
-		<Container style={plain}>
-			<Text align="right" style={{ width: '100%', padding: '0 2rem', fontFamily }}>
-				© 2025 <Link href="https://calarco.com.ar">CalarcoWEB</Link>
-			</Text>
-		</Container>
-	</Section>
-</Html>
+		{#if estimate.vehicleId}
+			<span style={inline}>{estimate.vehicleId}</span>
+		{/if}
+		{#if estimate.km}
+			<span style={inline}>{currency(estimate.km)} km</span>
+		{/if}
+	</Text>
+</Container>
+<table style={styleToString({ padding: '1rem' })}>
+	<tbody style={styleToString(table)}>
+		<tr style={styleToString(label)}>
+			<td align="left" colspan="2" width="100%">
+				<Text style={head}>Reparación</Text>
+			</td>
+			<td align="right">
+				<Text style={priceHead}>Mano de obra</Text>
+			</td>
+		</tr>
+		<tr>
+			<td align="left" colspan="2" width="100%">
+				<Text style={cell}>{estimate.description}</Text>
+			</td>
+			<td align="right">
+				<Text style={priceCell}><span style={sign}>$</span> {currency(estimate.labor)}</Text>
+			</td>
+		</tr>
+	</tbody>
+</table>
+{#if estimate.parts.length}
+	<table style={styleToString({ padding: '0 1rem' })}>
+		<tbody style={styleToString(table)}>
+			<tr style={styleToString(label)}>
+				<td align="center">
+					<Text style={amountHead}>Cantidad</Text>
+				</td>
+				<td align="left" width="100%">
+					<Text style={head}>Repuesto</Text>
+				</td>
+				<td align="right">
+					<Text style={priceHead}>Precio</Text>
+				</td>
+			</tr>
+			{#each estimate.parts as part (part.name)}
+				<tr>
+					<td align="center">
+						<Text style={amountCell}>{part.amount}</Text>
+					</td>
+					<td width="100%">
+						<Text style={cell}>{part.name}</Text>
+					</td>
+					<td align="right">
+						<Text style={priceCell}><span style={sign}>$</span> {currency(part.price)}</Text>
+					</td>
+				</tr>
+			{/each}
+		</tbody>
+	</table>
+	<table style={styleToString({ padding: '1rem' })}>
+		<tbody style={styleToString(table)}>
+			<tr style={styleToString(label)}>
+				<td align="left" colspan="2" width="100%"></td>
+				<td align="right">
+					<Text style={priceHead}>Total</Text>
+				</td>
+			</tr>
+			<tr>
+				<td align="left" colspan="2" width="100%"></td>
+				<td align="right">
+					<Text style={priceCell}><span style={sign}>$</span> {currency(estimate.labor + estimate.parts.reduce((a, { price }) => a + price, 0))}</Text>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+{/if}
+<Hr style={hr} />
+<Container style={plain}>
+	<Text align="right" style={{ width: '100%', padding: '0 2rem', fontFamily }}>
+		© 2025 <Link href="https://calarco.com.ar">CalarcoWEB</Link>
+	</Text>
+</Container>
