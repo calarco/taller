@@ -1,5 +1,11 @@
 import { startLoading, endLoading } from '$lib/shared.svelte.js';
 
+let version = $state(0);
+
+export function invalidateSearch() {
+	version += 1;
+}
+
 export function createSearch({ type = '' } = {}) {
 	let value = $state('');
 	let results = $state(null);
@@ -7,6 +13,7 @@ export function createSearch({ type = '' } = {}) {
 	let seq = 0;
 
 	$effect(() => {
+		version;
 		const query = value.trim();
 		if (!query) {
 			results = null;

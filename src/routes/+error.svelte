@@ -5,7 +5,7 @@
 	import { closeForm } from '$lib/shared.svelte.js';
 </script>
 
-<div class="cover" in:fade={panelEnter} out:fade={panelExit}>
+<div class="error" in:fade={panelEnter} out:fade={panelExit}>
 	<div in:fly={flyEnter} out:blur={blurExit}>
 		<div>
 			<a class="button" href="/" aria-label="Volver al inicio" onclick={closeForm}>
@@ -18,20 +18,17 @@
 </div>
 
 <style>
-	.cover {
+	.error {
 		position: absolute;
 		top: 0;
 		bottom: 0;
 		left: 0;
 		right: 0;
-		bottom: 0;
 		min-height: 3rem;
-		z-index: var(--layer-cover);
+		z-index: var(--layer-cover-content);
 		display: grid;
 		justify-items: center;
 		align-items: center;
-		background: var(--overlay);
-		backdrop-filter: blur(0.5rem);
 
 		> div {
 			width: 40rem;

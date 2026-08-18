@@ -1,4 +1,5 @@
 import { handleServerError } from '$lib/server/errors.js';
+import { toDayStart } from '$lib/server/validate.js';
 import { findUser } from '$lib/server/controllers/User.controller.js';
 import { findAppointments } from '$lib/server/controllers/Appointment.controller.js';
 import { getSearch } from '$lib/server/controllers/Search.controller.js';
@@ -13,7 +14,7 @@ export const load = async (event) => {
 	try {
 		const [user, appointments, search] = await Promise.all([
 			findUser(userId, { userId }),
-			findAppointments(userId, { date: { $gte: new Date(new Date().setHours(0, 0, 0, 0)) } }).populate(carModelPopulate),
+			findAppointments(userId, { date: { $gte: toDayStart(new Date()) } }).populate(carModelPopulate),
 			getSearch(userId),
 		]);
 

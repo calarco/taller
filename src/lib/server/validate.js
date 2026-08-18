@@ -26,6 +26,11 @@ export function toDate(value) {
 	return isNaN(date.getTime()) ? null : date;
 }
 
+export function toDayStart(value) {
+	const date = value instanceof Date ? value : new Date(value);
+	return isNaN(date.getTime()) ? null : new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+}
+
 const buckets = new Map();
 
 export function tooManyAttempts(key) {

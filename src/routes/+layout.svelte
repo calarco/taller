@@ -1,4 +1,6 @@
 <script>
+	import { fade } from 'svelte/transition';
+	import { panelEnter, panelExit } from '$lib/motion.js';
 	import { page, navigating } from '$app/state';
 	import { windowState, closeForm, startLoading, endLoading } from '$lib/shared.svelte.js';
 	import Appointments from '$lib/components/appointment/Appointments.svelte';
@@ -58,6 +60,9 @@
 		{/if}
 	</div>
 	<div id="printContainer"></div>
+	{#if !page.data.user || page.error}
+		<div class="cover" in:fade={panelEnter} out:fade={panelExit}></div>
+	{/if}
 </main>
 
 <style>
@@ -69,6 +74,17 @@
 		justify-content: center;
 		justify-items: center;
 		grid-template-rows: var(--bar-height) minmax(0, 1fr);
+	}
+
+	.cover {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		z-index: var(--layer-cover);
+		background: var(--overlay);
+		backdrop-filter: blur(0.5rem);
 	}
 
 	.panels {

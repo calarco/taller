@@ -1,4 +1,5 @@
 import { getModel } from '$lib/server/db';
+import { toDayStart } from '$lib/server/validate.js';
 
 let fixture;
 
@@ -34,6 +35,11 @@ export async function resetDemo(userId) {
 			Appointment: ['createdAt', 'updatedAt', 'date'],
 		};
 
+		const dayFields = {
+			Repair: ['date'],
+			Appointment: ['date'],
+		};
+
 		const models = [...collections.map(([, model]) => model), 'Counter'];
 		await Promise.all(models.map((model) => getModel(userId, model).deleteMany({})));
 
@@ -44,7 +50,8 @@ export async function resetDemo(userId) {
 			const documents = data[key].map((document) => {
 				const copy = { ...document };
 				for (const field of dateFields[model]) {
-					copy[field] = new Date(now + copy[field] * 24 * 60 * 60 * 1000);
+					const date = new Date(now + copy[field] * 24 * 60 * 60 * 1000);
+					copy[field] = dayFields[model]?.includes(field) ? toDayStart(date) : date;
 				}
 				return copy;
 			});

@@ -8,72 +8,61 @@
 
 	let { data } = $props();
 
-	let hide = $state(false);
 	let showForm = $state(false);
 
-	const submit = enhanceSubmit({
-		onResult: (result) => {
-			if (result.type === 'success' || result.type === 'redirect') {
-				hide = true;
-			}
-		},
-	});
+	const submit = enhanceSubmit({ reset: false });
 </script>
 
-<div class="cover" in:fade={panelEnter} out:fade={panelExit}>
-	{#if !hide}
-		{#if data.landing && !showForm}
-			<form class="landing" method="POST" action="?/demo" use:enhance={submit} in:fly={flyEnter} out:blur={blurExit}>
-				<div>
-					<h1>Taller Calarco</h1>
-					<p>Sistema de gestión para talleres mecánicos: clientes, vehículos, reparaciones y presupuestos.</p>
-				</div>
-				<div class="formButtons">
-					<button type="button" onclick={() => (showForm = true)}>Ingresar</button>
-					<button type="submit">Probar demo</button>
-				</div>
-			</form>
-		{:else}
-			<form method="POST" action="?/login" use:enhance={submit} in:fly={flyEnter} out:blur={blurExit}>
-				<Label title="Usuario" error={windowState.error?.userIdError}>
-					<input type="text" name="userId" autoComplete="username" />
-				</Label>
-				<Label title="Contraseña" error={windowState.error?.passwordError}>
-					<input type="password" name="password" autoComplete="current-password" />
-				</Label>
-				<div class="formButtons">
-					{#if data.landing}
-						<button
-							type="button"
-							onclick={() => {
-								windowState.error = {};
-								showForm = false;
-							}}
-						>
-							Volver
-						</button>
-					{/if}
-					<button type="submit">Ingresar</button>
-				</div>
-			</form>
-		{/if}
+<div class="forms" in:fade={panelEnter} out:fade={panelExit}>
+	{#if data.landing && !showForm}
+		<form class="landing" method="POST" action="?/demo" use:enhance={submit} in:fly={flyEnter} out:blur={blurExit}>
+			<div>
+				<h1>Taller Calarco</h1>
+				<p>Sistema de gestión para talleres mecánicos: clientes, vehículos, reparaciones y presupuestos.</p>
+			</div>
+			<div class="formButtons">
+				<button type="button" onclick={() => (showForm = true)}>Ingresar</button>
+				<button type="submit">Probar demo</button>
+			</div>
+		</form>
+	{:else}
+		<form method="POST" action="?/login" use:enhance={submit} in:fly={flyEnter} out:blur={blurExit}>
+			<Label title="Usuario" error={windowState.error?.userIdError}>
+				<input type="text" name="userId" autoComplete="username" />
+			</Label>
+			<Label title="Contraseña" error={windowState.error?.passwordError}>
+				<input type="password" name="password" autoComplete="current-password" />
+			</Label>
+			<div class="formButtons">
+				{#if data.landing}
+					<button
+						type="button"
+						onclick={() => {
+							windowState.error = {};
+							showForm = false;
+						}}
+					>
+						Volver
+					</button>
+				{/if}
+				<button type="submit">Ingresar</button>
+			</div>
+		</form>
 	{/if}
 </div>
 
 <style>
-	.cover {
+	.forms {
 		position: absolute;
 		top: 0;
 		left: 0;
 		right: 0;
 		bottom: 0;
-		z-index: var(--layer-cover);
+		z-index: var(--layer-cover-content);
 		display: grid;
 		justify-items: center;
 		align-items: center;
 		overflow: hidden;
-		background: var(--overlay);
-		backdrop-filter: blur(0.5rem);
 	}
 
 	form {

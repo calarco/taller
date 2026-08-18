@@ -59,6 +59,14 @@ concurrent creates pick the same id and the second **overwrites the first** inst
 seeds the counter from the highest existing id with a numeric collation sort — once per tenant per entity —
 so an existing database continues its sequence.
 
+**Date-only fields are UTC midnight.** `toDate` in `validate.js` parses `YYYY-MM-DD` as `T00:00:00.000Z`, so
+`Repair.date` and `Appointment.date` are instants at UTC midnight, not local. Read them back the same way:
+`toISODate` (UTC getters) to compare, `timeZone: 'UTC'` to format. Local getters render the day before west of
+Greenwich. To bound a query at today, use `toDayStart(new Date())`, which is UTC midnight of the _local_
+calendar day — `setHours(0, 0, 0, 0)` is local midnight and excludes today's rows at UTC-3. `createdAt`/
+`updatedAt` are ordinary timestamps and render local. The demo fixture stores day offsets, so `resetDemo`
+snaps the fields in its `dayFields` map through `toDayStart` while the timestamps keep their time of day.
+
 **`vehicleId` is the licence plate**, user-entered and uppercased, not an auto-increment. Editing it sends
 `oldVehicleId` too: `upsertVehicle` finds by the old plate and `moveRepairs` re-points the repairs.
 `Estimate.vehicleId` is the same plate string but is not required to match a Vehicle document.
@@ -178,7 +186,10 @@ Svelte 5 `$state`/`$derived`/`$effect` throughout — no stores.
   `use:enhance` passes; it toggles loading and copies `fail()` data into `windowState.error`. `postAction`
   does the same for a fetch-driven POST that isn't a real form submit (`CarForm`'s inline create).
 - `src/lib/search.svelte.js` — `createSearch({ type })` wraps `/search` with a 200 ms debounce, an
-  `AbortController` and a sequence guard. Use it rather than calling `/search` directly.
+  `AbortController` and a sequence guard. Use it rather than calling `/search` directly. Because those
+  results come from a `fetch` and not a `load`, `invalidateAll()` cannot refresh them — only the recents in
+  `page.data.search` — so `enhanceSubmit`/`postAction` call the module's `invalidateSearch()` on a `success`
+  or `redirect` result and every mounted `createSearch` refetches its active query.
 - `src/lib/motion.js` — the `in:`/`out:` presets every transition imports.
 
 Mutations re-run every `load` on the route by default. To scope that, pass update options through
@@ -219,7 +230,8 @@ absolutely-positioned form shell; `Label.svelte` is the field wrapper that rende
 appointments/search, then route panels, then the client/estimate form panels. No panel needs a `z-index`.
 
 Inside a panel use `--layer-sticky` → `--layer-card` → `--layer-scrim` → `--layer-form` → `--layer-error`. At
-the root use `--layer-bar` → `--layer-cover` → `--layer-loading` → `--layer-print`. The two scales never meet.
+the root use `--layer-bar` → `--layer-cover` → `--layer-cover-content` → `--layer-loading` → `--layer-print`.
+The two scales never meet.
 A sticky header whose `z-index` leaks out of its panel gets painted under an incoming panel, because the `fly`
 transform makes that panel a stacking context for the duration of the transition.
 
@@ -291,6 +303,17 @@ when `event.url.hostname` matches the list in `login/+page.server.js` (public do
 other host gets the plain form, so future tenant subdomains are unaffected. `Ingresar` just flips local state,
 it does not navigate.
 
+- **The `.cover` backdrop belongs to the root layout**, not to the pages that sit on it. It renders when
+  `page.data.user` is missing or `page.error` is set, so it tints and blurs the app through a logout as well as
+  a sign-in, and `/login` and `+error.svelte` contribute only their transparent centring grids (`.forms`,
+  `.error`) at `--layer-cover-content`. That token exists because the backdrop and the content it carries live
+  in different files, so DOM order cannot keep the backdrop underneath — share `--layer-cover` between them and
+  whichever lands last swallows the clicks. Wrapping `{@render children()}` in the cover instead
+  is not an option: the other routes need a second `{@render children()}`, and rendering that snippet twice
+  mounts the page component twice. `src/error.html` keeps its own tint — no layout runs for it.
+- **`Bar`, `Appointments` and `Search` stay mounted under the cover** and keep their client state across a
+  logout, so anything session-scoped has to clear itself — `Search.svelte` watches `page.data.user` and resets
+  the query when it goes missing.
 - **Resolve the hostname in `load`, never in the component.** On the client `page.url.hostname` comes from
   `location`; on the server from `ORIGIN || get_origin(headers)` in adapter-node. If an `ORIGIN` is ever set
   those disagree and hydration mismatches. A server-resolved boolean cannot.

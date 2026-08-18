@@ -15,6 +15,13 @@
 	let results = $derived((search.results ?? page.data.search ?? []).map((x) => ({ ...x, updatedAt: new Date(x.updatedAt) })));
 	const rows = $state([]);
 
+	$effect(() => {
+		if (!page.data.user) {
+			search.value = '';
+			activeIndex = -1;
+		}
+	});
+
 	function select(index) {
 		activeIndex = index;
 		rows[index]?.scrollIntoView({ block: 'nearest' });

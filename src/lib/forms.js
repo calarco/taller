@@ -1,5 +1,6 @@
 import { applyAction, deserialize } from '$app/forms';
 import { windowState, startLoading, endLoading } from '$lib/shared.svelte.js';
+import { invalidateSearch } from '$lib/search.svelte.js';
 
 export function enhanceSubmit({ onResult, ...options } = {}) {
 	return () => {
@@ -9,6 +10,9 @@ export function enhanceSubmit({ onResult, ...options } = {}) {
 		return async ({ result, update }) => {
 			if (result.type === 'failure' && result.data) {
 				windowState.error = result.data;
+			}
+			if (result.type === 'success' || result.type === 'redirect') {
+				invalidateSearch();
 			}
 			onResult?.(result);
 
@@ -39,6 +43,9 @@ export async function postAction(action, fields) {
 
 		if (result.type === 'failure' && result.data) {
 			windowState.error = result.data;
+		}
+		if (result.type === 'success' || result.type === 'redirect') {
+			invalidateSearch();
 		}
 		if (result.type === 'error' || result.type === 'redirect') {
 			await applyAction(result);

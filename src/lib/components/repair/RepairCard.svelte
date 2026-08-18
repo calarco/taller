@@ -16,7 +16,7 @@
 	<article>
 		<div class="title">
 			<h5>
-				{Intl.DateTimeFormat('es-AR', { year: 'numeric', month: 'long', day: 'numeric' }).format(repair?.date)}
+				{Intl.DateTimeFormat('es-AR', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' }).format(repair?.date)}
 				{#if repair?.km}
 					<small>{new Intl.NumberFormat('es-AR').format(repair.km)} km</small>
 				{/if}

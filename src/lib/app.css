@@ -151,6 +151,7 @@ body {
 
 	--layer-bar: 100;
 	--layer-cover: 200;
+	--layer-cover-content: 250;
 	--layer-loading: 300;
 	--layer-print: 400;
 
