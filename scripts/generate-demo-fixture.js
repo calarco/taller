@@ -7,10 +7,12 @@ import { dirname, resolve } from 'node:path';
 
 const OUT = resolve(dirname(fileURLToPath(import.meta.url)), '../src/lib/server/demo-fixture.json');
 
-const CLIENTS = 400;
-const ESTIMATES = 80;
-const RECENT_ESTIMATES = 12; // how many land in the last few days, so they reach the "Recientes" panel
-const APPOINTMENTS = 40;
+const CLIENTS = 120;
+const ESTIMATES = 30;
+const RECENT_ESTIMATES = 6; // how many land in the last few days, so they reach the "Recientes" panel
+const APPOINTMENTS = 44;
+const UPCOMING_APPOINTMENTS = 30; // the calendar panel loads only future turnos
+const FORTNIGHT_APPOINTMENTS = 22; // of those, how many land inside the next two weeks
 const HISTORY_DAYS = 1800; // ~5 years of history
 const SEED = 20260808;
 
@@ -365,7 +367,7 @@ const repairs = [];
 let repairId = 0;
 for (const vehicle of vehicles) {
 	// skewed low: most vehicles came in once or twice, a few are regulars
-	const count = chance(0.42) ? int(1, 2) : chance(0.7) ? int(3, 5) : int(6, 14);
+	const count = chance(0.42) ? int(1, 2) : chance(0.7) ? int(3, 5) : int(6, 10);
 	const span = -vehicle.createdAt;
 
 	const days = [];
@@ -444,8 +446,9 @@ for (let i = 1; i <= ESTIMATES; i += 1) {
 
 const appointments = [];
 for (let i = 1; i <= APPOINTMENTS; i += 1) {
-	// half in the coming weeks so the calendar panel is never empty, half as history
-	const date = i <= APPOINTMENTS / 2 ? int(0, 42) : -int(1, 400);
+	// the calendar opens on today and renders a row per day, so most upcoming turnos land inside the
+	// next two weeks; the rest spread over the following month, and the remainder are history
+	const date = i <= FORTNIGHT_APPOINTMENTS ? int(0, 13) : i <= UPCOMING_APPOINTMENTS ? int(14, 42) : -int(1, 400);
 	// booked before the visit, and never in the future — an upcoming turno was booked in the past
 	const createdAt = date > 0 ? -int(0, 25) : date - int(1, 20);
 	appointments.push({

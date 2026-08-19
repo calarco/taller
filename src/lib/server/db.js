@@ -31,10 +31,9 @@ export function getModel(userId, model) {
 		throw error(500, 'Sesion invalida');
 	}
 
-	const key = `${database}/${main ? 'main' : 'tenant'}`;
 	const db = mongoose.connection.useDb(database, { useCache: true });
-	if (!registered.has(key)) {
-		registered.add(key);
+	if (!registered.has(database)) {
+		registered.add(database);
 		for (const [schemaName, schema] of Object.entries(schemas)) {
 			if (!db.models[schemaName]) {
 				db.model(schemaName, schema);

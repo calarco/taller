@@ -12,7 +12,7 @@
 </script>
 
 <div class="panel" in:fly={panelFlyEnterX} out:blur={panelBlurExit}>
-	{#key data.client.clientId}
+	{#key data.client?.clientId}
 		<div in:fly={panelFlyEnterX} out:fly={panelFlyExitX}>
 			<div class="vehicles">
 				<div>
@@ -33,7 +33,7 @@
 						{#if !data.vehicles?.length}
 							<h5 class="empty">Sin vehiculos</h5>
 						{/if}
-						{#each data.vehicles as vehicle (vehicle.vehicleId)}
+						{#each data.vehicles ?? [] as vehicle (vehicle.vehicleId)}
 							<VehicleCard {vehicle} />
 						{/each}
 					</Section>

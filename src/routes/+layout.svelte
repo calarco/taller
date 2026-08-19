@@ -14,6 +14,16 @@
 	let { children } = $props();
 
 	let url = $derived(page.url.pathname);
+	let title = $derived.by(() => {
+		if (page.data.estimate) {
+			return `Presupuesto ${page.data.estimate.vehicleId}`;
+		}
+		if (!page.data.client) {
+			return 'Sistema Taller';
+		}
+		const client = `${page.data.client.name} ${page.data.client.lastName}`;
+		return page.params.vehicleId ? `${client} ${page.params.vehicleId}` : client;
+	});
 	$effect(() => {
 		if (url) {
 			closeForm();
@@ -37,7 +47,7 @@
 <svelte:window {onkeydown} />
 
 <svelte:head>
-	<title>Sistema Taller</title>
+	<title>{title}</title>
 	<meta name="description" content="Gestión de taller mecánico" />
 	<link rel="preload" as="font" type="font/woff2" href={supreme} crossorigin />
 </svelte:head>
