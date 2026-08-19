@@ -213,6 +213,17 @@ absolutely-positioned form shell; `Label.svelte` is the field wrapper that rende
 
 - **Tokens** are oklch inside `light-dark()`, declared on `body`. Typography comes from `font:` shorthand
   variables (`--body1`, `--subhead1`, `--title`, …). Don't hardcode colours or font stacks.
+- **Shadows** are the one token pair that isn't `light-dark()`. `--shadow` and `--shadow-variant` are a single
+  ramp of straight-down layers, each layer's alpha a `color-mix` of `--shadow-color` scaled by
+  `--shadow-strength`. Only those two switch on `prefers-color-scheme` — dark doubles the alpha, because a
+  shadow can only be so visible when `--shadow-color` sits 0.08 L below `--background`. Tune those two rather
+  than duplicating the ramp, and keep the offsets vertical: a horizontal offset reads as a second light source
+  next to every other shadow on screen. `--shadow-variant`'s per-layer alpha is _higher_ than `--shadow`'s on
+  purpose — it is the low-elevation pair, so its shadow is tighter and darker where `--shadow` is wider and
+  more diffuse. Light mode is the constraint: `--background` is `oklch(0.84)`, which leaves a shadow little
+  range to darken into, and the layers composite, so a change reads on the whole stack rather than on any one
+  alpha. Render a swatch on `--background` and compare against `box-shadow: none` before trusting a new value —
+  at these alphas the two are easy to confuse.
 - **Icons** are `.icon.<name>` rules using a `mask-image` data-URI. Add a rule rather than an `<img>`.
 - **The global button rule** (`.button, button, input[type='submit']`) gives every button a hover/
   `:focus-visible` background and a pointer cursor. To exempt one, add it to the `:not(.createButton, .overlay)`
