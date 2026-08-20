@@ -81,7 +81,7 @@
 		padding: 0.5rem 1.75rem;
 		border-top: 1px solid var(--border-variant);
 		background: var(--surface);
-		box-shadow: var(--shadow);
+		box-shadow: var(--shadow-variant);
 		display: grid;
 		gap: 1.75rem;
 		grid-auto-flow: column;

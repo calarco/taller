@@ -218,7 +218,7 @@
 								top: 0;
 								bottom: 0;
 								left: -1px;
-								border-left: 1px solid var(--primary-border);
+								border-left: 1px solid var(--border-variant);
 							}
 						}
 					}

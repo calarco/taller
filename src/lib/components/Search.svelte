@@ -191,7 +191,7 @@
 		margin-bottom: -1px;
 		border-radius: var(--border-radius) 0 0 0;
 		background: var(--surface);
-		box-shadow: var(--shadow);
+		box-shadow: var(--shadow-variant);
 		display: grid;
 		grid-template-columns: 3.5rem 1fr auto;
 		align-items: center;

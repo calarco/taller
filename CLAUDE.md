@@ -215,7 +215,7 @@ absolutely-positioned form shell; `Label.svelte` is the field wrapper that rende
   variables (`--body1`, `--subhead1`, `--title`, …). Don't hardcode colours or font stacks.
 - **Shadows** are the one token pair that isn't `light-dark()`. `--shadow` and `--shadow-variant` are a single
   ramp of straight-down layers, each layer's alpha a `color-mix` of `--shadow-color` scaled by
-  `--shadow-strength`. Only those two switch on `prefers-color-scheme` — dark doubles the alpha, because a
+  `--shadow-strength`. Only those two switch on `prefers-color-scheme` — dark carries a much higher strength, because a
   shadow can only be so visible when `--shadow-color` sits 0.08 L below `--background`. Tune those two rather
   than duplicating the ramp, and keep the offsets vertical: a horizontal offset reads as a second light source
   next to every other shadow on screen. `--shadow-variant`'s per-layer alpha is _higher_ than `--shadow`'s on
