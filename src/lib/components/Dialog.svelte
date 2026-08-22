@@ -75,7 +75,7 @@
 		padding: 0;
 		border-radius: var(--border-radius);
 		border: none;
-		outline: 1px solid var(--border-variant);
+		outline: 1px solid var(--border);
 		background: var(--surface);
 		box-shadow: var(--shadow);
 		opacity: 0;
@@ -89,7 +89,7 @@
 				width: 100%;
 				text-align: center;
 				padding: 0.75rem 1rem;
-				border-bottom: 1px solid var(--border-variant);
+				border-bottom: 1px solid var(--border);
 			}
 
 			> form {
@@ -106,7 +106,7 @@
 			width: 100%;
 			height: 3rem;
 			overflow: hidden;
-			border-top: 1px solid var(--border-variant);
+			border-top: 1px solid var(--border);
 			display: flex;
 			gap: 1px;
 
@@ -138,7 +138,7 @@
 					top: 0;
 					left: -1px;
 					bottom: 0;
-					border-left: 1px solid var(--border-variant);
+					border-left: 1px solid var(--border);
 				}
 			}
 

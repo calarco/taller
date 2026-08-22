@@ -44,16 +44,17 @@
 				--subhead2: 500 1rem/1.75rem var(--font-family);
 
 				--primary-hue: 233;
+				--background-saturation: 0.01;
 
 				--on-background: light-dark(oklch(0 0 360 / 90%), oklch(1 0 360));
 				--on-foreground: light-dark(oklch(1 0 360), oklch(0 0 360 / 90%));
 				--on-foreground-variant: light-dark(oklch(1 0 360 / 30%), oklch(0 0 360 / 15%));
 
-				--background: light-dark(oklch(0.84 0.01 var(--primary-hue)), oklch(0.13 0.01 var(--primary-hue)));
-				--overlay: light-dark(oklch(0.92 0.01 var(--primary-hue) / 0.6), oklch(0.15 0.01 var(--primary-hue) / 0.8));
+				--background: light-dark(oklch(0.84 var(--background-saturation) var(--primary-hue)), oklch(0.13 var(--background-saturation) var(--primary-hue)));
+				--overlay: light-dark(oklch(0.92 var(--background-saturation) var(--primary-hue) / 0.6), oklch(0.15 var(--background-saturation) var(--primary-hue) / 0.8));
 				--highlight: light-dark(oklch(0.51 0.03 var(--primary-hue) / 0.1), oklch(0.51 0.03 var(--primary-hue) / 0.1));
 
-				--border-variant: light-dark(oklch(0.6 0.05 var(--primary-hue) / 0.25), oklch(0.3 0.02 var(--primary-hue) / 0.4));
+				--border: light-dark(oklch(0.6 0.05 var(--primary-hue) / 0.25), oklch(0.3 0.02 var(--primary-hue) / 0.4));
 				--primary: light-dark(oklch(0.61 0.09 var(--primary-hue)), oklch(0.69 0.12 var(--primary-hue)));
 				--error: light-dark(oklch(0.63 0.13 15), oklch(0.65 0.23 21));
 
@@ -172,7 +173,7 @@
 					overflow: hidden;
 					background: var(--error);
 					box-shadow: var(--shadow);
-					outline: 1px solid var(--border-variant);
+					outline: 1px solid var(--border);
 					display: grid;
 					align-items: center;
 					grid-template-columns: auto;

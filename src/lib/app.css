@@ -101,22 +101,23 @@ body {
 	--headline: 300 1.5rem/2rem var(--font-family);
 	--display-1: 300 2rem/2.5rem var(--font-family);
 
-	--primary-hue: 233;
-	--secondary-hue: 56;
-
 	--on-background: light-dark(oklch(0 0 360 / 90%), oklch(1 0 360));
 	--on-background-variant: light-dark(oklch(0 0 360 / 50%), oklch(1 0 360 / 50%));
 	--on-background-disabled: light-dark(oklch(0.5 0 360 / 30%), oklch(1 0 360 / 6%));
 	--on-foreground: light-dark(oklch(1 0 360), oklch(0 0 360 / 90%));
 	--on-foreground-variant: light-dark(oklch(1 0 360 / 30%), oklch(0 0 360 / 15%));
 
-	--background: light-dark(oklch(0.84 0.01 var(--primary-hue)), oklch(0.13 0.01 var(--primary-hue)));
-	--surface: light-dark(oklch(0.99 0.01 var(--primary-hue)), oklch(0.18 0.01 var(--primary-hue)));
-	--surface-variant: light-dark(oklch(0.92 0.01 var(--primary-hue)), oklch(0.15 0.01 var(--primary-hue)));
-	--overlay: light-dark(oklch(0.92 0.01 var(--primary-hue) / 0.6), oklch(0.15 0.01 var(--primary-hue) / 0.8));
+	--primary-hue: 233;
+	--secondary-hue: 56;
+	--background-saturation: 0.012;
+
+	--background: light-dark(oklch(0.84 var(--background-saturation) var(--primary-hue)), oklch(0.13 var(--background-saturation) var(--primary-hue)));
+	--surface: light-dark(oklch(0.99 var(--background-saturation) var(--primary-hue)), oklch(0.18 var(--background-saturation) var(--primary-hue)));
+	--surface-variant: light-dark(oklch(0.92 var(--background-saturation) var(--primary-hue)), oklch(0.15 var(--background-saturation) var(--primary-hue)));
+	--overlay: light-dark(oklch(0.92 var(--background-saturation) var(--primary-hue) / 0.6), oklch(0.15 var(--background-saturation) var(--primary-hue) / 0.8));
 	--highlight: light-dark(oklch(0.51 0.03 var(--primary-hue) / 0.1), oklch(0.51 0.03 var(--primary-hue) / 0.1));
 
-	--border-variant: light-dark(oklch(0.6 0.05 var(--primary-hue) / 0.25), oklch(0.3 0.02 var(--primary-hue) / 0.4));
+	--border: light-dark(oklch(0.6 0.05 var(--primary-hue) / 0.25), oklch(0.3 0.02 var(--primary-hue) / 0.4));
 
 	--primary: light-dark(oklch(0.61 0.09 var(--primary-hue)), oklch(0.69 0.12 var(--primary-hue)));
 	--primary-variant: light-dark(oklch(0.92 0.02 var(--primary-hue)), oklch(0.24 0.02 var(--primary-hue)));
@@ -166,7 +167,7 @@ body {
 	--layer-print: 400;
 
 	--bar-height: 3rem;
-	--scrollbar-width: 11px;
+	--scrollbar-width: 13px;
 	--scrollbar-track: light-dark(rgba(0, 0, 0, 0.08), hsla(202, 15%, 20%, 0.08));
 	--border-radius: 0.75rem;
 
@@ -182,13 +183,14 @@ body {
 	::-webkit-scrollbar {
 		width: var(--scrollbar-width);
 		height: var(--scrollbar-width);
-		border-radius: 0 var(--border-radius) var(--border-radius) 0;
 	}
 	::-webkit-scrollbar-track {
+		corner-shape: superellipse(0.9);
 		border-radius: 0 var(--border-radius) var(--border-radius) 0;
 		background: var(--scrollbar-track);
 	}
 	::-webkit-scrollbar-thumb {
+		corner-shape: superellipse(0.9);
 		border-radius: 0 var(--border-radius) var(--border-radius) 0;
 		background: var(--on-background-disabled);
 	}
@@ -339,7 +341,7 @@ textarea {
 	border-radius: var(--border-radius);
 	background: none;
 	border: none;
-	outline: 1px solid var(--border-variant);
+	outline: 1px solid var(--border);
 	font: var(--subhead1);
 	color: var(--on-background);
 	transition:
@@ -432,7 +434,7 @@ select {
 	border-radius: var(--border-radius);
 	border: none;
 	background-color: var(--highlight);
-	outline: 1px solid var(--border-variant);
+	outline: 1px solid var(--border);
 	font: var(--subhead1);
 	color: var(--on-background);
 	transition:
@@ -508,7 +510,7 @@ select,
 	background: var(--surface);
 	box-shadow: var(--shadow);
 	border: none;
-	outline: 1px solid var(--border-variant);
+	outline: 1px solid var(--border);
 	opacity: 0;
 	transform: translateY(-1rem);
 	transition:
@@ -567,7 +569,7 @@ option {
 	}
 
 	&:not(option:first-of-type) {
-		border-top: 1px solid var(--border-variant);
+		border-top: 1px solid var(--border);
 
 		&:hover {
 			border-top: 1px solid rgba(0, 0, 0, 0);
@@ -777,7 +779,7 @@ a {
 		bottom: 0;
 		z-index: 10;
 		width: 100%;
-		border-bottom: 1px solid var(--border-variant);
+		border-bottom: 1px solid var(--border);
 	}
 }
 
@@ -883,7 +885,7 @@ a {
 			top: 0;
 			left: -1px;
 			bottom: 0;
-			border-left: 1px solid var(--border-variant);
+			border-left: 1px solid var(--border);
 		}
 	}
 }
@@ -941,6 +943,6 @@ a {
 		left: 0;
 		right: 0;
 		z-index: 0;
-		border-top: 1px solid var(--border-variant);
+		border-top: 1px solid var(--border);
 	}
 }

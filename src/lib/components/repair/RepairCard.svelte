@@ -93,7 +93,7 @@
 					bottom: -0.5rem;
 					right: 0;
 					width: 5.25rem;
-					border-bottom: 1px solid var(--border-variant);
+					border-bottom: 1px solid var(--border);
 				}
 
 				&:first-child p {

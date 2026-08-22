@@ -66,7 +66,7 @@
 	.vehicles {
 		position: relative;
 		border-radius: var(--border-radius);
-		border-top: 1px solid var(--border-variant);
+		border-top: 1px solid var(--border);
 
 		> div {
 			position: absolute;

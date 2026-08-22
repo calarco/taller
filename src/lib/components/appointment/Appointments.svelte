@@ -67,7 +67,7 @@
 		grid-column-start: panel-left;
 		grid-row-start: panel-top;
 		background: var(--surface-variant);
-		outline: 1px solid var(--border-variant);
+		outline: 1px solid var(--border);
 		box-shadow: var(--shadow-variant);
 	}
 
@@ -79,7 +79,7 @@
 		width: 100%;
 		min-height: calc(3rem + 1px);
 		padding: 0.5rem 1.75rem;
-		border-top: 1px solid var(--border-variant);
+		border-top: 1px solid var(--border);
 		background: var(--surface);
 		box-shadow: var(--shadow-variant);
 		display: grid;

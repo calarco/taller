@@ -153,7 +153,7 @@
 				position: relative;
 				border-radius: 0 0 var(--border-radius) var(--border-radius);
 				background: var(--surface-variant);
-				outline: 1px solid var(--border-variant);
+				outline: 1px solid var(--border);
 				box-shadow: var(--shadow-variant);
 				display: grid;
 				gap: 1px;
@@ -190,7 +190,7 @@
 								top: 0.5rem;
 								bottom: 0.5rem;
 								left: -1px;
-								border-left: 1px solid var(--border-variant);
+								border-left: 1px solid var(--border);
 							}
 
 							.icon::before {
@@ -237,7 +237,6 @@
 
 					.createButton {
 						border-radius: 0 0 var(--border-radius) var(--border-radius);
-						box-shadow: none;
 						border-top: none;
 
 						> div {

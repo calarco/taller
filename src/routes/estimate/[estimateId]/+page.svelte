@@ -127,7 +127,7 @@
 				top: 0;
 				left: -1px;
 				bottom: 0;
-				border-left: 1px solid var(--border-variant);
+				border-left: 1px solid var(--border);
 			}
 		}
 
@@ -142,7 +142,7 @@
 				top: 0;
 				left: -1px;
 				bottom: 0;
-				border-left: 1px solid var(--border-variant);
+				border-left: 1px solid var(--border);
 			}
 
 			input {
@@ -162,7 +162,7 @@
 					top: 0.5rem;
 					left: -1px;
 					bottom: 0.5rem;
-					border-left: 1px solid var(--border-variant);
+					border-left: 1px solid var(--border);
 				}
 
 				.mailsend {
@@ -183,7 +183,7 @@
 		bottom: 0;
 		left: 0;
 		border-radius: var(--border-radius);
-		border-top: 1px solid var(--border-variant);
+		border-top: 1px solid var(--border);
 	}
 
 	article {

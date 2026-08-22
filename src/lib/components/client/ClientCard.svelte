@@ -99,11 +99,11 @@
 	.cardButtons {
 		grid-row: 5;
 		border-radius: 0;
-		border-top: 1px solid var(--border-variant);
+		border-top: 1px solid var(--border);
 
 		button {
 			&:not(:first-child)::after {
-				border-left: 1px solid var(--border-variant);
+				border-left: 1px solid var(--border);
 			}
 		}
 	}

@@ -104,7 +104,7 @@
 		border-radius: var(--border-radius);
 		display: flex;
 		flex-direction: column;
-		outline: 1px solid var(--border-variant);
+		outline: 1px solid var(--border);
 	}
 
 	.createSlot {

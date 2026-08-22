@@ -43,7 +43,7 @@
 			right: 0;
 			left: 0;
 			z-index: 0;
-			border-top: 1px solid var(--border-variant);
+			border-top: 1px solid var(--border);
 		}
 
 		&:last-child {
@@ -62,7 +62,7 @@
 				top: 0;
 				bottom: 0;
 				left: -1px;
-				border-left: 1px solid var(--border-variant);
+				border-left: 1px solid var(--border);
 			}
 		}
 	}

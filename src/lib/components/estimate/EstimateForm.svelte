@@ -151,7 +151,7 @@
 				padding: 0;
 				background: var(--surface);
 				border-radius: var(--border-radius);
-				outline: 1px solid var(--border-variant);
+				outline: 1px solid var(--border);
 				display: grid;
 				align-content: space-between;
 				font: var(--label);
@@ -184,7 +184,7 @@
 								top: 0;
 								right: 9px;
 								bottom: 0;
-								border-right: 1px solid var(--border-variant);
+								border-right: 1px solid var(--border);
 							}
 						}
 
@@ -199,7 +199,7 @@
 								top: 0;
 								left: 6px;
 								bottom: 0;
-								border-left: 1px solid var(--border-variant);
+								border-left: 1px solid var(--border);
 							}
 						}
 
@@ -218,7 +218,7 @@
 								top: 0;
 								bottom: 0;
 								left: -1px;
-								border-left: 1px solid var(--border-variant);
+								border-left: 1px solid var(--border);
 							}
 						}
 					}
