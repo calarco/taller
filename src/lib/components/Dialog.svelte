@@ -7,6 +7,7 @@
 
 	let closing = $state(false);
 	let closeTimer;
+	let instance = $state(0);
 
 	$effect(() => () => clearTimeout(closeTimer));
 
@@ -16,6 +17,7 @@
 			dialog.close();
 		}
 		closing = false;
+		instance += 1;
 	}
 
 	function requestClose() {
@@ -58,7 +60,9 @@
 			})}
 		>
 			{#if children}
-				{@render children()}
+				{#key instance}
+					{@render children()}
+				{/key}
 			{/if}
 			<div class="dialogButtons">
 				<button type="button" onclick={requestClose}>Cancelar</button>

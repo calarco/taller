@@ -53,7 +53,7 @@
 		overflow-y: hidden;
 
 		&.notOverlay {
-			overflow-y: scroll;
+			overflow-y: auto;
 		}
 	}
 

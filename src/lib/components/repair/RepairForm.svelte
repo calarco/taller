@@ -53,7 +53,7 @@
 		<h5 class="price">{new Intl.NumberFormat('es-AR').format(total)}</h5>
 	</Label>
 	<Label title="Descripción" error={windowState.error?.descriptionError} --column-end="span 3">
-		<input type="text" name="description" placeholder="-" autoComplete="off" value={repair?.description || ''} />
+		<input type="text" name="description" placeholder="-" autoComplete="off" value={repair?.description || ''} data-focus />
 	</Label>
 	<Label title="KM">
 		<input type="number" min="0" name="km" placeholder="-" autoComplete="off" value={repair?.km || ''} />

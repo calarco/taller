@@ -40,7 +40,7 @@
 		</Label>
 	{/if}
 	<Label title="Patente" error={windowState.error?.vehicleIdError}>
-		<input class="plate" type="text" name="vehicleId" placeholder="-" autoComplete="off" value={vehicle?.vehicleId || ''} />
+		<input class="plate" type="text" name="vehicleId" placeholder="-" autoComplete="off" value={vehicle?.vehicleId || ''} data-focus />
 	</Label>
 	<CarForm carModelProp={vehicle?.carModelId} --column-end="span 2" />
 	<Label title="Año" --column-end="start">

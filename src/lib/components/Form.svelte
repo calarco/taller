@@ -2,13 +2,23 @@
 	import { fly, blur } from 'svelte/transition';
 	import { blurExit, flyEnter } from '$lib/motion.js';
 	import { enhance } from '$app/forms';
-	import { closeForm } from '$lib/shared.svelte.js';
+	import { windowState, closeForm } from '$lib/shared.svelte.js';
 	import { enhanceSubmit } from '$lib/forms.js';
 
 	let { action, isCreate, children } = $props();
+
+	let form = $state();
+	let opened;
+	$effect(() => {
+		if (opened !== windowState.id) {
+			opened = windowState.id;
+			(form?.querySelector('[data-focus]') ?? form?.querySelector('input:not([type="hidden"]), select, textarea'))?.focus();
+		}
+	});
 </script>
 
 <form
+	bind:this={form}
 	{action}
 	method="POST"
 	use:enhance={enhanceSubmit({
