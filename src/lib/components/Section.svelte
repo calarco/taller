@@ -25,15 +25,16 @@
 		height: 100%;
 		min-height: 25rem;
 		max-height: 100%;
-		border-radius: var(--border-radius);
+		border-radius: var(--section-radius, var(--border-radius));
 
 		&.cards {
 			background: var(--surface);
 			box-shadow: var(--shadow);
 
 			.scroller {
-				padding: 0 1rem;
+				padding: 0 0.5rem;
 				gap: 0;
+				scrollbar-gutter: stable both-edges;
 			}
 
 			.scrollSpacer {
@@ -47,7 +48,7 @@
 		display: flex;
 		flex-direction: column;
 		gap: 1px;
-		border-radius: var(--border-radius);
+		border-radius: var(--section-radius, var(--border-radius));
 		scrollbar-gutter: stable;
 		overflow-y: hidden;
 
@@ -61,7 +62,7 @@
 		z-index: var(--layer-scrim);
 		inset: 0;
 		padding: 0;
-		border-radius: var(--border-radius);
+		border-radius: var(--section-radius, var(--border-radius));
 		background: var(--overlay);
 		backdrop-filter: blur(0.5rem);
 	}

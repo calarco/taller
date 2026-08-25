@@ -108,7 +108,6 @@
 				.icon.info::before {
 					height: 1.25rem;
 					width: 1.25rem;
-					background: var(--on-foreground);
 				}
 			}
 		}

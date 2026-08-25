@@ -55,7 +55,7 @@
 				</form>
 			</div>
 			<div class="estimate">
-				<Section overlay={windowState.form === 'estimate'} cards>
+				<Section overlay={windowState.form === 'estimate'} cards --section-radius="0 0 var(--border-radius) var(--border-radius)">
 					<div bind:this={printContent}>
 						<!-- eslint-disable-next-line svelte/no-at-html-tags -- rendered by svelte/server, already escaped -->
 						{@html data.html}
@@ -155,6 +155,7 @@
 				border-radius: 0px;
 				min-width: 4rem;
 				padding: 0 1rem;
+				color: var(--primary);
 
 				&::after {
 					content: '';
@@ -182,7 +183,7 @@
 		right: 0;
 		bottom: 0;
 		left: 0;
-		border-radius: var(--border-radius);
+		border-radius: 0 0 var(--border-radius) var(--border-radius);
 		border-top: 1px solid var(--border);
 	}
 

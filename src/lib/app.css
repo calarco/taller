@@ -167,8 +167,9 @@ body {
 	--layer-print: 400;
 
 	--bar-height: 3rem;
-	--scrollbar-width: 13px;
-	--scrollbar-track: light-dark(rgba(0, 0, 0, 0.08), hsla(202, 15%, 20%, 0.08));
+	--scrollbar-width: 11px;
+	--scrollbar-track: light-dark(oklch(0.7 0.01 var(--primary-hue) / 0.3), oklch(0 0.01 var(--primary-hue) / 0.4));
+	--scrollbar-thumb: light-dark(oklch(0.7 0.01 var(--primary-hue) / 1), oklch(0.3 0.01 var(--primary-hue) / 1));
 	--border-radius: 0.75rem;
 
 	@supports (corner-shape: superellipse(2)) {
@@ -185,20 +186,21 @@ body {
 		height: var(--scrollbar-width);
 	}
 	::-webkit-scrollbar-track {
-		corner-shape: superellipse(0.9);
-		border-radius: 0 var(--border-radius) var(--border-radius) 0;
-		background: var(--scrollbar-track);
+		border-radius: var(--border-radius);
+		margin: 4px;
+		box-shadow: inset 0 0 10px 10px var(--scrollbar-track);
+		border: solid 4px transparent;
 	}
 	::-webkit-scrollbar-thumb {
-		corner-shape: superellipse(0.9);
-		border-radius: 0 var(--border-radius) var(--border-radius) 0;
-		background: var(--on-background-disabled);
+    	border-radius: var(--border-radius);
+    	box-shadow: inset 0 0 10px 10px var(--scrollbar-thumb);
+    	border: solid 3px transparent;
 	}
 
 	@supports (-moz-orient: inline) or (not selector(::-webkit-scrollbar)) {
 		&,
 		* {
-			scrollbar-color: var(--on-background-disabled) var(--scrollbar-track);
+			scrollbar-color: var(--scrollbar-thumb) transparent;
 		}
 	}
 
@@ -684,7 +686,7 @@ a {
 		width: 1.5rem;
 		height: 1.5rem;
 		vertical-align: -0.47em;
-		background: var(--primary);
+		background: currentcolor;
 	}
 }
 
@@ -754,6 +756,14 @@ a {
 
 .icon.print::before {
 	mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='M16 8.616v-3H8v3H7v-4h10v4zm-11.423 1h14.846zm13.038 2.5q.425 0 .713-.288t.287-.712t-.287-.713t-.713-.288t-.712.288t-.288.713t.288.712t.713.288M16 19v-4.538H8V19zm1 1H7v-4H3.577v-5.384q0-.85.577-1.425t1.423-.576h12.846q.85 0 1.425.576t.575 1.424V16H17zm2.423-5v-4.384q0-.425-.287-.713t-.713-.288H5.577q-.425 0-.712.288t-.288.713V15H7v-1.538h10V15z'/%3E%3C/svg%3E");
+}
+
+.icon.calendar::before {
+	mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='M5.616 21q-.691 0-1.153-.462T4 19.385V6.615q0-.69.463-1.152T5.616 5h1.769V2.77h1.077V5h7.154V2.77h1V5h1.769q.69 0 1.153.463T20 6.616v12.769q0 .69-.462 1.153T18.384 21zm0-1h12.769q.23 0 .423-.192t.192-.424v-8.768H5v8.769q0 .23.192.423t.423.192M5 9.615h14v-3q0-.23-.192-.423T18.384 6H5.616q-.231 0-.424.192T5 6.616zm0 0V6zm7 4.539q-.31 0-.54-.23t-.23-.54t.23-.539t.54-.23t.54.23t.23.54t-.23.539t-.54.23m-4.54-.23q-.23-.23-.23-.54q0-.309.23-.539t.54-.23t.54.23t.23.54t-.23.539t-.54.23t-.54-.23m8.54.23q-.31 0-.54-.23t-.23-.54t.23-.539t.54-.23t.54.23t.23.54t-.23.539t-.54.23M12 18q-.31 0-.54-.23t-.23-.54t.23-.539t.54-.23t.54.23t.23.54t-.23.54T12 18m-4.54-.23q-.23-.23-.23-.54q0-.309.23-.539t.54-.23t.54.23t.23.54t-.23.54Q8.31 18 8 18t-.54-.23M16 18q-.31 0-.54-.23t-.23-.54t.23-.539t.54-.23t.54.23t.23.54t-.23.54T16 18'/%3E%3C/svg%3E");
+}
+
+.icon.taller::before {
+	mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='M11.5 20.77v-3h-7v-1h15v1h-7v3zm-2.345-8.961q.23-.23.23-.54t-.23-.54t-.54-.229t-.539.23t-.23.54q0 .309.23.539t.54.23t.539-.23m6.769 0q.23-.23.23-.54t-.23-.54t-.54-.229t-.539.23t-.23.54t.23.539t.54.23t.539-.23M6 9.523l1.496-4.3q.067-.215.24-.334q.172-.12.387-.12h7.754q.215 0 .388.12q.172.119.239.334L18 9.523v5.793q0 .196-.129.325q-.129.128-.325.128h-.092q-.196 0-.325-.128q-.129-.13-.129-.325v-1.547H7v1.546q0 .197-.129.326q-.129.128-.325.128h-.092q-.196 0-.325-.129T6 15.316zm1.304-.754h9.392l-1.046-3h-7.3zM7 9.77v3zm0 3h10v-3H7z'/%3E%3C/svg%3E");
 }
 
 .unit {

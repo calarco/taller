@@ -20,7 +20,7 @@
 			<div class="title">
 				{#if !url[1] || url[1] === 'estimate'}
 					<div in:blur={blurEnter} out:blur={blurExit}>
-						<p>Turnos</p>
+						<p><span class="icon calendar"></span>Turnos</p>
 					</div>
 				{:else}
 					<div in:fly={panelFlyEnterX} out:blur={panelBlurExit}>
@@ -70,7 +70,7 @@
 					</div>
 				{:else}
 					<div in:blur={blurEnter} out:blur={blurExit}>
-						<p>Recientes</p>
+						<p><span class="icon taller"></span>Taller</p>
 					</div>
 				{/if}
 			</div>
@@ -222,10 +222,11 @@
 						}
 
 						> p {
-							padding: 0 1.5rem;
+							padding: 0 1.5rem 0 0;
 							height: 100%;
 							display: flex;
 							align-items: center;
+							gap: 1rem;
 							font-family: var(--font-family-alt);
 							color: var(--on-background-variant);
 						}

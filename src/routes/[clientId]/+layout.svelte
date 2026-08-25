@@ -16,7 +16,7 @@
 		<div in:fly={panelFlyEnterX} out:fly={panelFlyExitX}>
 			<div class="vehicles">
 				<div>
-					<Section overlay={windowState.form === 'vehicle' || windowState.form === 'client'} cards>
+					<Section overlay={windowState.form === 'vehicle' || windowState.form === 'client'} cards --section-radius="0 0 var(--border-radius) var(--border-radius)">
 						<div class={['sectionCard', { isActive }]}>
 							{#if isActive}
 								<div style="position: relative">
@@ -65,7 +65,7 @@
 
 	.vehicles {
 		position: relative;
-		border-radius: var(--border-radius);
+		border-radius: 0 0 var(--border-radius) var(--border-radius);
 		border-top: 1px solid var(--border);
 
 		> div {
