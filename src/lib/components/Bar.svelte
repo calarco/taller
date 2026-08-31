@@ -1,7 +1,7 @@
 <script>
 	import { fade, blur, fly } from 'svelte/transition';
 	import { sineIn } from 'svelte/easing';
-	import { blurEnter, blurExit, enter, exit, panelBlurExit, panelExit, panelFlyEnterX } from '$lib/motion.js';
+	import { blurEnter, blurExit, enter, exit, panelBlurExit, panelExit, panelFlyEnterY } from '$lib/motion.js';
 	import { page } from '$app/state';
 	import { windowState, openForm, openDialog } from '$lib/shared.svelte.js';
 	import Dialog from '$lib/components/Dialog.svelte';
@@ -23,7 +23,7 @@
 						<p><span class="icon calendar"></span>Turnos</p>
 					</div>
 				{:else}
-					<div in:fly={panelFlyEnterX} out:blur={panelBlurExit}>
+					<div in:fly={panelFlyEnterY} out:blur={panelBlurExit}>
 						<a class="button" href="/">
 							<span class="icon back"></span>Cliente
 						</a>
@@ -57,13 +57,13 @@
 		<div>
 			<div class="title">
 				{#if url[1] === 'estimate'}
-					<div in:fly={panelFlyEnterX} out:blur={panelBlurExit}>
+					<div in:fly={panelFlyEnterY} out:blur={panelBlurExit}>
 						<a class="button" href="/">
 							<span class="icon back"></span>Presupuesto
 						</a>
 					</div>
 				{:else if url[2]}
-					<div in:fly={panelFlyEnterX} out:blur={panelBlurExit}>
+					<div in:fly={panelFlyEnterY} out:blur={panelBlurExit}>
 						<a class="button" href={`/${url[1]}`}>
 							<span class="icon back"></span>Reparaciones
 						</a>

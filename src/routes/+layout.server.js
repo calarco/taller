@@ -12,13 +12,23 @@ export const load = async (event) => {
 	}
 
 	try {
-		const [user, appointments, search] = await Promise.all([
+		const today = toDayStart(new Date());
+		const [user, appointments, pastAppointments, search] = await Promise.all([
 			findUser(userId, { userId }),
-			findAppointments(userId, { date: { $gte: toDayStart(new Date()) } }).populate(carModelPopulate),
+			findAppointments(userId, { date: { $gte: today } }).populate(carModelPopulate),
+			findAppointments(userId, { date: { $lt: today } })
+				.sort({ date: -1 })
+				.limit(50)
+				.populate(carModelPopulate),
 			getSearch(userId),
 		]);
 
-		return { user: structuredClone(user), appointments: structuredClone(appointments), search };
+		return {
+			user: structuredClone(user),
+			appointments: structuredClone(appointments),
+			pastAppointments: structuredClone(pastAppointments),
+			search,
+		};
 	} catch (err) {
 		handleServerError(err, 'layout.server load');
 	}

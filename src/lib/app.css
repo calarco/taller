@@ -144,6 +144,10 @@ body {
 		0 1px 2px color-mix(in oklab, var(--shadow-color) calc(9% * var(--shadow-strength)), transparent),
 		0 2px 5px color-mix(in oklab, var(--shadow-color) calc(9% * var(--shadow-strength)), transparent),
 		0 5px 10px color-mix(in oklab, var(--shadow-color) calc(10% * var(--shadow-strength)), transparent);
+	--shadow-variant-inset:
+		inset 0 1px 2px color-mix(in oklab, var(--shadow-color) calc(9% * var(--shadow-strength)), transparent),
+		inset 0 2px 5px color-mix(in oklab, var(--shadow-color) calc(9% * var(--shadow-strength)), transparent),
+		inset 0 5px 10px color-mix(in oklab, var(--shadow-color) calc(10% * var(--shadow-strength)), transparent);
 
 	--ease-in: cubic-bezier(0.47, 0, 0.745, 0.715);
 	--ease-out: cubic-bezier(0.39, 0.575, 0.565, 1);
@@ -764,6 +768,10 @@ a {
 
 .icon.taller::before {
 	mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='M11.5 20.77v-3h-7v-1h15v1h-7v3zm-2.345-8.961q.23-.23.23-.54t-.23-.54t-.54-.229t-.539.23t-.23.54q0 .309.23.539t.54.23t.539-.23m6.769 0q.23-.23.23-.54t-.23-.54t-.54-.229t-.539.23t-.23.54t.23.539t.54.23t.539-.23M6 9.523l1.496-4.3q.067-.215.24-.334q.172-.12.387-.12h7.754q.215 0 .388.12q.172.119.239.334L18 9.523v5.793q0 .196-.129.325q-.129.128-.325.128h-.092q-.196 0-.325-.128q-.129-.13-.129-.325v-1.547H7v1.546q0 .197-.129.326q-.129.128-.325.128h-.092q-.196 0-.325-.129T6 15.316zm1.304-.754h9.392l-1.046-3h-7.3zM7 9.77v3zm0 3h10v-3H7z'/%3E%3C/svg%3E");
+}
+
+.icon.history::before {
+	mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='M11.962 20q-3.046 0-5.311-1.99q-2.264-1.989-2.62-5.01h1.011q.408 2.58 2.351 4.29T11.962 19q2.925 0 4.962-2.037T18.962 12t-2.038-4.963T11.962 5q-1.553 0-2.918.656q-1.365.655-2.41 1.805h2.481v1H4.962V4.309h1v2.388q1.16-1.273 2.718-1.984T11.962 4q1.663 0 3.118.626t2.542 1.714t1.714 2.542t.626 3.118t-.626 3.118t-1.714 2.542t-2.542 1.714t-3.118.626m3.204-4.146l-3.647-3.646V7h1v4.792l3.354 3.354z'/%3E%3C/svg%3E");
 }
 
 .unit {

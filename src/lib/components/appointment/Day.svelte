@@ -6,11 +6,13 @@
 
 	let { date } = $props();
 
+	let today = $derived(toLocalISODate(new Date()));
 	let id = $derived(toLocalISODate(date));
-	let isCurrent = $derived(id === toLocalISODate(new Date()));
+	let isCurrent = $derived(id === today);
+	let past = $derived(id < today);
 	let isWeekend = $derived([0, 6].indexOf(date.getDay()) !== -1);
-	let isCreate = $derived(windowState.form === 'appointment' && windowState.id === id);
-	let appointments = $derived((page.data.appointments ?? []).filter((x) => toISODate(new Date(x.date)) === id));
+	let isCreate = $derived(!past && windowState.form === 'appointment' && windowState.id === id);
+	let appointments = $derived(((past ? page.data.pastAppointments : page.data.appointments) ?? []).filter((x) => toISODate(new Date(x.date)) === id));
 
 	let element;
 	$effect(() => {
@@ -27,14 +29,16 @@
 		<p>{date.toLocaleDateString('default', { weekday: 'short' }).substring(0, 3)}</p>
 	</div>
 	<div class="list">
-		<div class={['createSlot', { isCreate }]}>
-			{#if isCreate}
-				<AppointmentForm date={id} />
-			{/if}
-			<button type="button" onclick={() => openForm('appointment', id)} aria-label="Crear un turno">
-				<span class="icon create"></span>
-			</button>
-		</div>
+		{#if !past}
+			<div class={['createSlot', { isCreate }]}>
+				{#if isCreate}
+					<AppointmentForm date={id} />
+				{/if}
+				<button type="button" onclick={() => openForm('appointment', id)} aria-label="Crear un turno">
+					<span class="icon create"></span>
+				</button>
+			</div>
+		{/if}
 		{#each appointments as appointment (appointment.appointmentId)}
 			<AppointmentCard {appointment} />
 		{/each}
@@ -44,11 +48,11 @@
 <style>
 	.dayRow {
 		position: relative;
-		padding: 0.75rem 1.5rem;
+		padding: 0.75rem 0.5rem 0.75rem 1rem;
 		display: grid;
 		align-items: start;
 		grid-template-columns: 2.5rem 1fr;
-		gap: 1.5rem;
+		gap: 1rem;
 		z-index: 1;
 		transition: z-index var(--duration-panel-out) step-end;
 
@@ -121,6 +125,16 @@
 			> button {
 				border-radius: var(--border-radius);
 			}
+		}
+
+		&:not(:last-child)::after {
+			content: '';
+			position: absolute;
+			z-index: 0;
+			right: 0;
+			bottom: -1px;
+			left: 0;
+			border-bottom: 1px solid var(--border);
 		}
 
 		&.isCreate {

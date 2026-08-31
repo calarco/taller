@@ -10,9 +10,11 @@ const OUT = resolve(dirname(fileURLToPath(import.meta.url)), '../src/lib/server/
 const CLIENTS = 120;
 const ESTIMATES = 30;
 const RECENT_ESTIMATES = 6; // how many land in the last few days, so they reach the "Recientes" panel
-const APPOINTMENTS = 44;
 const UPCOMING_APPOINTMENTS = 30; // the calendar panel loads only future turnos
 const FORTNIGHT_APPOINTMENTS = 22; // of those, how many land inside the next two weeks
+const HISTORY_APPOINTMENTS = 14; // scattered over the last few years
+const PAST_FORTNIGHT_APPOINTMENTS = 14; // and this many in the last two weeks, so the past view opens as full as the calendar
+const APPOINTMENTS = UPCOMING_APPOINTMENTS + HISTORY_APPOINTMENTS + PAST_FORTNIGHT_APPOINTMENTS;
 const HISTORY_DAYS = 1800; // ~5 years of history
 const SEED = 20260808;
 
@@ -447,8 +449,9 @@ for (let i = 1; i <= ESTIMATES; i += 1) {
 const appointments = [];
 for (let i = 1; i <= APPOINTMENTS; i += 1) {
 	// the calendar opens on today and renders a row per day, so most upcoming turnos land inside the
-	// next two weeks; the rest spread over the following month, and the remainder are history
-	const date = i <= FORTNIGHT_APPOINTMENTS ? int(0, 13) : i <= UPCOMING_APPOINTMENTS ? int(14, 42) : -int(1, 400);
+	// next two weeks; the rest spread over the following month, then history, and finally the last
+	// two weeks, which the past view opens on and so wants the same density as the calendar
+	const date = i <= FORTNIGHT_APPOINTMENTS ? int(0, 13) : i <= UPCOMING_APPOINTMENTS ? int(14, 42) : i <= UPCOMING_APPOINTMENTS + HISTORY_APPOINTMENTS ? -int(1, 400) : -int(1, 14);
 	// booked before the visit, and never in the future — an upcoming turno was booked in the past
 	const createdAt = date > 0 ? -int(0, 25) : date - int(1, 20);
 	appointments.push({

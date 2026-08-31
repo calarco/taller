@@ -1,6 +1,6 @@
 <script>
 	import { fly, blur } from 'svelte/transition';
-	import { panelBlurExit, panelFlyEnterX, panelFlyExitX } from '$lib/motion.js';
+	import { panelBlurExit, panelFlyEnterX, panelFlyEnterY, panelFlyExitX } from '$lib/motion.js';
 	import { windowState, openForm } from '$lib/shared.svelte.js';
 	import Section from '$lib/components/Section.svelte';
 	import VehicleForm from '$lib/components/vehicle/VehicleForm.svelte';
@@ -11,7 +11,7 @@
 	let isActive = $derived(windowState.form === 'vehicle');
 </script>
 
-<div class="panel" in:fly={panelFlyEnterX} out:blur={panelBlurExit}>
+<div class="panel" in:fly={panelFlyEnterY} out:blur={panelBlurExit}>
 	{#key data.client?.clientId}
 		<div in:fly={panelFlyEnterX} out:fly={panelFlyExitX}>
 			<div class="vehicles">
@@ -49,6 +49,8 @@
 	.panel {
 		grid-column-start: panel-left;
 		grid-row-start: panel-top;
+		background: var(--surface-variant);
+		overflow: hidden;
 
 		> div {
 			position: absolute;
@@ -57,7 +59,6 @@
 			left: 0;
 			right: 0;
 			border-radius: var(--border-radius);
-			background: var(--surface-variant);
 			display: grid;
 			grid-template-rows: auto 1fr;
 		}
@@ -67,6 +68,8 @@
 		position: relative;
 		border-radius: 0 0 var(--border-radius) var(--border-radius);
 		border-top: 1px solid var(--border);
+		background: var(--surface);
+		box-shadow: var(--shadow);
 
 		> div {
 			position: absolute;

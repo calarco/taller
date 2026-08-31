@@ -12087,6 +12087,118 @@
 			"carModelId": "15",
 			"createdAt": -127,
 			"updatedAt": -127
+		},
+		{
+			"appointmentId": "45",
+			"date": -12,
+			"description": "Diagnóstico",
+			"carModelId": "38",
+			"createdAt": -19,
+			"updatedAt": -19
+		},
+		{
+			"appointmentId": "46",
+			"date": -6,
+			"description": "Frenos",
+			"carModelId": "22",
+			"createdAt": -10,
+			"updatedAt": -10
+		},
+		{
+			"appointmentId": "47",
+			"date": -2,
+			"description": "Service completo",
+			"carModelId": "1",
+			"createdAt": -3,
+			"updatedAt": -3
+		},
+		{
+			"appointmentId": "48",
+			"date": -4,
+			"description": "Diagnóstico",
+			"carModelId": "7",
+			"createdAt": -23,
+			"updatedAt": -23
+		},
+		{
+			"appointmentId": "49",
+			"date": -8,
+			"description": "Alternador",
+			"carModelId": "36",
+			"createdAt": -28,
+			"updatedAt": -28
+		},
+		{
+			"appointmentId": "50",
+			"date": -3,
+			"description": "Servicio",
+			"carModelId": "36",
+			"createdAt": -8,
+			"updatedAt": -8
+		},
+		{
+			"appointmentId": "51",
+			"date": -10,
+			"description": "Caja",
+			"carModelId": "48",
+			"createdAt": -15,
+			"updatedAt": -15
+		},
+		{
+			"appointmentId": "52",
+			"date": -13,
+			"description": "Electricidad",
+			"carModelId": "42",
+			"createdAt": -18,
+			"updatedAt": -18
+		},
+		{
+			"appointmentId": "53",
+			"date": -2,
+			"description": "Bomba de agua",
+			"carModelId": "40",
+			"createdAt": -6,
+			"updatedAt": -6
+		},
+		{
+			"appointmentId": "54",
+			"date": -13,
+			"description": "Distribución",
+			"carModelId": "26",
+			"createdAt": -27,
+			"updatedAt": -27
+		},
+		{
+			"appointmentId": "55",
+			"date": -10,
+			"description": "Tren delantero",
+			"carModelId": "21",
+			"createdAt": -25,
+			"updatedAt": -25
+		},
+		{
+			"appointmentId": "56",
+			"date": -7,
+			"description": "Servicio",
+			"carModelId": "29",
+			"createdAt": -15,
+			"updatedAt": -15
+		},
+		{
+			"appointmentId": "57",
+			"date": -4,
+			"description": "Cambio de aceite",
+			"carModelId": "13",
+			"createdAt": -18,
+			"updatedAt": -18
+		},
+		{
+			"appointmentId": "58",
+			"date": -9,
+			"description": "Arranque",
+			"carModelId": "1",
+			"createdAt": -20,
+			"updatedAt": -20
 		}
 	]
 }

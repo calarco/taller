@@ -1,64 +1,31 @@
 <script>
+	import { fly } from 'svelte/transition';
+	import { panelFlyEnterX, panelFlyExitX } from '$lib/motion.js';
 	import { windowState } from '$lib/shared.svelte';
 	import Section from '$lib/components/Section.svelte';
-	import Day from './Day.svelte';
+	import UpcomingAppointments from './UpcomingAppointments.svelte';
+	import PastAppointments from './PastAppointments.svelte';
 
-	function getNextMonth(currentYear, currentMonth) {
-		const now = new Date();
-		const year = !currentYear ? now.getFullYear() : currentMonth === 11 ? currentYear + 1 : currentYear;
-		const month = !currentMonth && currentMonth !== 0 ? now.getMonth() : currentMonth === 11 ? 0 : currentMonth + 1;
-		const date = (currentMonth || currentMonth === 0) && currentYear ? 1 : now.getDate();
-
-		const days = [];
-		for (var i = date; i <= 32 - new Date(year, month, 32).getDate(); i++) {
-			days.push(i);
-		}
-
-		return { year: year, month: month, days: days };
-	}
-
-	const calendar = $state([getNextMonth()]);
-
-	function loadDays(e) {
-		const options = {
-			root: null,
-			rootMargin: '20px',
-			threshold: 0,
-		};
-		const observer = new IntersectionObserver((entries) => {
-			if (entries[0].isIntersecting) {
-				const lastCalendar = calendar[calendar.length - 1];
-				calendar.push(getNextMonth(lastCalendar.year, lastCalendar.month));
-				observer.disconnect();
-			}
-		}, options);
-
-		observer.observe(e);
-
-		return {
-			destroy() {
-				observer.disconnect();
-			},
-		};
-	}
+	let showPast = $state(false);
 </script>
 
 <div class="panel">
-	<Section overlay={windowState.form === 'appointment' || windowState.form === 'client'}>
-		{#each calendar as month (`${month.year}${month.month}`)}
-			<div use:loadDays>
-				<div class="month">
-					<h6>{month.year}</h6>
-					<h4>
-						{new Date(month.year, month.month, 1).toLocaleDateString('es-AR', { month: 'long' })}
-					</h4>
-				</div>
-				{#each month.days as date (date)}
-					<Day date={new Date(month.year, month.month, date)} />
-				{/each}
-			</div>
-		{/each}
-	</Section>
+	{#key showPast}
+		<div class="panelFill" in:fly={panelFlyEnterX} out:fly={panelFlyExitX}>
+			<Section overlay={windowState.form === 'appointment' || windowState.form === 'client'}>
+				{#if showPast}
+					<PastAppointments />
+				{:else}
+					<UpcomingAppointments />
+				{/if}
+			</Section>
+		</div>
+	{/key}
+	<div class={['pastToggle', { isActive: showPast }]}>
+		<button type="button" onclick={() => (showPast = !showPast)} aria-pressed={showPast} aria-label={showPast ? 'Ver turnos próximos' : 'Ver turnos anteriores'}>
+			<span class="icon history"></span>
+		</button>
+	</div>
 </div>
 
 <style>
@@ -69,28 +36,41 @@
 		background: var(--surface-variant);
 		outline: 1px solid var(--border);
 		box-shadow: var(--shadow-variant);
+		overflow: hidden;
 	}
 
-	.month {
-		position: sticky;
-		z-index: var(--layer-sticky);
-		top: -1px;
-		margin-top: -1px;
-		width: 100%;
-		min-height: calc(3rem + 1px);
-		padding: 0.5rem 1.75rem;
-		border-top: 1px solid var(--border);
-		background: var(--surface);
-		box-shadow: var(--shadow-variant);
-		display: grid;
-		gap: 1.75rem;
-		grid-auto-flow: column;
-		align-items: center;
-		justify-content: start;
-		text-transform: capitalize;
+	.panelFill {
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+	}
 
-		h6 {
-			color: var(--on-background-variant);
+	.pastToggle {
+		position: absolute;
+		z-index: var(--layer-sticky);
+		top: 0.25rem;
+		right: 1.25rem;
+		height: calc(2.5rem + 0px);
+		border-radius: var(--border-radius);
+		background: var(--surface);
+		display: grid;
+		transition:
+			background-color var(--duration-fast) var(--ease-out),
+			box-shadow var(--duration-fast) var(--ease-out);
+
+		&.isActive {
+			background: var(--surface-variant);
+			box-shadow: var(--shadow-variant-inset);
+
+			> button {
+				color: var(--secondary);
+			}
+		}
+
+		> button {
+			height: 100%;
 		}
 	}
 </style>

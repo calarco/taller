@@ -28,9 +28,6 @@
 		border-radius: var(--section-radius, var(--border-radius));
 
 		&.cards {
-			background: var(--surface);
-			box-shadow: var(--shadow);
-
 			.scroller {
 				padding: 0 0.5rem;
 				gap: 0;

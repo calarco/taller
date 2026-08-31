@@ -36,20 +36,18 @@
 		display: grid;
 		grid-template-columns: 1fr auto;
 
-		&:nth-child(2)::after {
-			content: '';
-			position: absolute;
-			top: -1px;
-			right: 0;
-			left: 0;
-			z-index: 0;
-			border-top: 1px solid var(--border);
-		}
-
 		&:last-child {
 			> button {
 				border-radius: 0 0 var(--border-radius) 0;
 			}
+		}
+
+		&:first-child > button {
+			border-radius: 0 var(--border-radius) 0 0;
+		}
+
+		&:first-child:last-child > button {
+			border-radius: 0 var(--border-radius) var(--border-radius) 0;
 		}
 
 		> button {

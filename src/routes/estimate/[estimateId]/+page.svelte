@@ -1,6 +1,6 @@
 <script>
 	import { fly, blur } from 'svelte/transition';
-	import { blurEnter, blurExit, panelBlurExit, panelFlyEnterX, panelFlyExitX } from '$lib/motion.js';
+	import { blurEnter, blurExit, panelBlurExit, panelFlyEnterX, panelFlyEnterY, panelFlyExitX } from '$lib/motion.js';
 	import { enhance } from '$app/forms';
 	import { windowState, openForm, openDialog } from '$lib/shared.svelte.js';
 	import { enhanceSubmit } from '$lib/forms.js';
@@ -16,7 +16,7 @@
 	let printContent = $state();
 </script>
 
-<div class="panel" in:fly={panelFlyEnterX} out:blur={panelBlurExit}>
+<div class="panel" in:fly={panelFlyEnterY} out:blur={panelBlurExit}>
 	{#key estimate.estimateId}
 		<div class="panelFill" in:fly={panelFlyEnterX} out:fly={panelFlyExitX}>
 			<div class="buttons">
@@ -185,6 +185,8 @@
 		left: 0;
 		border-radius: 0 0 var(--border-radius) var(--border-radius);
 		border-top: 1px solid var(--border);
+		background: var(--surface);
+		box-shadow: var(--shadow);
 	}
 
 	article {
