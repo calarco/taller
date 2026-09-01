@@ -1,6 +1,6 @@
 <script>
 	import { fly, blur } from 'svelte/transition';
-	import { blurEnter, blurExit, panelBlurExit, panelFlyEnterX, panelFlyEnterY, panelFlyExitX } from '$lib/motion.js';
+	import { blurEnter, blurExit, panelBlurExit, panelFlyEnterY, panelFlyExitY } from '$lib/motion.js';
 	import { enhance } from '$app/forms';
 	import { windowState, openForm, openDialog } from '$lib/shared.svelte.js';
 	import { enhanceSubmit } from '$lib/forms.js';
@@ -18,7 +18,7 @@
 
 <div class="panel" in:fly={panelFlyEnterY} out:blur={panelBlurExit}>
 	{#key estimate.estimateId}
-		<div class="panelFill" in:fly={panelFlyEnterX} out:fly={panelFlyExitX}>
+		<div class="panelFill" in:fly={panelFlyEnterY} out:fly={panelFlyExitY}>
 			<div class="buttons">
 				<button type="button" onclick={() => openDialog(dialog)} aria-label="Borrar el presupuesto">
 					<span class="icon delete"></span>

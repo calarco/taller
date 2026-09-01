@@ -1,7 +1,7 @@
 <script>
 	import { fly, blur } from 'svelte/transition';
 	import { page } from '$app/state';
-	import { panelBlurExit, panelFlyEnterX, panelFlyEnterY, panelFlyExitX } from '$lib/motion.js';
+	import { panelBlurExit, panelFlyEnterY, panelFlyExitY } from '$lib/motion.js';
 	import { windowState, openForm } from '$lib/shared.svelte.js';
 	import Section from '$lib/components/Section.svelte';
 	import RepairForm from '$lib/components/repair/RepairForm.svelte';
@@ -14,7 +14,7 @@
 
 <div class="panel" in:fly={panelFlyEnterY} out:blur={panelBlurExit}>
 	{#key page.params.vehicleId}
-		<div class="panelFill" in:fly={panelFlyEnterX} out:fly={panelFlyExitX}>
+		<div class="panelFill" in:fly={panelFlyEnterY} out:fly={panelFlyExitY}>
 			<Section overlay={windowState.form === 'repair' || windowState.form === 'estimate'} cards>
 				<div class={['sectionCard', { isActive }]}>
 					{#if isActive}

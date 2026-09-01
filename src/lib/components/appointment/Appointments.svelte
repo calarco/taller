@@ -1,6 +1,6 @@
 <script>
 	import { fly } from 'svelte/transition';
-	import { panelFlyEnterX, panelFlyExitX } from '$lib/motion.js';
+	import { panelFlyEnterY, panelFlyExitY } from '$lib/motion.js';
 	import { windowState } from '$lib/shared.svelte';
 	import Section from '$lib/components/Section.svelte';
 	import UpcomingAppointments from './UpcomingAppointments.svelte';
@@ -11,7 +11,7 @@
 
 <div class="panel">
 	{#key showPast}
-		<div class="panelFill" in:fly={panelFlyEnterX} out:fly={panelFlyExitX}>
+		<div class="panelFill" in:fly={panelFlyEnterY} out:fly={panelFlyExitY}>
 			<Section overlay={windowState.form === 'appointment' || windowState.form === 'client'}>
 				{#if showPast}
 					<PastAppointments />
