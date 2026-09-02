@@ -83,6 +83,7 @@
 		grid-column-start: panel-right;
 		grid-row-start: panel-top;
 		pointer-events: none;
+		overflow: hidden;
 	}
 
 	.panelFill {
@@ -179,12 +180,12 @@
 
 	.estimate {
 		position: absolute;
-		top: 3rem;
+		top: calc(3rem + 1px);
 		right: 0;
 		bottom: 0;
 		left: 0;
 		border-radius: 0 0 var(--border-radius) var(--border-radius);
-		border-top: 1px solid var(--border);
+		outline: 1px solid var(--border);
 		background: var(--surface);
 		box-shadow: var(--shadow);
 	}

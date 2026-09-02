@@ -1,10 +1,9 @@
 <script>
-	import { page } from '$app/state';
-	import { windowState, openForm, toISODate, toLocalISODate } from '$lib/shared.svelte.js';
+	import { windowState, openForm, toLocalISODate } from '$lib/shared.svelte.js';
 	import AppointmentForm from './AppointmentForm.svelte';
 	import AppointmentCard from './AppointmentCard.svelte';
 
-	let { date } = $props();
+	let { date, byDay } = $props();
 
 	let today = $derived(toLocalISODate(new Date()));
 	let id = $derived(toLocalISODate(date));
@@ -12,7 +11,7 @@
 	let past = $derived(id < today);
 	let isWeekend = $derived([0, 6].indexOf(date.getDay()) !== -1);
 	let isCreate = $derived(!past && windowState.form === 'appointment' && windowState.id === id);
-	let appointments = $derived(((past ? page.data.pastAppointments : page.data.appointments) ?? []).filter((x) => toISODate(new Date(x.date)) === id));
+	let appointments = $derived(byDay[id] ?? []);
 
 	let element;
 	$effect(() => {
@@ -26,7 +25,7 @@
 <div bind:this={element} class={['dayRow', { isCreate }]}>
 	<div class={['day', { isCurrent, isWeekend }]}>
 		<h3>{date.getDate()}</h3>
-		<p>{date.toLocaleDateString('default', { weekday: 'short' }).substring(0, 3)}</p>
+		<p>{date.toLocaleDateString('es-AR', { weekday: 'short' }).substring(0, 3)}</p>
 	</div>
 	<div class="list">
 		{#if !past}

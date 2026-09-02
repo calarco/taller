@@ -1,4 +1,5 @@
 import { startLoading, endLoading } from '$lib/shared.svelte.js';
+import { PAGE_AMOUNT } from '$lib/paging.js';
 
 let version = $state(0);
 
@@ -8,6 +9,7 @@ export function invalidateSearch() {
 
 export function createSearch({ type = '' } = {}) {
 	let value = $state('');
+	let limit = $state(PAGE_AMOUNT);
 	let results = $state(null);
 	let settled = $state(true);
 	let seq = 0;
@@ -15,7 +17,8 @@ export function createSearch({ type = '' } = {}) {
 	$effect(() => {
 		version;
 		const query = value.trim();
-		if (!query) {
+		const size = limit;
+		if (!query && size === PAGE_AMOUNT) {
 			results = null;
 			settled = true;
 			return;
@@ -27,7 +30,7 @@ export function createSearch({ type = '' } = {}) {
 			const current = ++seq;
 			startLoading();
 			try {
-				const response = await fetch(`/search?${type ? 'type=' + type + '&' : ''}q=${encodeURIComponent(query)}`, { signal: controller.signal });
+				const response = await fetch(`/search?${type ? 'type=' + type + '&' : ''}q=${encodeURIComponent(query)}&limit=${size}`, { signal: controller.signal });
 				const data = response.ok ? await response.json() : null;
 				if (current !== seq) {
 					return;
@@ -55,6 +58,7 @@ export function createSearch({ type = '' } = {}) {
 			return value;
 		},
 		set value(next) {
+			limit = PAGE_AMOUNT;
 			value = next;
 		},
 		get results() {
@@ -62,6 +66,18 @@ export function createSearch({ type = '' } = {}) {
 		},
 		get settled() {
 			return settled;
+		},
+		get limit() {
+			return limit;
+		},
+		loadMore() {
+			if (settled) {
+				limit += PAGE_AMOUNT;
+			}
+		},
+		reset() {
+			value = '';
+			limit = PAGE_AMOUNT;
 		},
 	};
 }

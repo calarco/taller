@@ -964,3 +964,7 @@ a {
 		border-top: 1px solid var(--border);
 	}
 }
+
+.sentinel {
+	min-height: 3rem;
+}

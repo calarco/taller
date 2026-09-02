@@ -61,13 +61,14 @@
 			border-radius: var(--border-radius);
 			display: grid;
 			grid-template-rows: auto 1fr;
+			gap: 1px;
 		}
 	}
 
 	.vehicles {
 		position: relative;
 		border-radius: 0 0 var(--border-radius) var(--border-radius);
-		border-top: 1px solid var(--border);
+		outline: 1px solid var(--border);
 		background: var(--surface);
 		box-shadow: var(--shadow);
 

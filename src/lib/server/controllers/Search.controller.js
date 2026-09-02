@@ -1,3 +1,4 @@
+import { PAGE_AMOUNT } from '$lib/paging.js';
 import { handleServerError } from '$lib/server/errors.js';
 import { findClients } from '$lib/server/controllers/Client.controller';
 import { findVehicles } from '$lib/server/controllers/Vehicle.controller';
@@ -5,9 +6,6 @@ import { findRepairs } from '$lib/server/controllers/Repair.controller';
 import { findEstimates } from '$lib/server/controllers/Estimate.controller';
 import { findCarMakes } from '$lib/server/controllers/CarMake.controller';
 import { findCarModels, carModelPopulate } from '$lib/server/controllers/CarModel.controller';
-
-const LIMIT = 25;
-const QUERY_LIMIT = 50;
 
 const clientPopulate = { path: 'client', select: 'name lastName -_id' };
 
@@ -119,7 +117,7 @@ function mapEstimate(x, score) {
 	};
 }
 
-function finalize(rows) {
+function finalize(rows, limit) {
 	const byId = new Map();
 	for (const row of rows) {
 		if (!row.clientId && !row.estimateId) {
@@ -132,7 +130,7 @@ function finalize(rows) {
 	}
 	const search = [...byId.values()]
 		.sort((a, b) => b.score - a.score || b.updatedAt - a.updatedAt)
-		.slice(0, LIMIT)
+		.slice(0, limit)
 		.map((row) => {
 			const result = { ...row };
 			delete result.score;
@@ -176,21 +174,23 @@ async function findClientRows(userId, filters, sort, limit) {
 	return clients;
 }
 
-function findClientHits(userId, query) {
-	return findClientRows(userId, termFilter(query.terms, ['name', 'lastName', 'dni', 'work', 'phone', 'email']), { name: 1, lastName: 1 }, QUERY_LIMIT);
+function findClientHits(userId, query, queryLimit) {
+	return findClientRows(userId, termFilter(query.terms, ['name', 'lastName', 'dni', 'work', 'phone', 'email']), { name: 1, lastName: 1 }, queryLimit);
 }
 
-export async function getSearch(userId, value, type) {
+export async function getSearch(userId, value, type, size) {
 	try {
+		const limit = Math.min(200, Math.max(PAGE_AMOUNT, Math.floor(size) || PAGE_AMOUNT));
+		const queryLimit = limit * 2;
 		const raw = String(value || '')
 			.trim()
 			.replace(/\s+/g, ' ');
 		if (!raw) {
 			const [clients, estimates] = await Promise.all([
-				findClientRows(userId, undefined, { updatedAt: -1 }, LIMIT),
-				findEstimates(userId).sort({ updatedAt: -1 }).populate(carModelPopulate).limit(LIMIT),
+				findClientRows(userId, undefined, { updatedAt: -1 }, limit),
+				findEstimates(userId).sort({ updatedAt: -1 }).populate(carModelPopulate).limit(limit),
 			]);
-			return finalize([...clients.map((x) => mapClient(x, 0)), ...estimates.map((x) => mapEstimate(x, 0))]);
+			return finalize([...clients.map((x) => mapClient(x, 0)), ...estimates.map((x) => mapEstimate(x, 0))], limit);
 		}
 
 		const query = {
@@ -201,20 +201,23 @@ export async function getSearch(userId, value, type) {
 		};
 
 		if (type === 'client') {
-			const clients = await findClientHits(userId, query);
-			return finalize(clients.map((x) => mapClient(x, rank(query, fullName(x), x.name, x.lastName, x.dni, x.phone, x.email))));
+			const clients = await findClientHits(userId, query, queryLimit);
+			return finalize(
+				clients.map((x) => mapClient(x, rank(query, fullName(x), x.name, x.lastName, x.dni, x.phone, x.email))),
+				limit
+			);
 		}
 
 		const [clients, repairs, estimates, carMakes, carModels] = await Promise.all([
-			findClientHits(userId, query),
+			findClientHits(userId, query, queryLimit),
 			findRepairs(userId, termFilter(query.terms, ['description', 'detail']))
 				.sort({ updatedAt: -1 })
 				.populate(repairPopulate)
-				.limit(QUERY_LIMIT),
+				.limit(queryLimit),
 			findEstimates(userId, { $or: [termFilter(query.terms, ['description', 'email']), ...(query.plateLower ? anyFilter(['vehicleId'], query.plateLower) : []), { estimateId: query.raw }] })
 				.sort({ updatedAt: -1 })
 				.populate(carModelPopulate)
-				.limit(QUERY_LIMIT),
+				.limit(queryLimit),
 			findCarMakes(userId),
 			findCarModels(userId),
 		]);
@@ -230,7 +233,7 @@ export async function getSearch(userId, value, type) {
 		const plateFilter = query.plateLower ? anyFilter(['vehicleId', 'vin'], query.plateLower) : [];
 		const vehicleFilter = [...plateFilter, ...(carModelIds.length ? [{ carModelId: { $in: carModelIds } }] : [])];
 
-		const vehicles = vehicleFilter.length ? await findVehicles(userId, { $or: vehicleFilter }).sort({ updatedAt: -1 }).populate([carModelPopulate, clientPopulate]).limit(QUERY_LIMIT) : [];
+		const vehicles = vehicleFilter.length ? await findVehicles(userId, { $or: vehicleFilter }).sort({ updatedAt: -1 }).populate([carModelPopulate, clientPopulate]).limit(queryLimit) : [];
 
 		const search = [
 			...clients.map((x) => mapClient(x, rank(query, fullName(x), x.name, x.lastName, x.dni, x.phone, x.email))),
@@ -239,7 +242,7 @@ export async function getSearch(userId, value, type) {
 			...estimates.map((x) => mapEstimate(x, rank(query, x.estimateId, x.description, x.email, x.vehicleId))),
 		];
 
-		return finalize(search);
+		return finalize(search, limit);
 	} catch (err) {
 		handleServerError(err, 'getSearch');
 	}

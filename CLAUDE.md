@@ -115,7 +115,8 @@ net for what escapes `resolve` untouched.
 /[clientId]/[vehicleId]  → vehicle repairs
 /estimate/[estimateId]   → estimate, print-to-PDF
 /login                   → auth page, and the landing page
-/search?q=&type=         → JSON search endpoint (+server.js, no page)
+/search?q=&type=&limit=  → JSON search endpoint (+server.js, no page)
+/appointments?from=&to=  → JSON appointment paging endpoint (+server.js, no page)
 /cars                    → JSON car makes + models (+server.js, no page)
 ```
 
@@ -135,7 +136,13 @@ its panel is visible re-queries on every hop between two routes that both show i
 
 The root layout reads no `params` and no `url` — that is what makes it run once per full page load and never
 on client-side navigation. Keep it that way. The cost is that a hard load of `/[clientId]/[vehicleId]` fetches
-`appointments` and `search` it cannot show.
+`appointments` and `search` it cannot show, which is why each is only the **first page**: `MONTHS_PER_BLOCK`
+months of upcoming appointments and `PAGE_AMOUNT` search rows. Everything past that is fetched by the client
+stores, and paging is therefore fetch-driven rather than `load` + `invalidate` — a `load` that took a page
+number would have to read `url`.
+
+**Past appointments are not loaded here at all.** The panel sits behind the history toggle and most sessions
+never open it, so `PastAppointments` fetches its first page on mount.
 
 **Never call `event.parent()` in a server load.** Server loads keep no state between requests, so `parent()`
 re-executes the parent server loads in that request. Query directly instead — the estimate page calls its own
@@ -156,8 +163,10 @@ re-runs only the two car queries. Two traps:
   by `response.ok` plus a `try`/`catch` around `.json()`: hooks redirects unauthenticated requests, so the
   body is HTML.
 
-`Day.svelte`, `Search.svelte` and `VehicleForm.svelte` guard with `?? []` because the root load returns
-nothing without a `userId`.
+`UpcomingAppointments.svelte`, `Search.svelte` and `VehicleForm.svelte` guard with `?? []` because the root
+load returns nothing without a `userId`. `Day.svelte` reads no `page.data`: its parent indexes the loaded
+appointments by ISO date and passes that object down, so a day costs a lookup rather than a scan of the whole
+list, and the two panels can feed it from different sources.
 
 ### Shared vs route-specific actions
 
@@ -190,7 +199,80 @@ Svelte 5 `$state`/`$derived`/`$effect` throughout — no stores.
   results come from a `fetch` and not a `load`, `invalidateAll()` cannot refresh them — only the recents in
   `page.data.search` — so `enhanceSubmit`/`postAction` call the module's `invalidateSearch()` on a `success`
   or `redirect` result and every mounted `createSearch` refetches its active query.
+- `src/lib/appointments.svelte.js` — the `upcoming` and `past` paging stores, plus `invalidateAppointments()`.
+  Module-level rather than component-level because `Appointments.svelte` wraps its `Section` in
+  `{#key showPast}`, so both lists are destroyed and recreated on every toggle. `upcoming.extra` holds only
+  the blocks **after** the one the root layout renders, so `UpcomingAppointments` reads
+  `[...page.data.appointments, ...upcoming.extra]`. That `{#key}` also carries the `userId`, because the
+  calendar's own block list is component state: without it a deep-scrolled calendar survives a logout and
+  renders months the cleared store can no longer fill.
+- `src/lib/paging.js` — `MONTHS_PER_BLOCK`, `PAGE_AMOUNT` and `onVisible`, the
+  `IntersectionObserver` action behind all three sentinels. Plain JS with no runes and no browser API at
+  module scope, so the root server load and `Search.controller.js` import the constants from it: Rollup shakes
+  `onVisible` out and the emitted server chunk is just the two constants. Both span the server/client
+  boundary, which is the whole reason they live together. `MONTHS_PER_BLOCK` bounds the root load's query
+  _and_ sizes the calendar's blocks, so the second block starts exactly where the server stopped; split them
+  and a month is fetched twice or never. `PAGE_AMOUNT` is the search page size, the floor `getSearch` clamps
+  `size` to — the SSR recents are the client's first page, so a smaller server default leaves `hasMore` false
+  on arrival and the list never pages — and the number of rows `past.loadMore` gathers before it stops
+  walking blocks backwards. `root` is
+  `null` even though the scroller is the `.scroller` inside `Section.svelte`: intersection is computed against
+  the viewport _after_ every ancestor clip rect, so a sentinel inside an `overflow-y: auto` box works. Unlike
+  a one-shot observer it keeps observing, so the sentinel re-fires as content is appended below it. It ignores
+  an intersection while that scroller does not overflow: rows enter with `slide`, so for a frame after a list
+  is populated every row still has zero height and the sentinel sits in view — unguarded, that pages a second
+  time on top of a list nobody has scrolled.
 - `src/lib/motion.js` — the `in:`/`out:` presets every transition imports.
+
+**A mutation refetches a store's whole loaded window, not just the changed row.** `enhanceSubmit`/
+`postAction` bump `invalidateAppointments()` beside `invalidateSearch()`, and `Appointments.svelte` reloads
+`upcoming` (`start` → `horizon`) and `past` (its oldest loaded month → today) in one request each. Patching in
+place would miss an appointment created into a block the store already holds, and re-paging from zero would
+drift.
+
+**Reload from an `$effect` through `untrack`.** Both reloads read store `$state` and then assign it, so an
+effect that calls them subscribes to the store it is about to write and re-runs on every unrelated store
+change. The effect in `Appointments.svelte` must depend on the version counter and nothing else. The paging
+cursors themselves — `start`/`horizon` for upcoming, `edge` for past — are deliberately plain `let` rather
+than `$state`, so sizing a request never creates a dependency.
+
+**Both panels page on month ranges, not offsets or a row cursor.** A block's bound is a date, so inserting or
+deleting an appointment inside the loaded window shifts nothing — the drift `skip`/`limit` suffers from
+cannot arise. A cursor on `Appointment.date` alone would not work: every date is UTC midnight, so same-day
+rows share a cursor value and `$lt` drops them, and the only tie-break — `appointmentId` — is a numeric
+_string_, which sorts `'10' < '9'`. Month boundaries sidestep the tie entirely.
+
+Past blocks run backwards from today and the panel renders only the days that hold an appointment, so a block
+can come back empty across a quiet stretch. `past.loadMore` therefore loops until it has gathered
+`PAGE_AMOUNT` rows or history runs out — without that, a quiet block would add no height, the sentinel would
+never re-enter the viewport and the list would stall.
+
+**Neither list requests a range it can already tell is empty.** Both branches answer
+`{ appointments, … }` plus the date of the nearest appointment beyond the block — `older` for `type=past`,
+`newer` for upcoming. Each comes from the same indexed `findOne` that would otherwise only report existence,
+so the date costs nothing extra, and each store keeps it as its frontier.
+
+They spend it differently, because only one of the two panels may skip months. Past renders just the days it
+has, so `past.loadMore` anchors the next block on the month _after_ `older` instead of on the block it just
+read, jumping a quiet stretch in one request; `older: null` ends the list. Upcoming must render every month
+whether or not it holds anything, since each day is a create target — so the calendar still grows a block at
+a time, but `upcoming.loadBlock` returns without fetching while `newer` is null or lands beyond the block.
+Both frontiers are refreshed by `reload`, which is what lets an appointment created past the point where the
+store stopped fetching still appear.
+
+The saving is the whole cost of scrolling through empty time: a five-year gap in history takes 3 requests
+instead of 14, and scrolling four years into an empty future takes 1 instead of 8. Anchored past blocks are
+no longer on a fixed grid, which is invisible because that panel groups by the data it receives rather than
+by the block.
+
+`getSearch` takes a `limit` and scales its per-query ceiling with it, so scrolling re-requests the same query
+at a larger size and **replaces** the list. There is no stable cursor across a ranked union of four
+collections; growing the limit keeps ranking and dedup globally correct at the cost of a re-query.
+
+Because that re-query raises `limit` before the rows arrive, `Search.svelte` guards `hasMore` with
+`!search.settled`. A bare `results.length >= search.limit` goes false the instant `loadMore` runs and only
+recovers when the response lands, so the sentinel unmounts for exactly as long as the fetch takes — invisible
+locally, obvious on a throttled connection, and the one moment the strip is meant to be on screen.
 
 Mutations re-run every `load` on the route by default. To scope that, pass update options through
 `enhanceSubmit` and invalidate one load — see `CarForm.svelte`. `page.data` is not writable, so patching it in
@@ -225,6 +307,8 @@ absolutely-positioned form shell; `Label.svelte` is the field wrapper that rende
   alpha. Render a swatch on `--background` and compare against `box-shadow: none` before trusting a new value —
   at these alphas the two are easy to confuse.
 - **Icons** are `.icon.<name>` rules using a `mask-image` data-URI. Add a rule rather than an `<img>`.
+- **`.sentinel` and `.empty` are global**, because all three paging sentinels and every empty-state heading
+  want the same shape. Neither needs a per-component override.
 - **The global button rule** (`.button, button, input[type='submit']`) gives every button a hover/
   `:focus-visible` background and a pointer cursor. To exempt one, add it to the `:not(.createButton, .overlay)`
   list in that rule — don't fight it with per-component overrides.
@@ -274,6 +358,12 @@ the exit never renders. Instead `requestClose()` adds `.closing`, plays a keyfra
 still open, and calls `close()` on `animationend` with a `setTimeout` backstop. **Add new close paths to
 `requestClose()`, not `close()`.** The backdrop animates `opacity`, not `background-color`: `backdrop-filter`
 is in no transition list, so fading the tint alone makes the blur snap on at full strength.
+
+**A submit closes the dialog on every result except `failure`.** `failure` is the one the user can act on —
+`Label` renders it beside the field, so the dialog has to stay put. `error` must close: the delete dialogs
+deliberately throw `error()` rather than `fail()`, and an unreachable server turns any submit into one, so
+matching only `success`/`redirect` leaves the dialog sitting on top of `+error.svelte` with the message
+unreachable behind it.
 
 ## Estimates and email
 

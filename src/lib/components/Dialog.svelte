@@ -53,7 +53,7 @@
 			use:enhance={enhanceSubmit({
 				reset: false,
 				onResult: (result) => {
-					if (result.type === 'success' || result.type === 'redirect') {
+					if (result.type !== 'failure') {
 						requestClose();
 					}
 				},

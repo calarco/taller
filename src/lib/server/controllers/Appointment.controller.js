@@ -10,6 +10,8 @@ export const findAppointment = appointments.find;
 
 export const findAppointments = appointments.findMany;
 
+export const findAppointmentsBetween = (userId, from, to) => findAppointments(userId, { date: { $gte: from, $lt: to } });
+
 export async function createAppointmentAction(event) {
 	try {
 		const userId = event.locals.userId;

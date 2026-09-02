@@ -1,16 +1,36 @@
 <script>
 	import { fly } from 'svelte/transition';
 	import { panelFlyEnterY, panelFlyExitY } from '$lib/motion.js';
+	import { untrack } from 'svelte';
+	import { page } from '$app/state';
 	import { windowState } from '$lib/shared.svelte';
+	import { upcoming, past, appointmentsVersion, resetAppointments } from '$lib/appointments.svelte.js';
 	import Section from '$lib/components/Section.svelte';
 	import UpcomingAppointments from './UpcomingAppointments.svelte';
 	import PastAppointments from './PastAppointments.svelte';
 
 	let showPast = $state(false);
+
+	$effect(() => {
+		if (!page.data.user) {
+			untrack(() => {
+				showPast = false;
+				resetAppointments();
+			});
+		}
+	});
+	$effect(() => {
+		if (appointmentsVersion()) {
+			untrack(() => {
+				upcoming.reload();
+				past.reload();
+			});
+		}
+	});
 </script>
 
 <div class="panel">
-	{#key showPast}
+	{#key `${showPast}${page.data.user?.userId ?? ''}`}
 		<div class="panelFill" in:fly={panelFlyEnterY} out:fly={panelFlyExitY}>
 			<Section overlay={windowState.form === 'appointment' || windowState.form === 'client'}>
 				{#if showPast}

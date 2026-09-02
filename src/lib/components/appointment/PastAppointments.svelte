@@ -1,11 +1,33 @@
 <script>
-	import { page } from '$app/state';
+	import { untrack } from 'svelte';
+	import { toISODate } from '$lib/shared.svelte.js';
+	import { past } from '$lib/appointments.svelte.js';
+	import { onVisible } from '$lib/paging.js';
 	import MonthHeader from './MonthHeader.svelte';
 	import Day from './Day.svelte';
 
+	$effect(() => {
+		if (!past.loaded) {
+			untrack(() => past.loadMore());
+		}
+	});
+
+	let byDay = $derived.by(() => {
+		const days = {};
+		for (const appointment of past.items) {
+			const id = toISODate(new Date(appointment.date));
+			if (days[id]) {
+				days[id].push(appointment);
+			} else {
+				days[id] = [appointment];
+			}
+		}
+		return days;
+	});
+
 	let months = $derived.by(() => {
 		const groups = [];
-		for (const appointment of page.data.pastAppointments ?? []) {
+		for (const appointment of past.items) {
 			const date = new Date(appointment.date);
 			const year = date.getUTCFullYear();
 			const month = date.getUTCMonth();
@@ -28,19 +50,13 @@
 	<div>
 		<MonthHeader year={month.year} month={month.month} />
 		{#each month.days as day (day)}
-			<Day date={new Date(month.year, month.month, day)} />
+			<Day date={new Date(month.year, month.month, day)} {byDay} />
 		{/each}
 	</div>
 {/each}
-{#if !months.length}
+{#if past.loaded && !months.length}
 	<h5 class="empty">No hay turnos anteriores</h5>
 {/if}
-
-<style>
-	.empty {
-		min-height: 4.5rem;
-		padding: 1.5rem;
-		text-align: center;
-		color: var(--on-background-variant);
-	}
-</style>
+{#if past.hasMore}
+	<div class="sentinel" use:onVisible={past.loadMore}></div>
+{/if}

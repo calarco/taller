@@ -5,6 +5,7 @@
 	import { goto } from '$app/navigation';
 	import { windowState } from '$lib/shared.svelte';
 	import { createSearch } from '$lib/search.svelte.js';
+	import { onVisible } from '$lib/paging.js';
 	import Section from '$lib/components/Section.svelte';
 	import Plate from '$lib/components/vehicle/Plate.svelte';
 
@@ -13,11 +14,12 @@
 	let activeIndex = $state(-1);
 	let searchInput = $state();
 	let results = $derived((search.results ?? page.data.search ?? []).map((x) => ({ ...x, updatedAt: new Date(x.updatedAt) })));
+	let hasMore = $derived(!search.settled || results.length >= search.limit);
 	const rows = $state([]);
 
 	$effect(() => {
 		if (!page.data.user) {
-			search.value = '';
+			search.reset();
 			activeIndex = -1;
 		}
 	});
@@ -45,7 +47,7 @@
 				goto(`/${result.clientId}`);
 			}
 		} else if (e.key === 'Escape') {
-			search.value = '';
+			search.reset();
 			activeIndex = -1;
 		}
 	}
@@ -54,7 +56,7 @@
 {#snippet updatedAt(date, href)}
 	<a {href} class="updatedAt">
 		<div>
-			{date.getDate()}/{date.toLocaleDateString('default', { month: 'short' }).substring(0, 3)}/{date.toLocaleDateString('default', { year: 'numeric' }).substring(2, 4)}
+			{date.getDate()}/{date.toLocaleDateString('es-AR', { month: 'short' }).substring(0, 3)}/{date.toLocaleDateString('default', { year: 'numeric' }).substring(2, 4)}
 		</div>
 		<div>
 			{date.toLocaleTimeString([], {
@@ -80,7 +82,7 @@
 							type="button"
 							onmousedown={(e) => e.preventDefault()}
 							onclick={() => {
-								search.value = '';
+								search.reset();
 								activeIndex = -1;
 								searchInput?.focus();
 							}}
@@ -169,6 +171,9 @@
 				{/if}
 			</div>
 		{/each}
+		{#if hasMore}
+			<div class="sentinel" use:onVisible={search.loadMore}></div>
+		{/if}
 	</Section>
 </div>
 

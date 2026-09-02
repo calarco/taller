@@ -1,54 +1,80 @@
 <script>
+	import { page } from '$app/state';
+	import { toISODate } from '$lib/shared.svelte.js';
+	import { upcoming } from '$lib/appointments.svelte.js';
+	import { MONTHS_PER_BLOCK, onVisible } from '$lib/paging.js';
 	import MonthHeader from './MonthHeader.svelte';
 	import Day from './Day.svelte';
 
-	function getNextMonth(currentYear, currentMonth) {
-		const now = new Date();
-		const year = !currentYear ? now.getFullYear() : currentMonth === 11 ? currentYear + 1 : currentYear;
-		const month = !currentMonth && currentMonth !== 0 ? now.getMonth() : currentMonth === 11 ? 0 : currentMonth + 1;
-		const date = (currentMonth || currentMonth === 0) && currentYear ? 1 : now.getDate();
-
-		const days = [];
-		for (var i = date; i <= 32 - new Date(year, month, 32).getDate(); i++) {
-			days.push(i);
-		}
-
-		return { year: year, month: month, days: days };
+	function monthStart(date, offset = 0) {
+		return new Date(Date.UTC(date.getFullYear(), date.getMonth() + offset, 1));
 	}
 
-	const calendar = $state([getNextMonth()]);
+	function monthDays(year, month, from) {
+		const days = [];
+		const last = new Date(year, month + 1, 0).getDate();
+		for (let day = from; day <= last; day++) {
+			days.push(day);
+		}
+		return days;
+	}
 
-	function loadDays(e, month) {
-		const options = {
-			root: null,
-			rootMargin: '20px',
-			threshold: 0,
-		};
-		const observer = new IntersectionObserver((entries) => {
-			if (entries[0].isIntersecting) {
-				const lastCalendar = calendar[calendar.length - 1];
-				if (lastCalendar.year === month.year && lastCalendar.month === month.month) {
-					calendar.push(getNextMonth(month.year, month.month));
-				}
-				observer.disconnect();
+	function nextBlock(after) {
+		const now = new Date();
+		const year = after ? after.year : now.getFullYear();
+		const month = after ? after.month + 1 : now.getMonth();
+		const first = after ? 1 : now.getDate();
+
+		const months = [];
+		for (let offset = 0; offset < MONTHS_PER_BLOCK; offset++) {
+			const date = new Date(year, month + offset, 1);
+			months.push({ year: date.getFullYear(), month: date.getMonth(), days: monthDays(date.getFullYear(), date.getMonth(), offset ? 1 : first) });
+		}
+
+		const anchor = new Date(year, month, 1);
+		return { months, from: monthStart(anchor), to: monthStart(anchor, MONTHS_PER_BLOCK) };
+	}
+
+	const blocks = $state([nextBlock()]);
+	let busy = false;
+
+	let byDay = $derived.by(() => {
+		const days = {};
+		for (const appointment of [...(page.data.appointments ?? []), ...upcoming.extra]) {
+			const id = toISODate(new Date(appointment.date));
+			if (days[id]) {
+				days[id].push(appointment);
+			} else {
+				days[id] = [appointment];
 			}
-		}, options);
+		}
+		return days;
+	});
 
-		observer.observe(e);
-
-		return {
-			destroy() {
-				observer.disconnect();
-			},
-		};
+	async function loadNext() {
+		if (busy) {
+			return;
+		}
+		busy = true;
+		try {
+			const months = blocks[blocks.length - 1].months;
+			const block = nextBlock(months[months.length - 1]);
+			await upcoming.loadBlock(block.from, block.to);
+			blocks.push(block);
+		} finally {
+			busy = false;
+		}
 	}
 </script>
 
-{#each calendar as month (`${month.year}${month.month}`)}
-	<div use:loadDays={month}>
-		<MonthHeader year={month.year} month={month.month} />
-		{#each month.days as date (date)}
-			<Day date={new Date(month.year, month.month, date)} />
-		{/each}
-	</div>
+{#each blocks as block, index (index)}
+	{#each block.months as month (`${month.year}${month.month}`)}
+		<div>
+			<MonthHeader year={month.year} month={month.month} />
+			{#each month.days as date (date)}
+				<Day date={new Date(month.year, month.month, date)} {byDay} />
+			{/each}
+		</div>
+	{/each}
 {/each}
+<div class="sentinel" use:onVisible={loadNext}></div>
