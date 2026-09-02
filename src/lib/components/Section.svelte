@@ -9,9 +9,6 @@
 <section class={[{ cards }]}>
 	<div class={['scroller', { notOverlay: !overlay }]}>
 		{@render children()}
-		{#if cards}
-			<div class="scrollSpacer"></div>
-		{/if}
 	</div>
 	{#if overlay}
 		<button type="button" class="overlay" aria-label="Cerrar el formulario" tabindex="-1" onclick={closeForm} in:fade={enter} out:fade={exit}></button>
@@ -32,10 +29,6 @@
 				padding: 0 0.5rem;
 				gap: 0;
 				scrollbar-gutter: stable both-edges;
-			}
-
-			.scrollSpacer {
-				min-height: 15rem;
 			}
 		}
 	}

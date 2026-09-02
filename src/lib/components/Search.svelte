@@ -197,6 +197,7 @@
 		border-radius: var(--border-radius) 0 0 0;
 		background: var(--surface);
 		box-shadow: var(--shadow-variant);
+		outline: 1px solid var(--border);
 		display: grid;
 		grid-template-columns: 3.5rem 1fr auto;
 		align-items: center;
@@ -279,7 +280,7 @@
 			transition: none;
 		}
 
-		&::after {
+		&:not(:last-child)::after {
 			content: '';
 			position: absolute;
 			bottom: -1px;
