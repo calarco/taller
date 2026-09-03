@@ -340,6 +340,30 @@ The two scales never meet.
 A sticky header whose `z-index` leaks out of its panel gets painted under an incoming panel, because the `fly`
 transform makes that panel a stacking context for the duration of the transition.
 
+### Hydration gate
+
+The root layout renders `<main inert={!hydrated}>`, so the whole app is non-interactive — pointer, keyboard
+_and_ tab order — until hydration, and `[inert] :is(.button, button, input[type='submit'])` in `app.css` greys
+it with the same `--on-background-disabled` the `:disabled` block uses. Nearly every control is a `openForm`/
+`openDialog`/`postAction` call that does nothing before the bundle lands, so the SSR paint would otherwise
+render an app that looks live and swallows clicks. The un-greying rides the colour transition the global
+button rule already declares.
+
+- **`hydrated` is component-local `$state` flipped in `onMount`, not `browser` from `$app/environment`.**
+  `browser` is a compile-time constant, so `inert={!browser}` folds to a static `inert={false}` in the client
+  bundle — an attribute Svelte may skip during hydration, stranding the SSR'd `inert` in the DOM forever.
+  `$derived` is wrong for the same reason in reverse: it evaluates during SSR, so the gate never renders —
+  which is why `onMount` rather than the `$state`/`$effect` pair `svelte/prefer-writable-derived` rejects. It
+  stays out of `shared.svelte.js` for the same reason `windowState` is a hazard there: that module-level
+  `$state` is one singleton across every request the adapter-node process serves.
+- **The `[inert]` rule must keep its `input[type='submit']` arm and stay after `button[type='reset']`.**
+  `:is()` takes the specificity of its most specific argument, so the type selector lifts the rule to a tie
+  with `button[type='submit']:not(:disabled)`, which source order then breaks. Drop either and every submit
+  button renders `--secondary` while inert.
+- **`error.html` gets no `inert`** — no layout and no JS run for that shell, so nothing would remove it. It is
+  also why the `<noscript>` notice in `app.html` inlines its own styles: without JS the gate never lifts, and
+  in `vite dev` the stylesheet is injected by JS and would not apply.
+
 ### Motion
 
 CSS uses `--duration-*` and `--ease-in`/`--ease-out` on `body`; Svelte transitions use the presets in

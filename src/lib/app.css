@@ -673,6 +673,14 @@ button[type='reset']:not(:disabled) {
 	color: var(--error);
 }
 
+[inert] :is(.button, button, input[type='submit']) {
+	color: var(--on-background-disabled);
+
+	.icon::before {
+		background: var(--on-background-disabled);
+	}
+}
+
 a {
 	text-decoration: none;
 	color: var(--on-background);

@@ -1,4 +1,5 @@
 <script>
+	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
 	import { panelEnter, panelExit } from '$lib/motion.js';
 	import { page, navigating } from '$app/state';
@@ -23,6 +24,10 @@
 		}
 		const client = `${page.data.client.name} ${page.data.client.lastName}`;
 		return page.params.vehicleId ? `${client} ${page.params.vehicleId}` : client;
+	});
+	let hydrated = $state(false);
+	onMount(() => {
+		hydrated = true;
 	});
 	$effect(() => {
 		if (url) {
@@ -52,7 +57,7 @@
 	<link rel="preload" as="font" type="font/woff2" href={supreme} crossorigin />
 </svelte:head>
 
-<main>
+<main inert={!hydrated}>
 	<Bar />
 	<div class="panels">
 		<Appointments />
