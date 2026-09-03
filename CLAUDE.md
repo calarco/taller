@@ -411,6 +411,31 @@ and port are hardcoded in `Estimate.controller.js`; only the credentials come fr
 `<body>`'s attributes onto the real one and its `font-family` overrides the app's. `<html>` accepts only
 `<head>`/`<body>`/`<frameset>`, so `Preview` and the content sit inside `Body`, never directly under `Html`.
 
+**The local `styleToString` has to kebab-case its keys.** svelte-email's own helper does, so a `style` prop
+passed to `Text`/`Container`/`Heading` is fine; the raw `<table>`/`<tr>`/`<td>` styles go through the copy in
+`Estimate.svelte`, and a browser silently drops `fontWeight:800` from a `style` attribute.
+
+**The document is one table.** Cantidad / Detalle / Importe, with the mano de obra row, the parts and the
+total inside it — three separate tables cannot align their money column, since each sizes its own. Column
+widths and the vertical rules therefore live on the cells, not on the `tr`: Outlook drops row-group styles.
+The header row is a real `<thead>` so print repeats it per page, and the total stays in `<tbody>` because
+`<tfoot>` would repeat too. Every `<tr>` carries `page-break-inside: avoid`.
+
+**The total renders whether or not there are parts** — a labor-only estimate is the common one. `price` is a
+line amount, not a unit price, which is why the column reads `Importe` and nothing multiplies by `amount`;
+`EstimateForm`'s preview total sums the same way, so change both or neither. Money is formatted to two
+fixed decimals with `tabular-nums`; `km` is the same locale with no decimals.
+
+**Leave the outer `Container` at its default `max-width`.** Its MSO conditional hardcodes `width:37.5em`, so
+overriding `maxWidth` desyncs the Outlook fallback from the div every other client sees. Nothing inside sets
+`display: grid` for the same reason. `fontFamily` is exported from `Estimate.svelte`'s `<script module>` and
+imported by `EstimateEmail.svelte`, so the two cannot drift.
+
+Every heading and paragraph carries `width: 100%` and its own `text-align`, because `app.css` makes `p` and
+`h1`–`h6` `inline-block`: in the panel they shrink to their text and centring has to come from the element,
+while in email — no `app.css` — they are blocks. Sizes are inline for the same reason, so the document reads
+the same in both.
+
 Print-to-PDF: the page copies its estimate node's `innerHTML` into the root layout's `#printContainer` and
 calls `window.print()`; an `@media print` block hides everything else.
 

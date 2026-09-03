@@ -1,3 +1,7 @@
+<script module>
+	export const fontFamily = "'Supreme-Variable', 'Helvetica Neue', Helvetica, Arial, sans-serif";
+</script>
+
 <script>
 	import { Container, Heading, Hr, Link, Text } from 'svelte-email';
 
@@ -8,145 +12,143 @@
 			if (style[key] === undefined) {
 				return str;
 			}
-			return str + key + ':' + style[key] + ';';
+			return (
+				str +
+				key
+					.split(/(?=[A-Z])/)
+					.join('-')
+					.toLowerCase() +
+				':' +
+				style[key] +
+				';'
+			);
 		}, '');
 	};
 
-	const currency = (value) => new Intl.NumberFormat('es-AR').format(value);
+	const money = (value) => new Intl.NumberFormat('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value || 0);
+	const number = (value) => new Intl.NumberFormat('es-AR').format(value || 0);
+	const longDate = (value) => new Intl.DateTimeFormat('es-AR', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'America/Argentina/Buenos_Aires' }).format(new Date(value));
+	const plate = (value = '') => (value.length === 6 ? `${value.slice(0, 3)} ${value.slice(3)}` : value.length === 7 ? `${value.slice(0, 2)} ${value.slice(2, 5)} ${value.slice(5)}` : value);
 
-	const fontFamily = "'Supreme-Variable', 'Helvetica Neue', Helvetica, Arial, sans-serif";
 	const rule = '1px solid rgba(128,128,128,0.2)';
+	const muted = 'rgba(128,128,128,0.75)';
 
-	const text = { margin: '0', fontFamily };
-	const table = { outline: rule };
-	const label = { color: 'rgba(128,128,128,0.75)', fontWeight: 800, fontFamily };
+	let parts = $derived(estimate.parts ?? []);
+	let total = $derived(Number(estimate.labor || 0) + parts.reduce((a, part) => a + Number(part.price || 0), 0));
+	let details = $derived(
+		[
+			estimate.createdAt ? { label: 'Fecha', value: longDate(estimate.createdAt) } : null,
+			estimate.vehicleId ? { label: 'Patente', value: plate(estimate.vehicleId) } : null,
+			estimate.carModel ? { label: 'Modelo', value: `${estimate.carModel.carMake?.name ?? ''} ${estimate.carModel.name ?? ''}`.trim() } : null,
+			estimate.km ? { label: 'KM', value: number(estimate.km) } : null,
+		].filter(Boolean)
+	);
 
+	const sheet = { margin: '0 auto', padding: '1.5rem 1rem' };
+	const text = { width: '100%', margin: '0', fontFamily, textAlign: 'center' };
+	const tagline = { ...text, color: muted };
+	const title = { width: '100%', margin: '0', padding: '0.75rem 0', fontFamily, textAlign: 'center' };
+	const subtitle = { width: '100%', margin: '0', fontFamily, textAlign: 'center' };
+	const summary = { ...text, padding: '0.25rem 0 1.5rem 0' };
+	const footer = { width: '100%', margin: '0', padding: '0 0.5rem', fontFamily, textAlign: 'right' };
 	const hr = { borderColor: 'rgba(128,128,128,0.2)', margin: '1rem 0' };
-	const section = { maxWidth: '100%', padding: '1rem', display: 'grid' };
-	const plain = { maxWidth: '100%' };
-	const title = { margin: '0', padding: '1.5rem', fontFamily };
-
-	const cell = { padding: '0 1.5rem', fontFamily };
-	const amountCell = { ...cell, minWidth: '100px' };
-	const priceCell = { ...cell, minWidth: '150px' };
-
-	const head = { ...cell, color: 'inherit', fontWeight: 'inherit' };
-	const amountHead = { ...head, minWidth: '100px', borderRight: rule };
-	const priceHead = { ...head, minWidth: '150px', borderLeft: rule };
-
 	const inline = styleToString({ padding: '0 0.5rem' });
-	const sign = styleToString({ padding: '0 0.25rem' });
+
+	const detailsTable = { width: '100%', margin: '0 0 1rem 0', borderCollapse: 'separate', borderSpacing: '0' };
+	const detailLabel = { padding: '0 1.5rem 0 0', fontFamily, fontSize: '12px', lineHeight: '16px', fontWeight: '500', color: muted, textAlign: 'left', whiteSpace: 'nowrap' };
+	const detailValue = { padding: '0 1.5rem 0 0', fontFamily, fontSize: '14px', lineHeight: '20px', fontWeight: '300', textAlign: 'left' };
+
+	const ledger = { width: '100%', margin: '1.5rem 0 2.5rem 0', border: rule, borderCollapse: 'separate', borderSpacing: '0' };
+	const row = { pageBreakInside: 'avoid', breakInside: 'avoid' };
+
+	const cell = { padding: '0.375rem 1.5rem', fontFamily, fontSize: '14px', lineHeight: '20px', fontWeight: '300', verticalAlign: 'top' };
+	const amountCell = { ...cell, width: '100px', textAlign: 'center', borderRight: rule };
+	const detailCell = { ...cell, width: '100%', textAlign: 'left' };
+	const priceCell = { ...cell, width: '150px', textAlign: 'right', borderLeft: rule, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' };
+
+	const head = { fontSize: '12px', lineHeight: '16px', fontWeight: '500', color: muted, borderBottom: rule, whiteSpace: 'nowrap' };
+	const amountHead = { ...amountCell, ...head };
+	const detailHead = { ...detailCell, ...head };
+	const priceHead = { ...priceCell, ...head };
+
+	const amountTotal = { ...amountCell, borderTop: rule };
+	const detailTotal = { ...detailCell, borderTop: rule, textAlign: 'right', fontSize: '12px', lineHeight: '20px', fontWeight: '500', color: muted };
+	const priceTotal = { ...priceCell, borderTop: rule, fontSize: '16px', fontWeight: '500' };
 </script>
 
-<Container align="center" style={section}>
+<Container style={sheet}>
 	{#if user.description}
-		<Heading as="h5" style={text}>
+		<Text style={tagline}>
 			{user.description}
-		</Heading>
+		</Text>
 	{/if}
 	<Heading as="h1" style={title}>
 		{user.name || user.userId}
 	</Heading>
-	<Container align="center" style={plain}>
-		<Text style={text}>
-			{#if user.address}
-				<span style={inline}>{user.address}</span>
-			{/if}
-			{#if user.phone}
-				<span style={inline}>{user.phone}</span>
-			{/if}
-			{#if user.email}
-				<span style={inline}>{user.email}</span>
-			{/if}
-		</Text>
-	</Container>
-</Container>
-<Hr style={hr} />
-<Container align="center" style={section}>
-	<Heading as="h4" style={text}>
-		Presupuesto - {Intl.DateTimeFormat('es-AR', { year: 'numeric', month: 'long', day: 'numeric' }).format(estimate.createdAt)}
-	</Heading>
-	<Text style={{ margin: '1rem 0 0 0', fontFamily }}>
-		{#if estimate.carModel}
-			<span style={inline}>{estimate.carModel.carMake?.name} {estimate.carModel.name}</span>
+	<Text style={text}>
+		{#if user.address}
+			<span style={inline}>{user.address}</span>
 		{/if}
-		{#if estimate.vehicleId}
-			<span style={inline}>{estimate.vehicleId}</span>
+		{#if user.phone}
+			<span style={inline}>{user.phone}</span>
 		{/if}
-		{#if estimate.km}
-			<span style={inline}>{currency(estimate.km)} km</span>
+		{#if user.email}
+			<span style={inline}>{user.email}</span>
 		{/if}
 	</Text>
-</Container>
-<table style={styleToString({ padding: '1rem' })}>
-	<tbody style={styleToString(table)}>
-		<tr style={styleToString(label)}>
-			<td align="left" colspan="2" width="100%">
-				<Text style={head}>Reparación</Text>
-			</td>
-			<td align="right">
-				<Text style={priceHead}>Mano de obra</Text>
-			</td>
-		</tr>
-		<tr>
-			<td align="left" colspan="2" width="100%">
-				<Text style={cell}>{estimate.description}</Text>
-			</td>
-			<td align="right">
-				<Text style={priceCell}><span style={sign}>$</span> {currency(estimate.labor)}</Text>
-			</td>
-		</tr>
-	</tbody>
-</table>
-{#if estimate.parts.length}
-	<table style={styleToString({ padding: '0 1rem' })}>
-		<tbody style={styleToString(table)}>
-			<tr style={styleToString(label)}>
-				<td align="center">
-					<Text style={amountHead}>Cantidad</Text>
-				</td>
-				<td align="left" width="100%">
-					<Text style={head}>Repuesto</Text>
-				</td>
-				<td align="right">
-					<Text style={priceHead}>Precio</Text>
-				</td>
+	<Hr style={hr} />
+	<Heading as="h2" style={subtitle}>Presupuesto</Heading>
+	{#if estimate.description}
+		<Text style={summary}>
+			{estimate.description}
+		</Text>
+	{/if}
+	{#if details.length}
+		<table style={styleToString(detailsTable)} border="0" cellpadding="0" cellspacing="0" role="presentation">
+			<tbody>
+				<tr style={styleToString(row)}>
+					{#each details as detail (detail.label)}
+						<td style={styleToString(detailLabel)}>{detail.label}</td>
+					{/each}
+				</tr>
+				<tr style={styleToString(row)}>
+					{#each details as detail (detail.label)}
+						<td style={styleToString(detailValue)}>{detail.value}</td>
+					{/each}
+				</tr>
+			</tbody>
+		</table>
+	{/if}
+	<table style={styleToString(ledger)} border="0" cellpadding="0" cellspacing="0">
+		<thead>
+			<tr style={styleToString(row)}>
+				<th scope="col" style={styleToString(amountHead)}>Cantidad</th>
+				<th scope="col" style={styleToString(detailHead)}>Detalle</th>
+				<th scope="col" style={styleToString(priceHead)}>Importe ($)</th>
 			</tr>
-			{#each estimate.parts as part (part.name)}
-				<tr>
-					<td align="center">
-						<Text style={amountCell}>{part.amount}</Text>
-					</td>
-					<td width="100%">
-						<Text style={cell}>{part.name}</Text>
-					</td>
-					<td align="right">
-						<Text style={priceCell}><span style={sign}>$</span> {currency(part.price)}</Text>
-					</td>
+		</thead>
+		<tbody>
+			<tr style={styleToString(row)}>
+				<td style={styleToString(amountCell)}>&nbsp;</td>
+				<td style={styleToString(detailCell)}>Mano de obra</td>
+				<td style={styleToString(priceCell)}>{money(estimate.labor)}</td>
+			</tr>
+			{#each parts as part (part.name)}
+				<tr style={styleToString(row)}>
+					<td style={styleToString(amountCell)}>{part.amount}</td>
+					<td style={styleToString(detailCell)}>{part.name}</td>
+					<td style={styleToString(priceCell)}>{money(part.price)}</td>
 				</tr>
 			{/each}
-		</tbody>
-	</table>
-	<table style={styleToString({ padding: '1rem' })}>
-		<tbody style={styleToString(table)}>
-			<tr style={styleToString(label)}>
-				<td align="left" colspan="2" width="100%"></td>
-				<td align="right">
-					<Text style={priceHead}>Total</Text>
-				</td>
-			</tr>
-			<tr>
-				<td align="left" colspan="2" width="100%"></td>
-				<td align="right">
-					<Text style={priceCell}><span style={sign}>$</span> {currency(estimate.labor + estimate.parts.reduce((a, { price }) => a + price, 0))}</Text>
-				</td>
+			<tr style={styleToString(row)}>
+				<td style={styleToString(amountTotal)}>&nbsp;</td>
+				<td style={styleToString(detailTotal)}>Total</td>
+				<td style={styleToString(priceTotal)}>{money(total)}</td>
 			</tr>
 		</tbody>
 	</table>
-{/if}
-<Hr style={hr} />
-<Container style={plain}>
-	<Text align="right" style={{ width: '100%', padding: '0 2rem', fontFamily }}>
-		© 2025 <Link href="https://calarco.com.ar">CalarcoWEB</Link>
+	<Hr style={hr} />
+	<Text style={footer}>
+		© <Link href="https://calarco.com.ar">CalarcoWEB</Link>
 	</Text>
 </Container>
