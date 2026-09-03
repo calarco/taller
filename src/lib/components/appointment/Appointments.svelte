@@ -6,8 +6,8 @@
 	import { windowState } from '$lib/shared.svelte';
 	import { upcoming, past, appointmentsVersion, resetAppointments } from '$lib/appointments.svelte.js';
 	import Section from '$lib/components/Section.svelte';
-	import UpcomingAppointments from './UpcomingAppointments.svelte';
-	import PastAppointments from './PastAppointments.svelte';
+	import UpcomingList from './UpcomingList.svelte';
+	import PastList from './PastList.svelte';
 
 	let showPast = $state(false);
 
@@ -34,9 +34,9 @@
 		<div class="panelFill" in:fly={panelFlyEnterY} out:fly={panelFlyExitY}>
 			<Section overlay={windowState.form === 'appointment' || windowState.form === 'client'}>
 				{#if showPast}
-					<PastAppointments />
+					<PastList />
 				{:else}
-					<UpcomingAppointments />
+					<UpcomingList />
 				{/if}
 			</Section>
 		</div>

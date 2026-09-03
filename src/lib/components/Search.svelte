@@ -193,7 +193,6 @@
 		right: 0;
 		left: 0;
 		height: 3rem;
-		margin-bottom: -1px;
 		border-radius: var(--border-radius) 0 0 0;
 		background: var(--surface);
 		box-shadow: var(--shadow-variant);

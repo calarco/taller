@@ -1,5 +1,6 @@
 <script>
 	import { windowState, openForm, toLocalISODate } from '$lib/shared.svelte.js';
+	import { holidays } from '$lib/holidays.js';
 	import AppointmentForm from './AppointmentForm.svelte';
 	import AppointmentCard from './AppointmentCard.svelte';
 
@@ -10,6 +11,7 @@
 	let isCurrent = $derived(id === today);
 	let past = $derived(id < today);
 	let isWeekend = $derived([0, 6].indexOf(date.getDay()) !== -1);
+	let isHoliday = $derived(holidays(date.getFullYear()).has(id));
 	let isCreate = $derived(!past && windowState.form === 'appointment' && windowState.id === id);
 	let appointments = $derived(byDay[id] ?? []);
 
@@ -23,7 +25,7 @@
 </script>
 
 <div bind:this={element} class={['dayRow', { isCreate }]}>
-	<div class={['day', { isCurrent, isWeekend }]}>
+	<div class={['day', { isCurrent, isWeekend, isHoliday }]}>
 		<h3>{date.getDate()}</h3>
 		<p>{date.toLocaleDateString('es-AR', { weekday: 'short' }).substring(0, 3)}</p>
 	</div>
@@ -79,7 +81,8 @@
 		display: grid;
 		grid-template-rows: auto auto;
 
-		&.isWeekend {
+		&.isWeekend,
+		&.isHoliday {
 			h3,
 			p {
 				color: var(--on-background-variant);

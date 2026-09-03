@@ -142,7 +142,7 @@ stores, and paging is therefore fetch-driven rather than `load` + `invalidate` �
 number would have to read `url`.
 
 **Past appointments are not loaded here at all.** The panel sits behind the history toggle and most sessions
-never open it, so `PastAppointments` fetches its first page on mount.
+never open it, so `PastList` fetches its first page on mount.
 
 **Never call `event.parent()` in a server load.** Server loads keep no state between requests, so `parent()`
 re-executes the parent server loads in that request. Query directly instead — the estimate page calls its own
@@ -163,7 +163,7 @@ re-runs only the two car queries. Two traps:
   by `response.ok` plus a `try`/`catch` around `.json()`: hooks redirects unauthenticated requests, so the
   body is HTML.
 
-`UpcomingAppointments.svelte`, `Search.svelte` and `VehicleForm.svelte` guard with `?? []` because the root
+`UpcomingList.svelte`, `Search.svelte` and `VehicleForm.svelte` guard with `?? []` because the root
 load returns nothing without a `userId`. `Day.svelte` reads no `page.data`: its parent indexes the loaded
 appointments by ISO date and passes that object down, so a day costs a lookup rather than a scan of the whole
 list, and the two panels can feed it from different sources.
@@ -202,7 +202,7 @@ Svelte 5 `$state`/`$derived`/`$effect` throughout — no stores.
 - `src/lib/appointments.svelte.js` — the `upcoming` and `past` paging stores, plus `invalidateAppointments()`.
   Module-level rather than component-level because `Appointments.svelte` wraps its `Section` in
   `{#key showPast}`, so both lists are destroyed and recreated on every toggle. `upcoming.extra` holds only
-  the blocks **after** the one the root layout renders, so `UpcomingAppointments` reads
+  the blocks **after** the one the root layout renders, so `UpcomingList` reads
   `[...page.data.appointments, ...upcoming.extra]`. That `{#key}` also carries the `userId`, because the
   calendar's own block list is component state: without it a deep-scrolled calendar survives a logout and
   renders months the cleared store can no longer fill.
@@ -222,6 +222,16 @@ Svelte 5 `$state`/`$derived`/`$effect` throughout — no stores.
   an intersection while that scroller does not overflow: rows enter with `slide`, so for a frame after a list
   is populated every row still has zero height and the sentinel sits in view — unguarded, that pages a second
   time on top of a list nobody has scrolled.
+- `src/lib/holidays.js` — `holidays(year)`, a `Set` of `YYYY-MM-DD` for the Argentine feriados nacionales,
+  memoised per year in a module-level `Map` because every `Day` asks for its own. `Day.svelte` colours a
+  feriado exactly like a weekend, so the rules have to hold for any year the calendar scrolls to: fixed
+  dates, Carnaval/Viernes Santo off Easter (Meeus), and the Ley 27.399 traslado — Tue/Wed back to the
+  previous Monday, Thu/Fri forward to the next one. Local-time `Date`s throughout, matching `toLocalISODate`;
+  the UTC-midnight convention is for stored instants, not for a calendar grid. Two things are deliberately
+  absent because no rule derives them: the `días no laborables con fines turísticos`, decreed per year by
+  the PEN, and a trasladable falling on a Saturday or Sunday, which Decreto 614/2025 lets the Jefatura de
+  Gabinete move to either side at its discretion — that one stays where it falls. `Jueves Santo` is a día no
+  laborable rather than a feriado and is out for the same reason.
 - `src/lib/motion.js` — the `in:`/`out:` presets every transition imports.
 
 **A mutation refetches a store's whole loaded window, not just the changed row.** `enhanceSubmit`/
