@@ -105,7 +105,7 @@
 		<Label title="Precio" --template-columns="max-content 1fr auto">
 			<h6 class="unit">$</h6>
 			<input type="number" min="0" placeholder="0" bind:value={price} class="price" onkeydown={onEnter(addPart)} />
-			<button type="button" onclick={addPart} aria-label="Agregar el repuesto">
+			<button type="button" class="addPart" onclick={addPart} aria-label="Agregar el repuesto">
 				<span class="icon create"></span>
 			</button>
 		</Label>
@@ -137,6 +137,12 @@
 
 		button {
 			padding: 0.25rem 0.5rem;
+		}
+
+		.addPart::before {
+			content: '';
+			position: absolute;
+			inset: -4px 0;
 		}
 
 		.parts {

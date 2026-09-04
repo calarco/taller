@@ -305,6 +305,11 @@ absolutely-positioned form shell; `Label.svelte` is the field wrapper that rende
 
 - **Tokens** are oklch inside `light-dark()`, declared on `body`. Typography comes from `font:` shorthand
   variables (`--body1`, `--subhead1`, `--title`, …). Don't hardcode colours or font stacks.
+- **`--border-radius` derives from `--border-radius-base`**, doubling it where `corner-shape: superellipse(2)`
+  is supported. The base token exists only so the `@supports` branch has something to `calc()` against:
+  both declarations land on `body`, so the branch wins the cascade outright rather than falling back to the
+  one above it, and `calc(var(--border-radius) * 2)` would be a self-reference. That is a cycle — invalid at
+  computed-value time — which zeroes every radius in the app rather than failing loudly.
 - **Shadows** are the one token pair that isn't `light-dark()`. `--shadow` and `--shadow-variant` are a single
   ramp of straight-down layers, each layer's alpha a `color-mix` of `--shadow-color` scaled by
   `--shadow-strength`. Only those two switch on `prefers-color-scheme` — dark carries a much higher strength, because a
@@ -320,8 +325,26 @@ absolutely-positioned form shell; `Label.svelte` is the field wrapper that rende
 - **`.sentinel` and `.empty` are global**, because all three paging sentinels and every empty-state heading
   want the same shape. Neither needs a per-component override.
 - **The global button rule** (`.button, button, input[type='submit']`) gives every button a hover/
-  `:focus-visible` background and a pointer cursor. To exempt one, add it to the `:not(.createButton, .overlay)`
-  list in that rule — don't fight it with per-component overrides.
+  `:focus-visible`/`:active` background and a pointer cursor. To exempt one, add it to the
+  `:not(.createButton, .overlay)` list in that rule — don't fight it with per-component overrides. The
+  `:active` arm must stay **after** the `:hover` arm: the two tie on specificity, so source order is what
+  makes a press visible while the pointer is still over the button. A component that re-declares a `:hover`
+  background at higher specificity — Svelte scoping alone is enough — outranks the global `:active` and needs
+  its own `:active` arm beside it, which is why `Dialog.svelte` and `.createButton` each carry one.
+- **A button whose wrapper owns the hover surface gets `.slotButton`**, which the hover and `:active` lists
+  exempt — `Label.svelte`'s error-dismiss and create buttons, where `.error`/`.create` paint the highlight.
+  Two stacked `--highlight` fills read as one darker blob, so the button must not paint its own. Exempting
+  is the only reliable fix: `&` in a nested rule takes the **largest** specificity in its parent list, so the
+  global rule resolves against `input[type='submit']` (0,1,1) rather than `button` (0,0,1), and a scoped
+  `&:hover { background: none }` merely ties it. `.slotButton` stays out of the `:focus-visible` list so
+  those buttons keep an indicator, and `.create` carries the `:active` the button no longer can.
+  **`cursor: pointer` sits in its own hover arm** exempting only `.overlay`, because it has to survive the
+  `.slotButton` exemption — fold it back into the background arm and every exempt button reverts to the UA
+  `cursor: default`, which inheriting `pointer` from the wrapper cannot fix.
+- **`.createButton` supplies its own focus ring.** It is exempt from the global `:focus-visible` background,
+  and its `outline: 1px solid var(--secondary-border)` is decorative — an author `outline` replaces the UA
+  focus ring, so without `&:not(.isActive):focus-visible` the four primary create actions show _no_ keyboard
+  focus indicator at all. That rule sits after `&:not(.isActive):hover` for the same tie-break reason.
 - **Selects** use Chrome's customizable-select (`appearance: base-select`, `::picker(select)`, `::picker-icon`)
   with an `@supports not (appearance: base-select)` fallback drawing the caret with gradients. Any select
   styling change needs checking in both branches.

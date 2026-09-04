@@ -18,7 +18,7 @@
 		<span class="label">{title}</span>
 		{#if error && !hideError}
 			<div class="error" in:fly={flyEnter} out:fly={flyExit}>
-				<button type="button" onclick={() => (hideError = true)} aria-label="ocultar el error">
+				<button type="button" class="slotButton" onclick={() => (hideError = true)} aria-label="ocultar el error">
 					<span class="icon info"></span>
 					{error}
 				</button>
@@ -26,7 +26,7 @@
 		{/if}
 		{#if showCreate}
 			<div class="create" in:fade={enter} out:fade={exit}>
-				<button type="button" onmousedown={(e) => e.preventDefault()} onclick={onCreate} aria-label={`Crear ${title}`}>
+				<button type="button" class="slotButton" onmousedown={(e) => e.preventDefault()} onclick={onCreate} aria-label={`Crear ${title}`}>
 					<span class={['icon', 'create', { isCreate }]}></span>
 				</button>
 			</div>
@@ -100,11 +100,6 @@
 				font: var(--body2);
 				font-size: 0.72rem;
 
-				&:hover:not(:has(*:hover)),
-				&:hover {
-					background: none;
-				}
-
 				.icon.info::before {
 					height: 1.25rem;
 					width: 1.25rem;
@@ -127,16 +122,22 @@
 				transition: none;
 			}
 
+			&:active {
+				background: var(--highlight-strong);
+				transition: none;
+			}
+
 			> button {
 				padding: 0 0.5rem;
 
-				&:disabled {
-					opacity: 0.5;
+				&::before {
+					content: '';
+					position: absolute;
+					inset: -6px 0;
 				}
 
-				&:hover:not(:has(*:hover)),
-				&:hover {
-					background: none;
+				&:disabled {
+					opacity: 0.5;
 				}
 
 				.icon.create {

@@ -190,11 +190,17 @@
 				padding: 0.25rem 0.5rem;
 				border: none;
 
+				&::before {
+					content: '';
+					position: absolute;
+					inset: -4px 0;
+				}
+
 				&:disabled {
 					opacity: 0.5;
 				}
 
-				.icon::before {
+				&:not(:disabled) .icon::before {
 					background: var(--secondary);
 				}
 			}

@@ -279,6 +279,10 @@
 			transition: none;
 		}
 
+		&:active {
+			background: var(--highlight-strong);
+		}
+
 		&:not(:last-child)::after {
 			content: '';
 			position: absolute;

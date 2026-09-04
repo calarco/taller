@@ -116,6 +116,7 @@ body {
 	--surface-variant: light-dark(oklch(0.92 var(--background-saturation) var(--primary-hue)), oklch(0.15 var(--background-saturation) var(--primary-hue)));
 	--overlay: light-dark(oklch(0.92 var(--background-saturation) var(--primary-hue) / 0.6), oklch(0.15 var(--background-saturation) var(--primary-hue) / 0.8));
 	--highlight: light-dark(oklch(0.51 0.03 var(--primary-hue) / 0.1), oklch(0.51 0.03 var(--primary-hue) / 0.1));
+	--highlight-strong: light-dark(oklch(0.51 0.03 var(--primary-hue) / 0.2), oklch(0.51 0.03 var(--primary-hue) / 0.2));
 
 	--border: light-dark(oklch(0.6 0.05 var(--primary-hue) / 0.25), oklch(0.3 0.02 var(--primary-hue) / 0.4));
 
@@ -174,10 +175,12 @@ body {
 	--scrollbar-width: 11px;
 	--scrollbar-track: light-dark(oklch(0.7 0.01 var(--primary-hue) / 0.3), oklch(0 0.01 var(--primary-hue) / 0.4));
 	--scrollbar-thumb: light-dark(oklch(0.7 0.01 var(--primary-hue) / 1), oklch(0.3 0.01 var(--primary-hue) / 1));
-	--border-radius: 0.75rem;
+
+	--border-radius-base: 0.75rem;
+	--border-radius: var(--border-radius-base);
 
 	@supports (corner-shape: superellipse(2)) {
-		--border-radius: 1.5rem;
+		--border-radius: calc(var(--border-radius-base) * 2);
 
 		*,
 		::picker(select) {
@@ -233,6 +236,7 @@ label,
 
 p {
 	font: var(--body1);
+	text-wrap: pretty;
 
 	&::before {
 		content: '';
@@ -269,6 +273,7 @@ h5 {
 
 h4 {
 	font: var(--subhead2);
+	text-wrap: balance;
 
 	&::before {
 		content: '';
@@ -281,6 +286,7 @@ h4 {
 
 h3 {
 	font: var(--title);
+	text-wrap: balance;
 
 	&::before {
 		content: '';
@@ -293,6 +299,7 @@ h3 {
 
 h2 {
 	font: var(--headline);
+	text-wrap: balance;
 
 	&::before {
 		content: '';
@@ -306,6 +313,7 @@ h2 {
 h1 {
 	font: var(--display-1);
 	text-align: center;
+	text-wrap: balance;
 
 	&::before {
 		content: '';
@@ -645,12 +653,24 @@ input[type='submit'] {
 
 	&:not(.overlay):not(:disabled):hover {
 		cursor: pointer;
+	}
+
+	&:not(.overlay, .slotButton):not(:disabled):hover {
 		background: var(--highlight);
+		transition: none;
+	}
+
+	&:not(.overlay, .slotButton):not(:disabled):active {
+		background: var(--highlight-strong);
 		transition: none;
 	}
 
 	&.createButton:not(.isActive):hover {
 		background: var(--secondary-variant);
+	}
+
+	&.createButton:not(.isActive):active {
+		background: var(--secondary-border);
 	}
 
 	&:disabled {
@@ -832,6 +852,10 @@ a {
 		background: var(--surface);
 		color: var(--primary);
 
+		&:focus-visible {
+			outline: 2px solid var(--primary);
+		}
+
 		.icon::before {
 			background: var(--primary);
 		}
@@ -840,6 +864,10 @@ a {
 	&:not(.isActive):hover {
 		outline: 1px solid var(--secondary);
 		transition: none;
+	}
+
+	&:not(.isActive):focus-visible {
+		outline: 2px solid var(--secondary);
 	}
 
 	&.isActive:hover {

@@ -42,5 +42,9 @@
 			cursor: pointer;
 			background: var(--highlight);
 		}
+
+		&:not(.isActive) > div:active {
+			background: var(--highlight-strong);
+		}
 	}
 </style>

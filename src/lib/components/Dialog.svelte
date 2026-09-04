@@ -136,6 +136,10 @@
 					background: var(--highlight);
 				}
 
+				&:not(:disabled):active {
+					background: var(--highlight-strong);
+				}
+
 				&:not(:first-child)::after {
 					content: '';
 					position: absolute;
