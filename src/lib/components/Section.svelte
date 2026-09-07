@@ -3,11 +3,11 @@
 	import { panelEnter, panelExit } from '$lib/motion.js';
 	import { closeForm } from '$lib/shared.svelte.js';
 
-	let { overlay, children, cards } = $props();
+	let { overlay, children, cards, scroller = $bindable() } = $props();
 </script>
 
 <section class={[{ cards }]}>
-	<div class={['scroller', { notOverlay: !overlay }]}>
+	<div bind:this={scroller} class={['scroller', { notOverlay: !overlay }]}>
 		{@render children()}
 	</div>
 	{#if overlay}

@@ -190,7 +190,13 @@ Svelte 5 `$state`/`$derived`/`$effect` throughout — no stores.
 
 - `src/lib/shared.svelte.js` — `windowState` (`form`, `id`, `data`, `loading`, `error`) plus `openForm`/
   `closeForm`/`openDialog` and the date helpers. `loading` is refcounted through `startLoading`/`endLoading`,
-  so never assign it directly. The root layout resets the form on navigation via `$effect`.
+  so never assign it directly. **The root layout closes the form when navigation _starts_,** from the same
+  `$effect` that reads `navigating.to` and drives the loading bar. Waiting for `page.url.pathname` to settle is
+  too late: the panel forms live in the root layout and the route ones re-render with `windowState.form`
+  unchanged, so a repair form flashes over the incoming vehicle's panel carrying the previous one's data and
+  plays its exit there instead of leaving with the outgoing panel. It also covers a navigation to the URL
+  already loaded, where the pathname never changes at all. The second `$effect`, on the settled pathname, stays
+  as the net for a form opened while a navigation is already in flight.
 - `src/lib/forms.js` — `enhanceSubmit({ onResult, ...updateOptions })` is the submit handler every
   `use:enhance` passes; it toggles loading and copies `fail()` data into `windowState.error`. `postAction`
   does the same for a fetch-driven POST that isn't a real form submit (`CarForm`'s inline create).
@@ -219,9 +225,9 @@ Svelte 5 `$state`/`$derived`/`$effect` throughout — no stores.
   `null` even though the scroller is the `.scroller` inside `Section.svelte`: intersection is computed against
   the viewport _after_ every ancestor clip rect, so a sentinel inside an `overflow-y: auto` box works. Unlike
   a one-shot observer it keeps observing, so the sentinel re-fires as content is appended below it. It ignores
-  an intersection while that scroller does not overflow: rows enter with `slide`, so for a frame after a list
-  is populated every row still has zero height and the sentinel sits in view — unguarded, that pages a second
-  time on top of a list nobody has scrolled.
+  an intersection while that scroller does not overflow: appointment rows enter with `slide`, so for a frame
+  after a list is populated every row still has zero height and the sentinel sits in view — unguarded, that
+  pages a second time on top of a list nobody has scrolled.
 - `src/lib/holidays.js` — `holidays(year)`, a `Set` of `YYYY-MM-DD` for the Argentine feriados nacionales,
   memoised per year in a module-level `Map` because every `Day` asks for its own. `Day.svelte` colours a
   feriado exactly like a weekend, so the rules have to hold for any year the calendar scrolls to: fixed
@@ -425,8 +431,32 @@ seconds.**
   of snapping. Keep that if you touch it.
 - **Scrims and list rows are the two carve-outs.** `Section`'s overlay, the root `.cover` and the two
   transparent centring grids stay `fade`: they carry `backdrop-filter: blur()`, so a transition blur would
-  nest two blurs. Search rows, appointment cards, estimate part rows and the card button bars stay `slide`,
-  which animates height — fly them and the row leaves a gap that then jumps closed.
+  nest two blurs. Appointment cards, estimate part rows and the card button bars stay `slide`,
+  which animates height — fly them and the row leaves a gap that then jumps closed. **Search rows carry no
+  transition of their own; the list animates as a whole.** `getSearch` re-queries at a larger `limit` and
+  replaces the whole list rather than appending, so every loaded row is destroyed and recreated on each page —
+  a per-row transition plays over rows that never moved, and the keyed `{#each}` cannot tell the difference.
+  `Search.svelte` therefore wraps the rows in `{#key search.query}` and runs one `in:fly`/`out:blurFly` on
+  that div at the **panel** tier, the same pair the route panels use.
+
+  Two things make the key work. It is `search.query` — the query that produced the rows on screen, tracked
+  inside `createSearch` — and not `search.value`: the input leads the results by the 200 ms debounce, so
+  keying on the raw value flies the _old_ rows out and back in and then swaps them silently when the fetch
+  lands. And because `limit` does not feed it, paging and `invalidateSearch()` refresh the rows in place
+  rather than replaying the transition over a list the user is scrolling.
+
+  The `.results` wrapper is a one-cell grid and the keyed `.list` sits at `grid-area: 1 / 1`, so the outgoing
+  and incoming lists overlap in that cell instead of stacking and doubling the panel's scroll height. The
+  wrapper repeats `.scroller`'s `flex-direction: column; gap: 1px`, which the rows no longer inherit now that
+  they are a level deeper. The sentinel stays **outside** the `{#key}` — inside, the outgoing list keeps a
+  second live `onVisible` for the length of the exit.
+
+  The same key drives the scroll reset. `Section` exposes its `.scroller` as a `$bindable` prop, and the
+  effect watching `search.query` puts it back to `0` — a new query's first result belongs on screen, and
+  paging is what the untouched `limit` dependency keeps from jumping. The scroll is instant rather than
+  smooth: the incoming list is already flying in, and a second animation on the same pixels reads as a
+  stutter.
+
 - **A scrim runs at the tier of what it covers.** All three currently sit on the panel tier alongside
   `Form.svelte`, the dialog and the login/error cards. A scrim that settles before its content stops moving
   is the tell that these have come apart.

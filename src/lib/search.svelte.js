@@ -11,6 +11,7 @@ export function createSearch({ type = '' } = {}) {
 	let value = $state('');
 	let limit = $state(PAGE_AMOUNT);
 	let results = $state(null);
+	let applied = $state('');
 	let settled = $state(true);
 	let seq = 0;
 
@@ -20,6 +21,7 @@ export function createSearch({ type = '' } = {}) {
 		const size = limit;
 		if (!query && size === PAGE_AMOUNT) {
 			results = null;
+			applied = '';
 			settled = true;
 			return;
 		}
@@ -36,10 +38,12 @@ export function createSearch({ type = '' } = {}) {
 					return;
 				}
 				results = Array.isArray(data) ? data : [];
+				applied = query;
 				settled = true;
 			} catch (err) {
 				if (err.name !== 'AbortError') {
 					results = [];
+					applied = query;
 					settled = true;
 				}
 			} finally {
@@ -63,6 +67,9 @@ export function createSearch({ type = '' } = {}) {
 		},
 		get results() {
 			return results;
+		},
+		get query() {
+			return applied;
 		},
 		get settled() {
 			return settled;

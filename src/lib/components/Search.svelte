@@ -1,6 +1,7 @@
 <script>
-	import { slide, blur } from 'svelte/transition';
-	import { enter, exit } from '$lib/motion.js';
+	import { fly, blur } from 'svelte/transition';
+	import { enter, exit, panelEnter, panelExit, blurFly } from '$lib/motion.js';
+	import { untrack } from 'svelte';
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import { windowState } from '$lib/shared.svelte';
@@ -13,9 +14,15 @@
 
 	let activeIndex = $state(-1);
 	let searchInput = $state();
+	let scroller = $state();
 	let results = $derived((search.results ?? page.data.search ?? []).map((x) => ({ ...x, updatedAt: new Date(x.updatedAt) })));
 	let hasMore = $derived(!search.settled || results.length >= search.limit);
 	const rows = $state([]);
+
+	$effect(() => {
+		search.query;
+		untrack(() => scroller?.scrollTo({ top: 0 }));
+	});
 
 	$effect(() => {
 		if (!page.data.user) {
@@ -69,7 +76,7 @@
 {/snippet}
 
 <div class="panel">
-	<Section overlay={windowState.form === 'estimate'}>
+	<Section bind:scroller overlay={windowState.form === 'estimate'}>
 		<div class="searchBar">
 			<div>
 				{#if !search.value}
@@ -106,71 +113,77 @@
 				{onkeydown}
 			/>
 		</div>
-		{#if !results.length && search.settled}
-			<h5 class="empty" in:slide={enter} out:slide={exit}>No se encontraron resultados</h5>
-		{/if}
-		{#each results as result, i (result.id)}
-			<div bind:this={rows[i]} class={['result', { isSelected: i === activeIndex }]} in:slide={enter} out:slide={exit}>
-				{#if result.clientId}
-					<div class="clientResult">
-						<a href={`/${result.clientId}`} class={['clientLink', { isActive: result.clientId === page.url.pathname.split('/')[1] }, { isVehicle: result.vehicleId }]}>
-							<div class="iconRow">
-								<span class="icon client"></span>
-								<h5>{result.clientName}</h5>
-							</div>
-						</a>
-						{#if result.vehicleId}
-							<a href={`/${result.clientId}/${result.vehicleId || ''}${result.repairId ? '#' + result.repairId : ''}`} class="vehicleLink">
-								<div class="vehicleInfo iconRow">
-									<span class="icon vehicle"></span>
-									<div>
-										<Plate vehicleId={result.vehicleId} />
-										{#if result.carModel}
-											<small>{result.carModel.carMake?.name} {result.carModel.name}</small>
-										{/if}
-									</div>
+		<div class="results">
+			{#key search.query}
+				<div class="list" in:fly={panelEnter} out:blurFly={panelExit}>
+					{#if !results.length && search.settled}
+						<h5 class="empty">No se encontraron resultados</h5>
+					{/if}
+					{#each results as result, i (result.id)}
+						<div bind:this={rows[i]} class={['result', { isSelected: i === activeIndex }]}>
+							{#if result.clientId}
+								<div class="clientResult">
+									<a href={`/${result.clientId}`} class={['clientLink', { isActive: result.clientId === page.url.pathname.split('/')[1] }, { isVehicle: result.vehicleId }]}>
+										<div class="iconRow">
+											<span class="icon client"></span>
+											<h5>{result.clientName}</h5>
+										</div>
+									</a>
+									{#if result.vehicleId}
+										<a href={`/${result.clientId}/${result.vehicleId || ''}${result.repairId ? '#' + result.repairId : ''}`} class="vehicleLink">
+											<div class="vehicleInfo iconRow">
+												<span class="icon vehicle"></span>
+												<div>
+													<Plate vehicleId={result.vehicleId} />
+													{#if result.carModel}
+														<small>{result.carModel.carMake?.name} {result.carModel.name}</small>
+													{/if}
+												</div>
+											</div>
+											{#if result.repairId}
+												<div class="repairInfo iconRow">
+													<span class="icon repair"></span>
+													<p>{result.description}</p>
+												</div>
+											{/if}
+										</a>
+									{/if}
 								</div>
-								{#if result.repairId}
-									<div class="repairInfo iconRow">
-										<span class="icon repair"></span>
+								{@render updatedAt(result.updatedAt, `/${result.clientId}/${result.vehicleId || ''}${result.repairId ? '#' + result.repairId : ''}`)}
+							{/if}
+							{#if result.estimateId}
+								<a class="estimateResult" href={`/estimate/${result.estimateId}`}>
+									<div class="estimateInfo iconRow">
+										<span class="icon estimate"></span>
 										<p>{result.description}</p>
 									</div>
-								{/if}
-							</a>
-						{/if}
-					</div>
-					{@render updatedAt(result.updatedAt, `/${result.clientId}/${result.vehicleId || ''}${result.repairId ? '#' + result.repairId : ''}`)}
-				{/if}
-				{#if result.estimateId}
-					<a class="estimateResult" href={`/estimate/${result.estimateId}`}>
-						<div class="estimateInfo iconRow">
-							<span class="icon estimate"></span>
-							<p>{result.description}</p>
+									{#if result.vehicleId}
+										<div class="vehicleLink">
+											<div class="vehicleInfo iconRow">
+												<span class="icon vehicle"></span>
+												<div>
+													<Plate vehicleId={result.vehicleId} />
+													{#if result.carModel}
+														<small>{result.carModel.carMake?.name} {result.carModel.name}</small>
+													{/if}
+												</div>
+											</div>
+											{#if result.email}
+												<div class="repairInfo iconRow">
+													<span class="icon mail"></span>
+													<p>{result.email}</p>
+												</div>
+											{/if}
+										</div>
+									{/if}
+								</a>
+								{@render updatedAt(result.updatedAt, `/estimate/${result.estimateId}`)}
+							{/if}
 						</div>
-						{#if result.vehicleId}
-							<div class="vehicleLink">
-								<div class="vehicleInfo iconRow">
-									<span class="icon vehicle"></span>
-									<div>
-										<Plate vehicleId={result.vehicleId} />
-										{#if result.carModel}
-											<small>{result.carModel.carMake?.name} {result.carModel.name}</small>
-										{/if}
-									</div>
-								</div>
-								{#if result.email}
-									<div class="repairInfo iconRow">
-										<span class="icon mail"></span>
-										<p>{result.email}</p>
-									</div>
-								{/if}
-							</div>
-						{/if}
-					</a>
-					{@render updatedAt(result.updatedAt, `/estimate/${result.estimateId}`)}
-				{/if}
-			</div>
-		{/each}
+					{/each}
+				</div>
+			{/key}
+		</div>
 		{#if hasMore}
 			<div class="sentinel" use:onVisible={search.loadMore}></div>
 		{/if}
@@ -257,6 +270,17 @@
 				background: var(--on-background-variant);
 			}
 		}
+	}
+
+	.results {
+		display: grid;
+	}
+
+	.list {
+		grid-area: 1 / 1;
+		display: flex;
+		flex-direction: column;
+		gap: 1px;
 	}
 
 	.empty {

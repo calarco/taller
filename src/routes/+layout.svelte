@@ -38,6 +38,7 @@
 		if (!navigating.to) {
 			return;
 		}
+		closeForm();
 		startLoading();
 		return endLoading;
 	});
