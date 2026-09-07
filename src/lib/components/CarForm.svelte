@@ -1,7 +1,7 @@
 <script>
 	import { untrack } from 'svelte';
-	import { fade, fly } from 'svelte/transition';
-	import { enter, exit, flyEnter, flyExit } from '$lib/motion.js';
+	import { blur, fly } from 'svelte/transition';
+	import { blurFly, enter, exit } from '$lib/motion.js';
 	import { invalidate } from '$app/navigation';
 	import { page } from '$app/state';
 	import { windowState } from '$lib/shared.svelte.js';
@@ -103,7 +103,7 @@
 	>
 		<div class="formSlot">
 			{#if isCreatingMake}
-				<div class="inlineCreate" in:fly={flyEnter} out:fly={flyExit}>
+				<div class="inlineCreate" in:fly={enter} out:blurFly={exit}>
 					<input type="text" placeholder="-" autocomplete="off" bind:value={carMakeName} onkeydown={onEnter(createCarMake)} use:focus />
 					<button type="button" onclick={createCarMake} aria-label="Guardar la marca">
 						<span class="icon ok"></span>
@@ -117,8 +117,8 @@
 						carModelId = '';
 						createModel = false;
 					}}
-					in:fade={enter}
-					out:fade={exit}
+					in:blur={enter}
+					out:blur={exit}
 				>
 					{#each carMakes as carMake (carMake.carMakeId)}
 						<option value={carMake.carMakeId}>
@@ -142,14 +142,14 @@
 	>
 		<div class="formSlot">
 			{#if isCreatingModel}
-				<div class="inlineCreate" in:fly={flyEnter} out:fly={flyExit}>
+				<div class="inlineCreate" in:fly={enter} out:blurFly={exit}>
 					<input type="text" placeholder="-" autocomplete="off" disabled={isCreatingMake} bind:value={carModelName} onkeydown={onEnter(createCarModel)} use:focus />
 					<button type="button" onclick={createCarModel} disabled={isCreatingMake} aria-label="Guardar el modelo">
 						<span class="icon ok"></span>
 					</button>
 				</div>
 			{:else}
-				<select placeholder="-" disabled={!carMakeId} bind:value={carModelId} in:fade={enter} out:fade={exit}>
+				<select placeholder="-" disabled={!carMakeId} bind:value={carModelId} in:blur={enter} out:blur={exit}>
 					{#each carModels as carModel (carModel.carModelId)}
 						<option value={carModel.carModelId}>
 							{carModel.name}

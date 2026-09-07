@@ -1,6 +1,6 @@
 <script>
 	import { fly } from 'svelte/transition';
-	import { panelFlyEnterY, panelFlyExitY } from '$lib/motion.js';
+	import { panelEnter, panelExit, blurFly } from '$lib/motion.js';
 	import { untrack } from 'svelte';
 	import { page } from '$app/state';
 	import { windowState } from '$lib/shared.svelte';
@@ -31,7 +31,7 @@
 
 <div class="panel">
 	{#key `${showPast}${page.data.user?.userId ?? ''}`}
-		<div class="panelFill" in:fly={panelFlyEnterY} out:fly={panelFlyExitY}>
+		<div class="panelFill" in:fly={panelEnter} out:blurFly={panelExit}>
 			<Section overlay={windowState.form === 'appointment' || windowState.form === 'client'}>
 				{#if showPast}
 					<PastList />

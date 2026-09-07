@@ -1,6 +1,6 @@
 <script>
 	import { fade } from 'svelte/transition';
-	import { enter, exit } from '$lib/motion.js';
+	import { panelEnter, panelExit } from '$lib/motion.js';
 	import { closeForm } from '$lib/shared.svelte.js';
 
 	let { overlay, children, cards } = $props();
@@ -11,7 +11,7 @@
 		{@render children()}
 	</div>
 	{#if overlay}
-		<button type="button" class="overlay" aria-label="Cerrar el formulario" tabindex="-1" onclick={closeForm} in:fade={enter} out:fade={exit}></button>
+		<button type="button" class="overlay" aria-label="Cerrar el formulario" tabindex="-1" onclick={closeForm} in:fade={panelEnter} out:fade={panelExit}></button>
 	{/if}
 </section>
 

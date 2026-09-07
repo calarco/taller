@@ -1,12 +1,12 @@
 <script>
-	import { fade, fly, blur } from 'svelte/transition';
-	import { blurExit, flyEnter, panelEnter, panelExit } from '$lib/motion.js';
+	import { fade, fly } from 'svelte/transition';
+	import { panelEnter, panelExit, blurFly } from '$lib/motion.js';
 	import { page } from '$app/state';
 	import { closeForm } from '$lib/shared.svelte.js';
 </script>
 
 <div class="error" in:fade={panelEnter} out:fade={panelExit}>
-	<div in:fly={flyEnter} out:blur={blurExit}>
+	<div in:fly={panelEnter} out:blurFly={panelExit}>
 		<div>
 			<a class="button" href="/" aria-label="Volver al inicio" onclick={closeForm}>
 				<span class="icon close"></span>

@@ -55,7 +55,7 @@
 		grid-template-columns: 2.5rem 1fr;
 		gap: 1rem;
 		z-index: 1;
-		transition: z-index var(--duration-panel-out) step-end;
+		transition: z-index var(--duration-panel-exit) step-end;
 
 		&:nth-child(2) {
 			margin-top: 0.75rem;

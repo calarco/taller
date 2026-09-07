@@ -1,6 +1,6 @@
 <script>
-	import { fly, blur } from 'svelte/transition';
-	import { blurExit, flyEnter } from '$lib/motion.js';
+	import { fly } from 'svelte/transition';
+	import { blurFly, panelEnter, panelExit } from '$lib/motion.js';
 	import { enhance } from '$app/forms';
 	import { windowState, closeForm } from '$lib/shared.svelte.js';
 	import { enhanceSubmit } from '$lib/forms.js';
@@ -28,8 +28,8 @@
 			}
 		},
 	})}
-	in:fly={flyEnter}
-	out:blur={blurExit}
+	in:fly={panelEnter}
+	out:blurFly={panelExit}
 >
 	{@render children()}
 	<div class="formButtons">

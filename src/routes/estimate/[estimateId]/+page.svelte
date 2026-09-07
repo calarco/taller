@@ -1,6 +1,6 @@
 <script>
 	import { fly, blur } from 'svelte/transition';
-	import { blurEnter, blurExit, panelBlurExit, panelFlyEnterY, panelFlyExitY } from '$lib/motion.js';
+	import { panelEnter, panelExit, blurFly, enter, exit } from '$lib/motion.js';
 	import { enhance } from '$app/forms';
 	import { windowState, openForm, openDialog } from '$lib/shared.svelte.js';
 	import { enhanceSubmit } from '$lib/forms.js';
@@ -16,9 +16,9 @@
 	let printContent = $state();
 </script>
 
-<div class="panel" in:fly={panelFlyEnterY} out:blur={panelBlurExit}>
+<div class="panel" in:fly={panelEnter} out:blurFly={panelExit}>
 	{#key estimate.estimateId}
-		<div class="panelFill" in:fly={panelFlyEnterY} out:fly={panelFlyExitY}>
+		<div class="panelFill" in:fly={panelEnter} out:blurFly={panelExit}>
 			<div class="buttons">
 				<button type="button" onclick={() => openDialog(dialog)} aria-label="Borrar el presupuesto">
 					<span class="icon delete"></span>
@@ -47,9 +47,9 @@
 					<input type="email" name="email" placeholder="Dirección de correo" value={estimate.email || ''} disabled={isDemo} />
 					<button type="submit" aria-label="Enviar el presupuesto" disabled={isDemo}>
 						{#if estimate.email}
-							<span class="icon mailok" in:blur={blurEnter} out:blur={blurExit}></span>
+							<span class="icon mailok" in:blur={enter} out:blur={exit}></span>
 						{:else}
-							<span class="icon mailsend" in:blur={blurEnter} out:blur={blurExit}></span>
+							<span class="icon mailsend" in:blur={enter} out:blur={exit}></span>
 						{/if}
 					</button>
 				</form>

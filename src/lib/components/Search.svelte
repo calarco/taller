@@ -1,6 +1,6 @@
 <script>
 	import { slide, blur } from 'svelte/transition';
-	import { blurEnter, blurExit, slideEnter, slideExit } from '$lib/motion.js';
+	import { enter, exit } from '$lib/motion.js';
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import { windowState } from '$lib/shared.svelte';
@@ -73,11 +73,11 @@
 		<div class="searchBar">
 			<div>
 				{#if !search.value}
-					<label class="slot" for="searchInput" in:blur={blurEnter} out:blur={blurExit}>
+					<label class="slot" for="searchInput" in:blur={enter} out:blur={exit}>
 						<span class="icon search"></span>
 					</label>
 				{:else}
-					<div class="slot close" in:blur={blurEnter} out:blur={blurExit}>
+					<div class="slot close" in:blur={enter} out:blur={exit}>
 						<button
 							type="button"
 							onmousedown={(e) => e.preventDefault()}
@@ -107,10 +107,10 @@
 			/>
 		</div>
 		{#if !results.length && search.settled}
-			<h5 class="empty" in:slide={slideEnter} out:slide={slideExit}>No se encontraron resultados</h5>
+			<h5 class="empty" in:slide={enter} out:slide={exit}>No se encontraron resultados</h5>
 		{/if}
 		{#each results as result, i (result.id)}
-			<div bind:this={rows[i]} class={['result', { isSelected: i === activeIndex }]} in:slide={slideEnter} out:slide={slideExit}>
+			<div bind:this={rows[i]} class={['result', { isSelected: i === activeIndex }]} in:slide={enter} out:slide={exit}>
 				{#if result.clientId}
 					<div class="clientResult">
 						<a href={`/${result.clientId}`} class={['clientLink', { isActive: result.clientId === page.url.pathname.split('/')[1] }, { isVehicle: result.vehicleId }]}>

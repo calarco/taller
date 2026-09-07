@@ -1,7 +1,7 @@
 <script>
 	import { untrack } from 'svelte';
 	import { slide } from 'svelte/transition';
-	import { slideEnter, slideExit } from '$lib/motion.js';
+	import { enter, exit } from '$lib/motion.js';
 	import { page } from '$app/state';
 	import { windowState } from '$lib/shared.svelte.js';
 	import Form from '$lib/components/Form.svelte';
@@ -73,7 +73,7 @@
 		<div class="parts">
 			<ul>
 				{#each parts as part (part.name)}
-					<li in:slide={slideEnter} out:slide={slideExit}>
+					<li in:slide={enter} out:slide={exit}>
 						<div>
 							<p>{part.amount}</p>
 						</div>
@@ -90,7 +90,7 @@
 					</li>
 				{/each}
 				{#if !parts.length}
-					<li in:slide={slideEnter} out:slide={slideExit}>
+					<li in:slide={enter} out:slide={exit}>
 						<h5 class="empty">Sin repuestos</h5>
 					</li>
 				{/if}

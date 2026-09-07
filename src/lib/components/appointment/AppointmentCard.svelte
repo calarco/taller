@@ -1,6 +1,6 @@
 <script>
 	import { slide } from 'svelte/transition';
-	import { slideEnter, slideExit } from '$lib/motion.js';
+	import { enter, exit } from '$lib/motion.js';
 	import { openDialog } from '$lib/shared.svelte.js';
 	import Dialog from '$lib/components/Dialog.svelte';
 
@@ -19,7 +19,7 @@
 	</article>
 {/snippet}
 
-<div class="card" in:slide={slideEnter} out:slide={slideExit}>
+<div class="card" in:slide={enter} out:slide={exit}>
 	{@render appointmentContent()}
 	<button type="button" onclick={() => openDialog(dialog)} aria-label="Borrar el turno">
 		<span class="icon delete"></span>

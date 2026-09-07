@@ -232,7 +232,7 @@ Svelte 5 `$state`/`$derived`/`$effect` throughout — no stores.
   the PEN, and a trasladable falling on a Saturday or Sunday, which Decreto 614/2025 lets the Jefatura de
   Gabinete move to either side at its discretion — that one stays where it falls. `Jueves Santo` is a día no
   laborable rather than a feriado and is out for the same reason.
-- `src/lib/motion.js` — the `in:`/`out:` presets every transition imports.
+- `src/lib/motion.js` — the four `enter`/`exit` presets and the `blurFly` transition.
 
 **A mutation refetches a store's whole loaded window, not just the changed row.** `enhanceSubmit`/
 `postAction` bump `invalidateAppointments()` beside `invalidateSearch()`, and `Appointments.svelte` reloads
@@ -345,6 +345,13 @@ absolutely-positioned form shell; `Label.svelte` is the field wrapper that rende
   and its `outline: 1px solid var(--secondary-border)` is decorative — an author `outline` replaces the UA
   focus ring, so without `&:not(.isActive):focus-visible` the four primary create actions show _no_ keyboard
   focus indicator at all. That rule sits after `&:not(.isActive):hover` for the same tie-break reason.
+- **A `.createButton` whose form is open is `disabled`, not merely `.isActive`.** `Bar.svelte` sets both from
+  the same condition, so the attribute is what actually removes hover, the pointer cursor, the click and the
+  tab stop — the class only styles. That is why the `onclick` needs no `windowState.form` guard. It also
+  means `&.isActive` alone loses to the global `:disabled` block, which greys the button out: `&` there
+  resolves against `input[type='submit']` (0,1,1), putting `&:disabled` at (0,2,1) above `.createButton.isActive`
+  at (0,2,0). The `&.isActive:disabled` arm beside it is what keeps an open form's button reading as
+  _current_ rather than _unavailable_.
 - **Selects** use Chrome's customizable-select (`appearance: base-select`, `::picker(select)`, `::picker-icon`)
   with an `@supports not (appearance: base-select)` fallback drawing the caret with gradients. Any select
   styling change needs checking in both branches.
@@ -389,13 +396,45 @@ button rule already declares.
 
 ### Motion
 
-CSS uses `--duration-*` and `--ease-in`/`--ease-out` on `body`; Svelte transitions use the presets in
-`motion.js`. The `--ease-*` beziers are the CSS equivalents of `sineIn`/`sineOut`, so both layers curve
-identically. **Import a preset rather than writing `{ duration, easing }` inline, and use the tokens rather
-than raw seconds.**
+`motion.js` holds **four presets and one helper**, nothing else. `enter`/`exit` are the element tier,
+`panelEnter`/`panelExit` the panel tier — the only difference is duration. CSS mirrors the same ladder in
+`--duration-enter`/`--duration-exit`/`--duration-panel-enter`/`--duration-panel-exit`, plus `--duration-fast`
+for hover, which has no JS twin because hover never originates in JS. **The token names deliberately track
+the preset names**, so a preset and its CSS twin are always found by the same word — keep them in step if you
+rename either. The `--ease-*` beziers are the CSS equivalents of `sineIn`/`sineOut`, so both layers curve
+identically, but note they are named after the curve rather than the direction: an enter uses `--ease-out`.
+**Import a preset rather than writing `{ duration, easing }` inline, and use the tokens rather than raw
+seconds.**
 
-- Enter with `sineOut` / `--ease-out`, exit with `sineIn` / `--ease-in`; elements (`--duration-in`/
-  `--duration-out`) move faster than the panels containing them (`--duration-panel-*`).
+**The two ladders are declared separately and must be changed together.** They have drifted before. Enter with
+`sineOut` / `--ease-out`, exit with `sineIn` / `--ease-in`.
+
+- **One preset object drives every transition**, because Svelte transitions ignore params they don't
+  understand: `y` is read only by `fly`, `amount` only by `blur`, `axis` only by `slide`. That is why a single
+  `{ y, amount, axis, duration, easing }` can be passed to `in:fly`, `in:fade`, `in:blur` and `in:slide`
+  alike — don't split it back into per-transition presets.
+- **Three behaviours, and which one a thing gets is a question about layering.** Something that _arrives or
+  departs_ enters `in:fly` and leaves `out:blurFly` — panels, forms, the bar back-links, login and error
+  cards, `Label`'s error chip, `CarForm`'s inline create. Something that _sits behind_ in a fixed slot blurs
+  in place both ways (`in:blur`/`out:blur`) — the bar titles, the six create-button icons, the search icon,
+  the mail icons, `CarForm`'s selects. Two halves of one slot must not both move, or the swap reads as a
+  glitch rather than a swap.
+- **`blurFly` is the one custom transition**, because Svelte has no built-in that blurs _and_ flies and only
+  one `out:` is allowed per element. It mirrors Svelte's own `fly`/`blur` by reading `target_opacity` and the
+  live `transform`/`filter` at transition start, so an interrupted run resumes from the current value instead
+  of snapping. Keep that if you touch it.
+- **Scrims and list rows are the two carve-outs.** `Section`'s overlay, the root `.cover` and the two
+  transparent centring grids stay `fade`: they carry `backdrop-filter: blur()`, so a transition blur would
+  nest two blurs. Search rows, appointment cards, estimate part rows and the card button bars stay `slide`,
+  which animates height — fly them and the row leaves a gap that then jumps closed.
+- **A scrim runs at the tier of what it covers.** All three currently sit on the panel tier alongside
+  `Form.svelte`, the dialog and the login/error cards. A scrim that settles before its content stops moving
+  is the tell that these have come apart.
+- **Nested panel exits never fire together, so both are needed.** The route panels put an `out:blurFly` on
+  `.panel` _and_ on the keyed inner div. Route leave animates only the outer — a component destroy skips
+  descendant outros — while a `{#key}` change animates only the inner. Dropping the outer `out:` does not
+  merely lose one animation: it removes the exit entirely, because that directive is what defers subtree
+  removal.
 - **Hover is instant in, eased out** — the base rule carries the transition and the `:hover` rule sets
   `transition: none`. Don't invert this.
 - **Never `transition: <time> <easing>` with no property** — that is `transition: all`. List the properties
@@ -404,8 +443,9 @@ than raw seconds.**
   blur transitions, and never animate `background-position` in a loop (see the transform-driven loading bar in
   `Bar.svelte`).
 - `prefers-reduced-motion` is handled by one global block in `app.css`. Because Svelte compiles
-  `fade`/`fly`/`slide`/`blur` to CSS animations, that block covers both layers. It sets
-  `animation-duration: 0.01ms`, not `none`, because `Dialog.svelte` closes on `animationend`.
+  `fade`/`fly`/`slide`/`blur` — and any custom transition with a `css` callback, which is what `blurFly` is —
+  to CSS animations, that block covers both layers. A `tick`-based transition would silently escape it. It
+  sets `animation-duration: 0.01ms`, not `none`, because `Dialog.svelte` closes on `animationend`.
 
 ### Dialog
 
@@ -413,7 +453,9 @@ than raw seconds.**
 Firefox has no `overlay` property, so it drops the dialog out of the top layer the instant `close()` runs and
 the exit never renders. Instead `requestClose()` adds `.closing`, plays a keyframe exit while the dialog is
 still open, and calls `close()` on `animationend` with a `setTimeout` backstop. **Add new close paths to
-`requestClose()`, not `close()`.** The backdrop animates `opacity`, not `background-color`: `backdrop-filter`
+`requestClose()`, not `close()`.** That backstop is a hardcoded literal and **must stay longer than
+`--duration-panel-exit`**, or it fires mid-animation and cuts the exit off. It runs on the panel tier, and it
+blurs only on the way out — the `@starting-style` enter is opacity and transform alone. The backdrop animates `opacity`, not `background-color`: `backdrop-filter`
 is in no transition list, so fading the tint alone makes the blur snap on at full strength.
 
 **A submit closes the dialog on every result except `failure`.** `failure` is the one the user can act on —

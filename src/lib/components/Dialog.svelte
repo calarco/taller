@@ -25,7 +25,7 @@
 		windowState.error = {};
 		closing = true;
 		clearTimeout(closeTimer);
-		closeTimer = setTimeout(finishClose, 300);
+		closeTimer = setTimeout(finishClose, 500);
 	}
 
 	function onanimationend(event) {
@@ -83,7 +83,6 @@
 		background: var(--surface);
 		box-shadow: var(--shadow);
 		opacity: 0;
-		filter: blur(1rem);
 		transform: translateY(-1rem);
 
 		> div {
@@ -185,28 +184,25 @@
 
 	dialog[open] {
 		opacity: 1;
-		filter: blur(0rem);
 		transform: none;
 		transition:
-			opacity var(--duration-in) var(--ease-out),
-			filter var(--duration-in) var(--ease-out),
-			transform var(--duration-in) var(--ease-out);
+			opacity var(--duration-panel-enter) var(--ease-out),
+			transform var(--duration-panel-enter) var(--ease-out);
 	}
 
 	@starting-style {
 		dialog[open] {
 			opacity: 0;
-			filter: blur(1rem);
 			transform: translateY(-1rem);
 		}
 	}
 
 	dialog.closing {
-		animation: dialog-out var(--duration-out) var(--ease-in) forwards;
+		animation: dialog-out var(--duration-panel-exit) var(--ease-in) forwards;
 	}
 
 	dialog.closing::backdrop {
-		animation: backdrop-out var(--duration-out) var(--ease-in) forwards;
+		animation: backdrop-out var(--duration-panel-exit) var(--ease-in) forwards;
 	}
 
 	@keyframes dialog-out {
@@ -231,7 +227,7 @@
 
 	dialog[open]::backdrop {
 		opacity: 1;
-		transition: opacity var(--duration-in) var(--ease-out);
+		transition: opacity var(--duration-panel-enter) var(--ease-out);
 	}
 
 	@starting-style {

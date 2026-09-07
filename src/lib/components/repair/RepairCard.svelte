@@ -1,6 +1,6 @@
 <script>
 	import { slide } from 'svelte/transition';
-	import { slideEnter, slideExit } from '$lib/motion.js';
+	import { enter, exit } from '$lib/motion.js';
 	import { page } from '$app/state';
 	import { openForm, openDialog } from '$lib/shared.svelte.js';
 	import Card from '$lib/components/Card.svelte';
@@ -46,7 +46,7 @@
 		{@render repairContent()}
 	</a>
 	{#if isActive}
-		<div class="cardButtons" in:slide={slideEnter} out:slide={slideExit}>
+		<div class="cardButtons" in:slide={enter} out:slide={exit}>
 			<button type="button" onclick={() => openDialog(dialog)} aria-label="Borrar la reparación">
 				<span class="icon delete"></span>
 			</button>

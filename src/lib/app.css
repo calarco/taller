@@ -154,10 +154,10 @@ body {
 	--ease-out: cubic-bezier(0.39, 0.575, 0.565, 1);
 
 	--duration-fast: 0.1s;
-	--duration-in: 0.2s;
-	--duration-out: 0.15s;
-	--duration-panel-in: 0.3s;
-	--duration-panel-out: 0.25s;
+	--duration-enter: 0.2s;
+	--duration-exit: 0.15s;
+	--duration-panel-enter: 0.3s;
+	--duration-panel-exit: 0.25s;
 
 	--layer-sticky: 10;
 	--layer-card: 20;
@@ -379,10 +379,10 @@ textarea {
 		box-shadow: var(--shadow-variant);
 		color: var(--on-background);
 		transition:
-			background-color var(--duration-out) var(--ease-out),
-			outline-color var(--duration-out) var(--ease-out),
-			box-shadow var(--duration-out) var(--ease-out),
-			color var(--duration-out) var(--ease-out);
+			background-color var(--duration-exit) var(--ease-out),
+			outline-color var(--duration-exit) var(--ease-out),
+			box-shadow var(--duration-exit) var(--ease-out),
+			color var(--duration-exit) var(--ease-out);
 	}
 
 	&:is(:-webkit-autofill, :autofill) {
@@ -460,12 +460,12 @@ select {
 		padding: 0 6px;
 		transform: scale(0.8);
 		color: var(--on-background-disabled);
-		transition: rotate var(--duration-out) var(--ease-in);
+		transition: rotate var(--duration-exit) var(--ease-in);
 	}
 
 	&:open::picker-icon {
 		rotate: 180deg;
-		transition: rotate var(--duration-in) var(--ease-out);
+		transition: rotate var(--duration-enter) var(--ease-out);
 	}
 
 	&:not(:disabled):hover {
@@ -526,12 +526,14 @@ select,
 	border: none;
 	outline: 1px solid var(--border);
 	opacity: 0;
+	filter: blur(1rem);
 	transform: translateY(-1rem);
 	transition:
-		opacity var(--duration-out) var(--ease-in),
-		transform var(--duration-out) var(--ease-in),
-		overlay var(--duration-out) var(--ease-in) allow-discrete,
-		display var(--duration-out) var(--ease-in) allow-discrete;
+		opacity var(--duration-exit) var(--ease-in),
+		filter var(--duration-exit) var(--ease-in),
+		transform var(--duration-exit) var(--ease-in),
+		overlay var(--duration-exit) var(--ease-in) allow-discrete,
+		display var(--duration-exit) var(--ease-in) allow-discrete;
 }
 
 select::picker(select)::-webkit-scrollbar {
@@ -550,17 +552,20 @@ select::picker(select)::-webkit-scrollbar-thumb {
 
 ::picker(select):popover-open {
 	opacity: 1;
+	filter: blur(0);
 	transform: none;
 	transition:
-		opacity var(--duration-in) var(--ease-out),
-		transform var(--duration-in) var(--ease-out),
-		overlay var(--duration-in) var(--ease-out) allow-discrete,
-		display var(--duration-in) var(--ease-out) allow-discrete;
+		opacity var(--duration-enter) var(--ease-out),
+		filter var(--duration-enter) var(--ease-out),
+		transform var(--duration-enter) var(--ease-out),
+		overlay var(--duration-enter) var(--ease-out) allow-discrete,
+		display var(--duration-enter) var(--ease-out) allow-discrete;
 }
 
 @starting-style {
 	::picker(select):popover-open {
 		opacity: 0;
+		filter: blur(0);
 		transform: translateY(-1rem);
 	}
 }
@@ -847,7 +852,8 @@ a {
 		background-color var(--duration-fast) var(--ease-out),
 		color var(--duration-fast) var(--ease-out);
 
-	&.isActive {
+	&.isActive,
+	&.isActive:disabled {
 		outline: 1px solid var(--primary);
 		background: var(--surface);
 		color: var(--primary);

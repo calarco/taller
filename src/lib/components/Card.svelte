@@ -32,9 +32,9 @@
 			border-radius: var(--border-radius);
 			outline: 1px solid rgba(0, 0, 0, 0);
 			transition:
-				outline-color var(--duration-in) var(--ease-out),
-				background-color var(--duration-out) var(--ease-out),
-				z-index var(--duration-panel-out) step-end;
+				outline-color var(--duration-enter) var(--ease-out),
+				background-color var(--duration-exit) var(--ease-out),
+				z-index var(--duration-panel-exit) step-end;
 		}
 
 		&:not(.isActive) > div:hover {

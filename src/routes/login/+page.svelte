@@ -1,6 +1,6 @@
 <script>
-	import { fade, fly, blur } from 'svelte/transition';
-	import { blurExit, flyEnter, panelEnter, panelExit } from '$lib/motion.js';
+	import { fade, fly } from 'svelte/transition';
+	import { panelEnter, panelExit, blurFly } from '$lib/motion.js';
 	import { enhance } from '$app/forms';
 	import Label from '$lib/components/Label.svelte';
 	import { windowState } from '$lib/shared.svelte.js';
@@ -15,7 +15,7 @@
 
 <div class="forms" in:fade={panelEnter} out:fade={panelExit}>
 	{#if data.landing && !showForm}
-		<form class="landing" method="POST" action="?/demo" use:enhance={submit} in:fly={flyEnter} out:blur={blurExit}>
+		<form class="landing" method="POST" action="?/demo" use:enhance={submit} in:fly={panelEnter} out:blurFly={panelExit}>
 			<div>
 				<h1>Taller Calarco</h1>
 				<p>Sistema de gestión para talleres mecánicos: clientes, vehículos, reparaciones y presupuestos.</p>
@@ -26,7 +26,7 @@
 			</div>
 		</form>
 	{:else}
-		<form method="POST" action="?/login" use:enhance={submit} in:fly={flyEnter} out:blur={blurExit}>
+		<form method="POST" action="?/login" use:enhance={submit} in:fly={panelEnter} out:blurFly={panelExit}>
 			<Label title="Usuario" error={windowState.error?.userIdError}>
 				<input type="text" name="userId" autoComplete="username" />
 			</Label>

@@ -1,6 +1,6 @@
 <script>
 	import { fly, fade } from 'svelte/transition';
-	import { enter, exit, flyEnter, flyExit } from '$lib/motion.js';
+	import { blurFly, enter, exit } from '$lib/motion.js';
 
 	let { title, error, isCreate, onCreate, showCreate, children } = $props();
 
@@ -17,7 +17,7 @@
 	<div class="titleRow">
 		<span class="label">{title}</span>
 		{#if error && !hideError}
-			<div class="error" in:fly={flyEnter} out:fly={flyExit}>
+			<div class="error" in:fly={enter} out:blurFly={exit}>
 				<button type="button" class="slotButton" onclick={() => (hideError = true)} aria-label="ocultar el error">
 					<span class="icon info"></span>
 					{error}
@@ -25,7 +25,7 @@
 			</div>
 		{/if}
 		{#if showCreate}
-			<div class="create" in:fade={enter} out:fade={exit}>
+			<div class="create" in:fade={enter} out:blurFly={exit}>
 				<button type="button" class="slotButton" onmousedown={(e) => e.preventDefault()} onclick={onCreate} aria-label={`Crear ${title}`}>
 					<span class={['icon', 'create', { isCreate }]}></span>
 				</button>

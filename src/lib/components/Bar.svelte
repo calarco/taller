@@ -1,7 +1,7 @@
 <script>
 	import { fade, blur, fly } from 'svelte/transition';
 	import { sineIn } from 'svelte/easing';
-	import { blurEnter, blurExit, enter, exit, panelBlurExit, panelExit, panelFlyEnterY } from '$lib/motion.js';
+	import { panelEnter, panelExit, blurFly, enter, exit } from '$lib/motion.js';
 	import { page } from '$app/state';
 	import { windowState, openForm, openDialog } from '$lib/shared.svelte.js';
 	import Dialog from '$lib/components/Dialog.svelte';
@@ -19,11 +19,11 @@
 		<div>
 			<div class="title">
 				{#if !url[1] || url[1] === 'estimate'}
-					<div in:blur={blurEnter} out:blur={blurExit}>
+					<div in:blur={panelEnter} out:blur={panelExit}>
 						<p><span class="icon calendar"></span>Turnos</p>
 					</div>
 				{:else}
-					<div in:fly={panelFlyEnterY} out:blur={panelBlurExit}>
+					<div in:fly={panelEnter} out:blurFly={panelExit}>
 						<a class="button" href="/">
 							<span class="icon back"></span>Cliente
 						</a>
@@ -31,22 +31,14 @@
 				{/if}
 			</div>
 			<div class="createSlot">
-				<button
-					type="button"
-					class={['createButton', { isActive: windowState.form === 'client' }]}
-					onclick={() => {
-						if (windowState.form !== 'client') {
-							openForm('client');
-						}
-					}}
-				>
+				<button type="button" class={['createButton', { isActive: windowState.form === 'client' }]} disabled={windowState.form === 'client'} onclick={() => openForm('client')}>
 					<div>
 						{#if windowState.form === 'client' && !windowState.id}
-							<span class="icon create" in:blur={{ amount: 8, ...enter }} out:blur={{ amount: 8, ...exit }}> </span>
+							<span class="icon create" in:blur={enter} out:blur={exit}> </span>
 						{:else if windowState.form === 'client'}
-							<span class="icon edit" in:blur={{ amount: 8, ...enter }} out:blur={{ amount: 8, ...exit }}> </span>
+							<span class="icon edit" in:blur={enter} out:blur={exit}> </span>
 						{:else}
-							<span class="icon client" in:blur={{ amount: 8, ...enter }} out:blur={{ amount: 8, ...exit }}> </span>
+							<span class="icon client" in:blur={enter} out:blur={exit}> </span>
 						{/if}
 					</div>
 					<span>Cliente</span>
@@ -57,40 +49,32 @@
 		<div>
 			<div class="title">
 				{#if url[1] === 'estimate'}
-					<div in:fly={panelFlyEnterY} out:blur={panelBlurExit}>
+					<div in:fly={panelEnter} out:blurFly={panelExit}>
 						<a class="button" href="/">
 							<span class="icon back"></span>Presupuesto
 						</a>
 					</div>
 				{:else if url[2]}
-					<div in:fly={panelFlyEnterY} out:blur={panelBlurExit}>
+					<div in:fly={panelEnter} out:blurFly={panelExit}>
 						<a class="button" href={`/${url[1]}`}>
 							<span class="icon back"></span>Reparaciones
 						</a>
 					</div>
 				{:else}
-					<div in:blur={blurEnter} out:blur={blurExit}>
+					<div in:blur={panelEnter} out:blur={panelExit}>
 						<p><span class="icon taller"></span>Taller</p>
 					</div>
 				{/if}
 			</div>
 			<div class="createSlot">
-				<button
-					type="button"
-					class={['createButton', { isActive: windowState.form === 'estimate' }]}
-					onclick={() => {
-						if (windowState.form !== 'estimate') {
-							openForm('estimate');
-						}
-					}}
-				>
+				<button type="button" class={['createButton', { isActive: windowState.form === 'estimate' }]} disabled={windowState.form === 'estimate'} onclick={() => openForm('estimate')}>
 					<div>
 						{#if windowState.form === 'estimate' && !windowState.id}
-							<span class="icon create" in:blur={blurEnter} out:blur={blurExit}> </span>
+							<span class="icon create" in:blur={enter} out:blur={exit}> </span>
 						{:else if windowState.form === 'estimate'}
-							<span class="icon edit" in:blur={blurEnter} out:blur={blurExit}> </span>
+							<span class="icon edit" in:blur={enter} out:blur={exit}> </span>
 						{:else}
-							<span class="icon estimate" in:blur={blurEnter} out:blur={blurExit}> </span>
+							<span class="icon estimate" in:blur={enter} out:blur={exit}> </span>
 						{/if}
 					</div>
 					<span>Presupuesto</span>
