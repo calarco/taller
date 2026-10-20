@@ -407,13 +407,13 @@ button rule already declares.
 `--duration-enter`/`--duration-exit`/`--duration-panel-enter`/`--duration-panel-exit`, plus `--duration-fast`
 for hover, which has no JS twin because hover never originates in JS. **The token names deliberately track
 the preset names**, so a preset and its CSS twin are always found by the same word — keep them in step if you
-rename either. The `--ease-*` beziers are the CSS equivalents of `sineIn`/`sineOut`, so both layers curve
+rename either. The `--ease-*` beziers are the CSS equivalents of `cubicIn`/`quintOut`, so both layers curve
 identically, but note they are named after the curve rather than the direction: an enter uses `--ease-out`.
 **Import a preset rather than writing `{ duration, easing }` inline, and use the tokens rather than raw
 seconds.**
 
 **The two ladders are declared separately and must be changed together.** They have drifted before. Enter with
-`sineOut` / `--ease-out`, exit with `sineIn` / `--ease-in`.
+`quintOut` / `--ease-out`, exit with `cubicIn` / `--ease-in`.
 
 - **One preset object drives every transition**, because Svelte transitions ignore params they don't
   understand: `y` is read only by `fly`, `amount` only by `blur`, `axis` only by `slide`. That is why a single

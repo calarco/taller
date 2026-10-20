@@ -1,7 +1,7 @@
-import { sineIn, sineOut } from 'svelte/easing';
+import { cubicIn, quintOut } from 'svelte/easing';
 
-export const enter = { y: '-1rem', amount: 16, axis: 'y', duration: 200, easing: sineOut };
-export const exit = { y: '-1rem', amount: 16, axis: 'y', duration: 150, easing: sineIn };
+export const enter = { y: '-1rem', amount: 16, axis: 'y', duration: 200, easing: quintOut };
+export const exit = { y: '-1rem', amount: 16, axis: 'y', duration: 150, easing: cubicIn };
 export const panelEnter = { ...enter, duration: 300 };
 export const panelExit = { ...exit, duration: 250 };
 

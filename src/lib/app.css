@@ -150,8 +150,8 @@ body {
 		inset 0 2px 5px color-mix(in oklab, var(--shadow-color) calc(9% * var(--shadow-strength)), transparent),
 		inset 0 5px 10px color-mix(in oklab, var(--shadow-color) calc(10% * var(--shadow-strength)), transparent);
 
-	--ease-in: cubic-bezier(0.47, 0, 0.745, 0.715);
-	--ease-out: cubic-bezier(0.39, 0.575, 0.565, 1);
+	--ease-in: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+	--ease-out: cubic-bezier(0.23, 1, 0.32, 1);
 
 	--duration-fast: 0.1s;
 	--duration-enter: 0.2s;
