@@ -179,7 +179,7 @@ body {
 	--border-radius-base: 0.75rem;
 	--border-radius: var(--border-radius-base);
 
-	@supports (corner-shape: superellipse(2)) {
+	@supports (corner-shape: superellipse(2)) and (not (-moz-orient: inline)) {
 		--border-radius: calc(var(--border-radius-base) * 2);
 
 		*,

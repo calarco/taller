@@ -316,6 +316,9 @@ absolutely-positioned form shell; `Label.svelte` is the field wrapper that rende
   both declarations land on `body`, so the branch wins the cascade outright rather than falling back to the
   one above it, and `calc(var(--border-radius) * 2)` would be a self-reference. That is a cycle — invalid at
   computed-value time — which zeroes every radius in the app rather than failing loudly.
+  The condition also requires `not (-moz-orient: inline)`: Gecko browsers — Zen, and Firefox with the pref on —
+  report `corner-shape` as supported without drawing the superellipse, so a bare check doubles their radius
+  onto plain round corners. `error.html` carries the same condition.
 - **Shadows** are the one token pair that isn't `light-dark()`. `--shadow` and `--shadow-variant` are a single
   ramp of straight-down layers, each layer's alpha a `color-mix` of `--shadow-color` scaled by
   `--shadow-strength`. Only those two switch on `prefers-color-scheme` — dark carries a much higher strength, because a

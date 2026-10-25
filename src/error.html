@@ -75,7 +75,7 @@
 				--ease-out: cubic-bezier(0.39, 0.575, 0.565, 1);
 				--border-radius: 0.75rem;
 
-				@supports (corner-shape: superellipse(2)) {
+				@supports (corner-shape: superellipse(2)) and (not (-moz-orient: inline)) {
 					--border-radius: 1.5rem;
 
 					* {
